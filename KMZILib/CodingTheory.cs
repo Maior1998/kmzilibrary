@@ -26,6 +26,10 @@ namespace KMZILib
                 Value = new List<byte>(Value) {value}.ToArray();
             }
 
+            public string StringValue =>string.Join("", Value);
+
+            public int Length => Value.Length;
+
             public ByteSet()
             {
 
@@ -44,7 +48,7 @@ namespace KMZILib
 
             public override string ToString()
             {
-                return string.Join("", Value);
+                return StringValue;
             }
         }
         /// <summary>
@@ -54,13 +58,17 @@ namespace KMZILib
         {
             public static class HuffmanCoding
             {
-                public static ByteSet[] Encode(double[] Probabilities, int k)
+                public static ByteSet[] Encode(double[] Probabilities, int k, out double AverageLength)
                 {
+                    AverageLength = 0;
                     if (k >= Probabilities.Length)
                     {
                         ByteSet[] answer= new ByteSet[Probabilities.Length];
-                        for(int i=0;i<Probabilities.Length;i++)
-                            answer[i]=new ByteSet(){Value = new []{(byte)i}};
+                        for (int i = 0; i < Probabilities.Length; i++)
+                        {
+                            answer[i] = new ByteSet() {Value = new[] {(byte) i}};
+                            AverageLength += Probabilities[i];
+                        }
                         return answer;
                     }
                         
@@ -112,8 +120,8 @@ namespace KMZILib
                         Answer = buffer;
                     }
 
+                    AverageLength += Probabilities.Select((t, i) => t * Answer[i].Length).Sum();
                     return Answer.ToArray();
-
                 }
 
                 private class SumMoving
