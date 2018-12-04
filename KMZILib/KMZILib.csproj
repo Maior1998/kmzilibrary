@@ -54,6 +54,7 @@
     <Compile Include="Ciphers\TextStat.cs" />
     <Compile Include="Ciphers\TranspositionCipher.cs" />
     <Compile Include="Ciphers\VigenereCipher.cs" />
+    <Compile Include="CodingTheory.cs" />
     <Compile Include="Comparison.cs" />
     <Compile Include="CRT.cs" />
     <Compile Include="DiophantineEquation.cs" />
