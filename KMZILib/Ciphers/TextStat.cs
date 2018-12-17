@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace KMZILib
 {
     /// <summary>
-    /// Статический класс для работа с частотным анализом
+    /// Статический класс для работы с частотным анализом
     /// </summary>
     public static class TextStat
     {

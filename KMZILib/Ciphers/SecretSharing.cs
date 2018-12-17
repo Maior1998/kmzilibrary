@@ -5,6 +5,7 @@ using System.Net.NetworkInformation;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using static KMZILib.Comparison;
 using LinearComparison=KMZILib.Comparison.LinearComparison;
 using Polynom=KMZILib.Polynoms.Polynom;
 

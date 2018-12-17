@@ -60,7 +60,6 @@
     <Compile Include="DiophantineEquation.cs" />
     <Compile Include="JacobiSymbol.cs" />
     <Compile Include="MMA.cs" />
-    <Compile Include="MultiplicativeInverse.cs" />
     <Compile Include="Polynoms.cs" />
     <Compile Include="PrimalityTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
