@@ -83,17 +83,17 @@ namespace KMZILib
         public byte CountOfVariables => (byte)Math.Log(ValuesArray.Length, 2);
 
         /// <summary>
-        /// Своство функции, показывающее, принадлежит ли она классу функций, сохраняющих нуль
+        /// Свойство функции, показывающее, принадлежит ли она классу функций, сохраняющих нуль
         /// </summary>
         public bool IsT0Class => !ValuesArray[0];
 
         /// <summary>
-        /// Своство функции, показывающее, принадлежит ли она классу функций, сохраняющих единицу
+        /// Свойство функции, показывающее, принадлежит ли она классу функций, сохраняющих единицу
         /// </summary>
         public bool IsT1Class => ValuesArray.Last();
 
         /// <summary>
-        /// Своство функции, показывающее, принадлежит ли она классу самодвойственных функций
+        /// Свойство функции, показывающее, принадлежит ли она классу самодвойственных функций
         /// </summary>
         public bool IsTsClass
         {
@@ -107,7 +107,7 @@ namespace KMZILib
         }
 
         /// <summary>
-        /// Своство функции, показывающее, принадлежит ли она классу монотонных функций
+        /// Свойство функции, показывающее, принадлежит ли она классу монотонных функций
         /// </summary>
         public bool IsTmClass
         {
@@ -127,7 +127,7 @@ namespace KMZILib
         }
 
         /// <summary>
-        /// Своство функции, показывающее, принадлежит ли она классу линейных функций
+        /// Свойство функции, показывающее, принадлежит ли она классу линейных функций
         /// </summary>
         public bool IsTlClass
         {
@@ -265,7 +265,7 @@ namespace KMZILib
 
         }
 
-        private static void RemoveColumns(Dictionary<DNF, Dictionary<DNF, bool>> QuineTable, DNF TargetRow)
+        private static void RemoveColumns(IReadOnlyDictionary<DNF, Dictionary<DNF, bool>> QuineTable, DNF TargetRow)
         {
             //необходимо удлаить столбцы, в которых задланная строка имеет true
             DNF[] TargetingColumns =
@@ -276,7 +276,7 @@ namespace KMZILib
         }
 
         /// <summary>
-        /// Получение первого столбца по числа точек в нем
+        /// Получение первого столбца по числу точек в нем
         /// </summary>
         /// <param name="QuineTable"></param>
         /// <param name="Count"></param>
