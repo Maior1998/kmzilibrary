@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 
 namespace KMZILib
 {
@@ -107,31 +108,58 @@ namespace KMZILib
                     //отсортировали свою копию массива в порядке убывания вероятностей
 
                     Stack<int> Insertions = new Stack<int>();
-                    while (ProbCop.Length > k)
+                    //n - мощность исходного алфавита (кол-во вероятностей, которое на вход дали)
+                    //k - мощность конечного алфавита (система счисления)
+                    //ПЕРВАЯ СВЕРТКА
+                    int FirstConvolutionLength;
+                    if (k == 2) FirstConvolutionLength = 2;
+                    else
                     {
-                        double Sum = ProbCop.Skip(ProbCop.Length - k).Sum();
+                        Comparison.LinearComparison k0 = new Comparison.LinearComparison(ProbCop.Length,k-1);
+                        if(k0.A==0)
+                            FirstConvolutionLength = k - 1;
+                        else if (k0.A == 1)
+                            FirstConvolutionLength = k;
+                        else
+                            FirstConvolutionLength = (int)k0.A;
+                    }
+                    double Sum= ProbCop.Skip(ProbCop.Length - FirstConvolutionLength).Sum();
+                    Sum = Math.Round(Sum, 3);
+                    int Index = 0;
+                    int ResultLength = ProbCop.Length - FirstConvolutionLength + 1;
+                    while (ProbCop[Index] >= Sum && Index < ResultLength) Index++;
+                    Insertions.Push(Index);
+                    List<double> bufferProb = new List<double>(ProbCop);
+                    bufferProb.Insert(Index, Sum);
+                    ProbCop = bufferProb.Take(ResultLength).ToArray();
+                    while (ProbCop.Length != k)
+                    {
+                        Sum = ProbCop.Skip(ProbCop.Length - k).Sum();
                         Sum = Math.Round(Sum, 3);
                         //вычислили сумму последних k элементов
 
                         //надо определить, на какой индекс будем вставлять
-                        int Index = 0;
-                        int ResultLength = ProbCop.Length - k + 1;
+                        Index = 0;
+                        ResultLength = ProbCop.Length - k + 1;
                         while (ProbCop[Index] >= Sum && Index < ResultLength) Index++;
                         //нашли индекс, на который необходимо вставить полученную сумму
 
                         Insertions.Push(Index);
-                        List<double>bufferProb = new List<double>(ProbCop);
+                        bufferProb = new List<double>(ProbCop);
                         bufferProb.Insert(Index,Sum);
                         ProbCop = bufferProb.Take(ResultLength).ToArray();
                     }
                     List<ByteSet> Answer = new List<ByteSet>();
                     for(int i=0;i<ProbCop.Length;i++)
                         Answer.Add(new ByteSet{Value = new[]{(byte)i}});
-                    while (Insertions.Count != 0)
+
+                    int Moving;
+                    List<ByteSet> buffer;
+                    while (Insertions.Count != 1)
                     {
-                        int Moving = Insertions.Pop();
+                        Moving = Insertions.Pop();
                         //узнали о перестановке
-                        List<ByteSet> buffer = new List<ByteSet>(Answer);
+                        buffer = new List<ByteSet>(Answer);
                         buffer.RemoveAt(Moving);
                         for (int i = 0; i < k; i++)
                         {
@@ -140,6 +168,17 @@ namespace KMZILib
                         }
                         Answer = buffer;
                     }
+
+                    Moving = Insertions.Pop();
+                    //узнали о перестановке
+                    buffer = new List<ByteSet>(Answer);
+                    buffer.RemoveAt(Moving);
+                    for (int i = 0; i < FirstConvolutionLength; i++)
+                    {
+                        buffer.Add(new ByteSet(Answer[Moving]));
+                        buffer.Last().Expand((byte)i);
+                    }
+                    Answer = buffer;
 
                     AverageLength += Probabilities.Select((t, i) => t * Answer[i].Length).Sum();
                     return Answer.ToArray();
