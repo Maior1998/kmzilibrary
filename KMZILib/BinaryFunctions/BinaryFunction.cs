@@ -115,7 +115,7 @@ namespace KMZILib
                 for (int i = 0; i < ValuesArray.Length - 1; i++)
                 for (int j = i + 1; j < ValuesArray.Length; j++)
                 {
-                    DNF idnf = new DNF(GetBinaryArray(i, CountOfVariables).Select(val=>new bool?(val)).ToArray());
+                    DNF idnf = new DNF(GetBinaryArray(i, CountOfVariables).Select(val => new bool?(val)).ToArray());
                     DNF jdnf = new DNF(GetBinaryArray(j, CountOfVariables).Select(val => new bool?(val)).ToArray());
                     if (!idnf.IsPrecedeDNF(jdnf)) continue;
                     if (ValuesArray[i] && !ValuesArray[j]) return false;
@@ -500,9 +500,8 @@ namespace KMZILib
 
         private class DNF : IEquatable<DNF>
         {
-            public bool IsParticiated;
-
             public readonly bool?[] Values;
+            public bool IsParticiated;
 
             public DNF(bool?[] Source)
             {

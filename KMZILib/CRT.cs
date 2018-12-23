@@ -27,7 +27,7 @@ namespace KMZILib
                 buffer.Second *= CurrentComparison.M;
             }
 
-            return new Comparison.LinearComparison((int)buffer.First, (int)buffer.Second);
+            return new Comparison.LinearComparison((int) buffer.First, (int) buffer.Second);
         }
 
         /// <summary>
@@ -52,7 +52,7 @@ namespace KMZILib
                 buffer.Second *= CurrentComparison.M;
             }
 
-            return (int)buffer.First;
+            return (int) buffer.First;
         }
 
         internal class ExpressByPair

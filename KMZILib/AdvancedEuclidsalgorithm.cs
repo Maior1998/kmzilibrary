@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 
@@ -23,7 +22,7 @@ namespace KMZILib
                 return null;
             BigInteger Max = BigInteger.Abs(First) >= BigInteger.Abs(Second) ? First : Second;
             BigInteger Min = BigInteger.Abs(First) >= BigInteger.Abs(Second) ? Second : First;
-            BigInteger[] answer = gcd(BigInteger.Abs(Max), BigInteger.Abs(Min),0,1,1,0);
+            BigInteger[] answer = gcd(BigInteger.Abs(Max), BigInteger.Abs(Min), 0, 1, 1, 0);
             if (BigInteger.Abs(First) < BigInteger.Abs(Second))
             {
                 BigInteger buffer = answer[1];
@@ -63,7 +62,7 @@ namespace KMZILib
             List<BigInteger[]> Table = new List<BigInteger[]>
             {
                 new[] {a, new BigInteger(1), new BigInteger(0)},
-                new[] { b, new BigInteger(0), new BigInteger(1), new BigInteger(0) }
+                new[] {b, new BigInteger(0), new BigInteger(1), new BigInteger(0)}
             };
             int i = 1;
             while (b != 0)
@@ -135,7 +134,7 @@ namespace KMZILib
         }
 
         /// <summary>
-        /// Подсчет наибольшего общего делителя для списка чисел.
+        ///     Подсчет наибольшего общего делителя для списка чисел.
         /// </summary>
         /// <param name="Array"></param>
         /// <returns></returns>

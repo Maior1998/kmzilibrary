@@ -28,7 +28,7 @@ namespace KMZILib
         /// <summary>
         ///     Факторизация числа. Получает набор уникальных делителей числа и возвращает в виде массива.
         /// </summary>
-        /// <param name="Number"/>
+        /// <param name="Number" />
         /// <returns></returns>
         public static int[] GetUniqueNumberDividers(int Number)
         {
@@ -58,7 +58,7 @@ namespace KMZILib
         /// <summary>
         ///     Факторизация числа. Получает набор уникальных делителей числа при помощи факторизации и возвращает в виде массива.
         /// </summary>
-        /// <param name="Number"/>
+        /// <param name="Number" />
         /// <returns></returns>
         public static int[] GetUniqueNumberDividersF(int Number)
         {
@@ -66,20 +66,20 @@ namespace KMZILib
             List<int> dividers = new List<int>();
             int i = 1;
             while (++i < (int) Math.Sqrt(Number))
-                if(Number%i==0) dividers.Add(i);
+                if (Number % i == 0)
+                    dividers.Add(i);
             dividers.Add(Number);
             return dividers.ToArray();
         }
 
-
         /// <summary>
         ///     Факторизация числа. Получает набор делителей числа и возвращает в виде массива.
         /// </summary>
-        /// <param name="Number"/>
+        /// <param name="Number" />
         /// <returns></returns>
         public static int[] GetNumberDividers(int Number)
         {
-            int Length = (int)Math.Sqrt(Number) + 1;
+            int Length = (int) Math.Sqrt(Number) + 1;
             if (Number < 0) Number *= -1;
             List<int> dividers = new List<int>();
             while (Number != 1)
@@ -111,7 +111,8 @@ namespace KMZILib
         /// <param name="Result"></param>
         /// <param name="GCD"></param>
         /// <returns></returns>
-        public static bool Solve(BigInteger a, BigInteger b, BigInteger m, out LinearComparison Result, BigInteger[] GCD = null)
+        public static bool Solve(BigInteger a, BigInteger b, BigInteger m, out LinearComparison Result,
+            BigInteger[] GCD = null)
         {
             //ax=b(mod m)
 
@@ -132,39 +133,6 @@ namespace KMZILib
         /// </summary>
         public class LinearComparison
         {
-            /// <summary>
-            /// Возвращает результат сравненения с другим линейным сравнением
-            /// </summary>
-            /// <param name="other">Сравнение, с котором необходимо сравнить данное сравнение</param>
-            /// <returns>true - остаток и модуль совпадают. false - что-то отличается</returns>
-            protected bool Equals(LinearComparison other)
-            {
-                return a == other.a && M == other.M;
-            }
-
-            /// <summary>
-            /// Определяет, является ли <see cref="object"/> obj линейным сравнением, совпадающим с данным
-            /// </summary>
-            /// <param name="obj"></param>
-            /// <returns></returns>
-            public override bool Equals(object obj)
-            {
-                if (ReferenceEquals(null, obj)) return false;
-                if (ReferenceEquals(this, obj)) return true;
-                return obj.GetType() == GetType() && Equals((LinearComparison) obj);
-            }
-
-            /// <summary>
-            /// Возвращает хэш-код данного линейного сравнения
-            /// </summary>
-            /// <returns></returns>
-            public override int GetHashCode()
-            {
-                unchecked
-                {
-                    return (int)(a * 397) ^ (int)M;
-                }
-            }
             //x=a(mod m)
 
             /// <summary>
@@ -173,7 +141,7 @@ namespace KMZILib
             private BigInteger a;
 
             /// <summary>
-            /// Инициализирует новое линейное сравнение с заданным остатоком и модулем
+            ///     Инициализирует новое линейное сравнение с заданным остатоком и модулем
             /// </summary>
             /// <param name="a">Остаток линейного сравнения</param>
             /// <param name="m">Модуль линейного сравнения</param>
@@ -184,7 +152,7 @@ namespace KMZILib
             }
 
             /// <summary>
-            /// Инициализирует новое линейное сравнение копией заданного сравнения
+            ///     Инициализирует новое линейное сравнение копией заданного сравнения
             /// </summary>
             /// <param name="Other">Сравнение, для которого требуется создать копию</param>
             public LinearComparison(LinearComparison Other)
@@ -224,7 +192,38 @@ namespace KMZILib
             public BigInteger M { get; }
 
             /// <summary>
-            /// Сравнивает остаток и модуль двух линейных сравнений
+            ///     Возвращает результат сравненения с другим линейным сравнением
+            /// </summary>
+            /// <param name="other">Сравнение, с котором необходимо сравнить данное сравнение</param>
+            /// <returns>true - остаток и модуль совпадают. false - что-то отличается</returns>
+            protected bool Equals(LinearComparison other)
+            {
+                return a == other.a && M == other.M;
+            }
+
+            /// <summary>
+            ///     Определяет, является ли <see cref="object" /> obj линейным сравнением, совпадающим с данным
+            /// </summary>
+            /// <param name="obj"></param>
+            /// <returns></returns>
+            public override bool Equals(object obj)
+            {
+                if (ReferenceEquals(null, obj)) return false;
+                if (ReferenceEquals(this, obj)) return true;
+                return obj.GetType() == GetType() && Equals((LinearComparison) obj);
+            }
+
+            /// <summary>
+            ///     Возвращает хэш-код данного линейного сравнения
+            /// </summary>
+            /// <returns></returns>
+            public override int GetHashCode()
+            {
+                return (int) (a * 397) ^ (int) M;
+            }
+
+            /// <summary>
+            ///     Сравнивает остаток и модуль двух линейных сравнений
             /// </summary>
             /// <param name="First">Первое сравнение</param>
             /// <param name="Second">Второе сравнение</param>
@@ -235,7 +234,7 @@ namespace KMZILib
             }
 
             /// <summary>
-            /// Сравнивает остаток и модуль двух линейных сравнений
+            ///     Сравнивает остаток и модуль двух линейных сравнений
             /// </summary>
             /// <param name="First">Первое сравнение</param>
             /// <param name="Second">Второе сравнение</param>
@@ -246,7 +245,7 @@ namespace KMZILib
             }
 
             /// <summary>
-            /// Возвращает строковое представление данного сравнения
+            ///     Возвращает строковое представление данного сравнения
             /// </summary>
             /// <returns></returns>
             public override string ToString()
@@ -265,7 +264,8 @@ namespace KMZILib
             ///     (mod m)
             /// </summary>
             /// <returns>Сущесвует ли мультипликативный обратный?</returns>
-            public static bool TrySolveByGCD(BigInteger a, BigInteger m, out LinearComparison Result, BigInteger[] GCD = null)
+            public static bool TrySolveByGCD(BigInteger a, BigInteger m, out LinearComparison Result,
+                BigInteger[] GCD = null)
             {
                 Result = null;
                 if (GCD == null) GCD = AdvancedEuclidsalgorithm.GCD(a, m);
@@ -306,7 +306,7 @@ namespace KMZILib
             {
                 if (a < 0) a *= -1;
                 if (a <= 1) return false;
-                for (int i = 2; i < (int)Math.Sqrt(a) + 1; i++)
+                for (int i = 2; i < (int) Math.Sqrt(a) + 1; i++)
                     if (a % i == 0)
                         return false;
                 return true;
@@ -327,8 +327,8 @@ namespace KMZILib
                 Result = null;
                 if (AdvancedEuclidsalgorithm.GCDResult(a, m) != 1) return false;
                 Result = new LinearComparison(a, m);
-                int degree = Comparison.EulersFunction((int)m) - 1;
-                BitArray sma = new BitArray(new[] { degree });
+                int degree = EulersFunction((int) m) - 1;
+                BitArray sma = new BitArray(new[] {degree});
                 int i = sma.Length - 1;
                 while (!sma[i]) i--;
                 for (i--; i >= 0; i--)
@@ -338,9 +338,7 @@ namespace KMZILib
                         Result.A *= a;
                     }
                     else
-                    {
                         Result.A *= Result.A;
-                    }
 
                 return true;
             }

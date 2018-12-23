@@ -1,19 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace KMZILib
 {
     public static partial class Ciphers
     {
         /// <summary>
-        /// Шифр перестановки
+        ///     Шифр перестановки
         /// </summary>
         public static class TranspositionCipher
         {
-
             private static char GetEncryptedChar(char source, IReadOnlyList<byte> key)
             {
                 return Alphabets.CurrentLanguage == Language.Russian
@@ -29,7 +26,8 @@ namespace KMZILib
             }
 
             /// <summary>
-            /// Осуществляет шифрование строки с использованием ключа в виде перестановочной функции, записанной в виде массив <see cref="byte"/>
+            ///     Осуществляет шифрование строки с использованием ключа в виде перестановочной функции, записанной в виде массив
+            ///     <see cref="byte" />
             /// </summary>
             /// <param name="Source">Открытый текст, к которому необходимо применить алгоритм шифрования</param>
             /// <param name="Key">Массив, представляющий перестановочную функцию</param>
@@ -40,8 +38,9 @@ namespace KMZILib
                 for (int i = 0; i < buffer.Length; i++)
                 {
                     if (char.IsWhiteSpace(buffer[i])) continue;
-                    if ((Alphabets.CurrentLanguage == Language.Russian && !Alphabets.RussianAlphabet.Contains(buffer[i])) ||
-                        (Alphabets.CurrentLanguage == Language.English && !Alphabets.EnglishAlphabet.Contains(buffer[i])))
+                    if (Alphabets.CurrentLanguage == Language.Russian &&
+                        !Alphabets.RussianAlphabet.Contains(buffer[i]) ||
+                        Alphabets.CurrentLanguage == Language.English && !Alphabets.EnglishAlphabet.Contains(buffer[i]))
                     {
                         buffer[i] = '.';
                         continue;
@@ -58,10 +57,11 @@ namespace KMZILib
             }
 
             /// <summary>
-            /// Осуществляет дешифрование строки с использованием ключа в виде перестановочной функции, записанной в виде массив <see cref="byte"/>
+            ///     Осуществляет дешифрование строки с использованием ключа в виде перестановочной функции, записанной в виде массив
+            ///     <see cref="byte" />
             /// </summary>
             /// <param name="Source">Шифртекст, который необходимо дешифровать</param>
-            /// <param name="Key">Массив типа <see cref="byte"/>, представляющий собой перестановочную функцию</param>
+            /// <param name="Key">Массив типа <see cref="byte" />, представляющий собой перестановочную функцию</param>
             /// <returns>Строка - результат дешифрования</returns>
             public static string Decrypt(string Source, byte[] Key)
             {
@@ -81,11 +81,8 @@ namespace KMZILib
                 string answer = buffer.ToString();
                 while (answer.Contains("  "))
                     answer = answer.Replace("  ", " ");
-                return answer.ToString();
+                return answer;
             }
-
-
-
         }
     }
 }

@@ -12,54 +12,23 @@ namespace KMZILib
     public class MMA
     {
         /// <summary>
-        /// Определяет, совпадает ли данное число сдругим числом <see cref="MMA"/>
+        ///     Список сравнений многомодульного числа, содержащий как остатки деления числа на соответствующие модули, так и сами
+        ///     модули.
         /// </summary>
-        /// <param name="other">Сравниваемое число класса <see cref="MMA"/></param>
-        /// <returns>true - Совпадают. false - Что-то отличается</returns>
-        protected bool Equals(MMA other)
-        {
-            return Equals(Values, other.Values);
-        }
+        private List<LinearComparison> Values = new List<LinearComparison>();
 
         /// <summary>
-        /// Определяет, является указанный объект числом <see cref="MMA"/>, совпадающим с данным
-        /// </summary>
-        /// <param name="obj">Сравниваемый объект</param>
-        /// <returns>true - Является. false - не является</returns>
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            return obj.GetType() == this.GetType() && Equals((MMA) obj);
-        }
-
-        /// <summary>
-        /// Возвращает хэш-код данного числа
-        /// </summary>
-        /// <returns></returns>
-        public override int GetHashCode()
-        {
-            return (Values != null ? Values.GetHashCode() : 0);
-        }
-
-        /// <summary>
-        ///     Список сравнений многомодульного числа, содержащий как остатки деления числа на соответствующий модуль, так и сами
-        ///     модули
-        /// </summary>
-        private List<Comparison.LinearComparison> Values = new List<Comparison.LinearComparison>();
-
-        /// <summary>
-        /// Инициализирует новое многомодульное число по заданному набору сравнений
+        ///     Инициализирует новое многомодульное число по заданному набору сравнений
         /// </summary>
         /// <param name="comparisons"></param>
-        public MMA(IEnumerable<Comparison.LinearComparison> comparisons)
+        public MMA(IEnumerable<LinearComparison> comparisons)
         {
-            foreach (Comparison.LinearComparison comparison in comparisons)
-                Values.Add(new Comparison.LinearComparison(comparison.A, comparison.M));
+            foreach (LinearComparison comparison in comparisons)
+                Values.Add(new LinearComparison(comparison.A, comparison.M));
         }
 
         /// <summary>
-        ///     Список остатков многомодульного числа
+        ///     Список остатков многомодульного числа. Наименьшие неотрицательные.
         /// </summary>
         public List<BigInteger> Remainders => Values.Select(value => value.A).ToList();
 
@@ -77,22 +46,24 @@ namespace KMZILib
             {
                 //В противном случае, мы можем определить знак только если у нас есть двойка в модулях
                 if (!Modules.Contains(2))
+                {
                     throw new InvalidOperationException(
                         "Нахождение знака возможно только при наличии модуля 2 в составе числа!");
+                }
 
                 //создаем копию текущего набора сравнений, так как в процессе вычисления знака надо будет этот набор изменять
-                List<Comparison.LinearComparison> buffer = new List<Comparison.LinearComparison>();
-                foreach (Comparison.LinearComparison comparison in Values)
-                    buffer.Add(new Comparison.LinearComparison(comparison.A, comparison.M));
+                List<LinearComparison> buffer = new List<LinearComparison>();
+                foreach (LinearComparison comparison in Values)
+                    buffer.Add(new LinearComparison(comparison.A, comparison.M));
 
                 //Сортируем набор в порядке убывания модулей, чтобы двойка оказалась в самом его конце, как нужно по алгоритму
-                buffer=buffer.OrderByDescending(element => element.M).ToList();
+                buffer = buffer.OrderByDescending(element => element.M).ToList();
 
 
                 for (int i = 0; i < buffer.Count; i++)
                 {
                     //набор оставшихся ненулевыхз модулей
-                    IEnumerable<Comparison.LinearComparison> a = buffer.Skip(i);
+                    IEnumerable<LinearComparison> a = buffer.Skip(i);
                     //Если все имеющиеся на данный момент остатки равны 0 - нет смысла считать дальше - возвращаем 0.
                     if (a.All(comparison => comparison.A == 0)) return 0;
                     //сначала нужно отнять первый ненулевой остаток у всех остальных сравнений
@@ -136,9 +107,9 @@ namespace KMZILib
         }
 
         /// <summary>
-        ///     Сравнение по текущего многомодульного числа по полному модулю. Вычисляется за счет ГКТ (<see cref="CRT" />)
+        ///     Сравнение текущего многомодульного числа по полному модулю. Вычисляется за счет ГКТ (<see cref="CRT" />)
         /// </summary>
-        public Comparison.LinearComparison ComparisonValue => CRT.Solve(Values);
+        public LinearComparison ComparisonValue => CRT.Solve(Values);
 
         /// <summary>
         ///     Наименьшее по модулю значение числа. Вычисляется за счет ГКТ (<see cref="CRT" />)
@@ -151,11 +122,42 @@ namespace KMZILib
         public BigInteger ABSValue => CRT.Solve(Values).SmallestNonnegative;
 
         /// <summary>
-        /// Метод, добавляющий модуль в многомодульное число.
+        ///     Определяет, совпадает ли данное число сдругим числом <see cref="MMA" />
+        /// </summary>
+        /// <param name="other">Сравниваемое число класса <see cref="MMA" /></param>
+        /// <returns>true - Совпадают. false - Что-то отличается</returns>
+        protected bool Equals(MMA other)
+        {
+            return Equals(Values, other.Values);
+        }
+
+        /// <summary>
+        ///     Определяет, является указанный объект числом <see cref="MMA" />, совпадающим с данным
+        /// </summary>
+        /// <param name="obj">Сравниваемый объект</param>
+        /// <returns>true - Является. false - не является</returns>
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            return obj.GetType() == GetType() && Equals((MMA) obj);
+        }
+
+        /// <summary>
+        ///     Возвращает хэш-код данного числа.
+        /// </summary>
+        /// <returns></returns>
+        public override int GetHashCode()
+        {
+            return Values != null ? Values.GetHashCode() : 0;
+        }
+
+        /// <summary>
+        ///     Метод, добавляющий модуль в многомодульное число.
         /// </summary>
         /// <param name="comparison"></param>
         /// <exception cref="InvalidOperationException">Модуль уже присутствует в числе</exception>
-        public void AddModule(Comparison.LinearComparison comparison)
+        public void AddModule(LinearComparison comparison)
         {
             if (Modules.Contains(comparison.M))
                 throw new InvalidOperationException("Такой модуль уже присутствует в числе!");
@@ -164,7 +166,7 @@ namespace KMZILib
         }
 
         /// <summary>
-        /// Сложение двух многомодульных чисел
+        ///     Сложение двух многомодульных чисел
         /// </summary>
         /// <param name="First">Первый операнд</param>
         /// <param name="Second">Второй операнд</param>
@@ -175,12 +177,12 @@ namespace KMZILib
                 throw new ArgumentException("Наборы модулей чисел не совпадают!");
             First.Sort();
             Second.Sort();
-            MMA Result = new MMA(new List<Comparison.LinearComparison>());
+            MMA Result = new MMA(new List<LinearComparison>());
             for (int i = 0; i < First.Values.Count; i++)
             {
                 if (First.Values[i].M != Second.Values[i].M)
                     throw new ArgumentException("Наборы модулей чисел не совпадают!");
-                Result.AddModule(new Comparison.LinearComparison(First.Values[i].A + Second.Values[i].A,
+                Result.AddModule(new LinearComparison(First.Values[i].A + Second.Values[i].A,
                     First.Values[i].M));
             }
 
@@ -188,7 +190,7 @@ namespace KMZILib
         }
 
         /// <summary>
-        /// Разность двух многомодульных чисел
+        ///     Разность двух многомодульных чисел
         /// </summary>
         /// <param name="First">Первый операнд</param>
         /// <param name="Second">Второй операнд</param>
@@ -199,12 +201,12 @@ namespace KMZILib
                 throw new ArgumentException("Наборы модулей чисел не совпадают!");
             First.Sort();
             Second.Sort();
-            MMA Result = new MMA(new List<Comparison.LinearComparison>());
+            MMA Result = new MMA(new List<LinearComparison>());
             for (int i = 0; i < First.Values.Count; i++)
             {
                 if (First.Values[i].M != Second.Values[i].M)
                     throw new ArgumentException("Наборы модулей чисел не совпадают!");
-                Result.AddModule(new Comparison.LinearComparison(First.Values[i].A - Second.Values[i].A,
+                Result.AddModule(new LinearComparison(First.Values[i].A - Second.Values[i].A,
                     First.Values[i].M));
             }
 
@@ -212,7 +214,7 @@ namespace KMZILib
         }
 
         /// <summary>
-        /// Произведение двух многомодульных чисел
+        ///     Произведение двух многомодульных чисел
         /// </summary>
         /// <param name="First">Первый операнд</param>
         /// <param name="Second">Второй операнд</param>
@@ -223,12 +225,12 @@ namespace KMZILib
                 throw new ArgumentException("Наборы модулей чисел не совпадают!");
             First.Sort();
             Second.Sort();
-            MMA Result = new MMA(new List<Comparison.LinearComparison>());
+            MMA Result = new MMA(new List<LinearComparison>());
             for (int i = 0; i < First.Values.Count; i++)
             {
                 if (First.Values[i].M != Second.Values[i].M)
                     throw new ArgumentException("Наборы модулей чисел не совпадают!");
-                Result.AddModule(new Comparison.LinearComparison(First.Values[i].A * Second.Values[i].A,
+                Result.AddModule(new LinearComparison(First.Values[i].A * Second.Values[i].A,
                     First.Values[i].M));
             }
 
@@ -236,7 +238,7 @@ namespace KMZILib
         }
 
         /// <summary>
-        /// Деление двух многомодульных чисел
+        ///     Деление двух многомодульных чисел
         /// </summary>
         /// <param name="First">Первый операнд</param>
         /// <param name="Second">Второй операнд</param>
@@ -247,12 +249,12 @@ namespace KMZILib
                 throw new ArgumentException("Наборы модулей чисел не совпадают!");
             First.Sort();
             Second.Sort();
-            MMA Result = new MMA(new List<Comparison.LinearComparison>());
+            MMA Result = new MMA(new List<LinearComparison>());
             for (int i = 0; i < First.Values.Count; i++)
             {
                 if (First.Values[i].M != Second.Values[i].M)
                     throw new ArgumentException("Наборы модулей чисел не совпадают!");
-                Result.AddModule(new Comparison.LinearComparison(First.Values[i].A / Second.Values[i].A,
+                Result.AddModule(new LinearComparison(First.Values[i].A / Second.Values[i].A,
                     First.Values[i].M));
             }
 
@@ -260,7 +262,7 @@ namespace KMZILib
         }
 
         /// <summary>
-        /// Сравнивает набор сравнений двух многомодульных чисел
+        ///     Сравнивает набор сравнений двух многомодульных чисел
         /// </summary>
         /// <param name="First">Сравниваемое число</param>
         /// <param name="Second">Сравниваемое число</param>
@@ -279,7 +281,7 @@ namespace KMZILib
         }
 
         /// <summary>
-        /// Сравнивает набор сравнений двух многомодульных чисел
+        ///     Сравнивает набор сравнений двух многомодульных чисел
         /// </summary>
         /// <param name="First">Сравниваемое число</param>
         /// <param name="Second">Сравниваемое число</param>
@@ -293,7 +295,7 @@ namespace KMZILib
         }
 
         /// <summary>
-        /// Возвращает строковое представление данного многомодульюного числа по общему модулю
+        ///     Возвращает строковое представление данного многомодульюного числа по общему модулю
         /// </summary>
         /// <returns>Строка, представляющая данное многомодульное число</returns>
         public override string ToString()

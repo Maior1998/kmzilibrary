@@ -4,7 +4,6 @@ using System.Text;
 
 namespace KMZILib
 {
-
     public partial class BinaryFunction
     {
         /// <summary>
@@ -12,39 +11,6 @@ namespace KMZILib
         /// </summary>
         public class BinaryRelationMatrix
         {
-            /// <summary>
-            /// Опеределяет, совпадают ли значения двух матриц <see cref="BinaryRelationMatrix"/>
-            /// </summary>
-            /// <param name="other"></param>
-            /// <returns></returns>
-            protected bool Equals(BinaryRelationMatrix other)
-            {
-
-                return Equals(matrix, other.matrix);
-            }
-
-            /// <summary>
-            /// Опеределяет, являются ли два объекта <see cref="object"/> матрицами <see cref="BinaryRelationMatrix"/>, совпадающими по значению
-            /// </summary>
-            /// <param name="obj"></param>
-            /// <returns></returns>
-            public override bool Equals(object obj)
-            {
-
-                if (ReferenceEquals(null, obj)) return false;
-                if (ReferenceEquals(this, obj)) return true;
-                return obj.GetType() == this.GetType() && Equals((BinaryRelationMatrix) obj);
-            }
-
-            /// <summary>
-            /// Возвращает хэш-код данной матрицы
-            /// </summary>
-            /// <returns></returns>
-            public override int GetHashCode()
-            {
-                return (matrix != null ? matrix.GetHashCode() : 0);
-            }
-
             /// <summary>
             ///     Матрица бинарного отношения в виде массива массивов <see cref="bool" />
             /// </summary>
@@ -196,7 +162,7 @@ namespace KMZILib
             public byte Size => (byte) matrix.GetLength(0);
 
             /// <summary>
-            /// Получает доступ к матрице бинарного отношения
+            ///     Получает доступ к матрице бинарного отношения
             /// </summary>
             /// <param name="index1">Индекс вертикального измерения</param>
             /// <param name="index2">Индекс горизонтального измерения</param>
@@ -208,7 +174,39 @@ namespace KMZILib
             }
 
             /// <summary>
-            /// Возвращает строковое представление матрицы бинарного отношения
+            ///     Опеределяет, совпадают ли значения двух матриц <see cref="BinaryRelationMatrix" />
+            /// </summary>
+            /// <param name="other"></param>
+            /// <returns></returns>
+            protected bool Equals(BinaryRelationMatrix other)
+            {
+                return Equals(matrix, other.matrix);
+            }
+
+            /// <summary>
+            ///     Опеределяет, являются ли два объекта <see cref="object" /> матрицами <see cref="BinaryRelationMatrix" />,
+            ///     совпадающими по значению
+            /// </summary>
+            /// <param name="obj"></param>
+            /// <returns></returns>
+            public override bool Equals(object obj)
+            {
+                if (ReferenceEquals(null, obj)) return false;
+                if (ReferenceEquals(this, obj)) return true;
+                return obj.GetType() == GetType() && Equals((BinaryRelationMatrix) obj);
+            }
+
+            /// <summary>
+            ///     Возвращает хэш-код данной матрицы
+            /// </summary>
+            /// <returns></returns>
+            public override int GetHashCode()
+            {
+                return matrix != null ? matrix.GetHashCode() : 0;
+            }
+
+            /// <summary>
+            ///     Возвращает строковое представление матрицы бинарного отношения
             /// </summary>
             /// <returns></returns>
             public override string ToString()
@@ -243,7 +241,7 @@ namespace KMZILib
             }
 
             /// <summary>
-            /// Сравнение матриц бинарных отношений
+            ///     Сравнение матриц бинарных отношений
             /// </summary>
             /// <param name="A">Сравниваемая матрица</param>
             /// <param name="B">Сравниваемая матрица</param>
@@ -258,7 +256,7 @@ namespace KMZILib
             }
 
             /// <summary>
-            /// Сравнение матриц бинарных отношений
+            ///     Сравнение матриц бинарных отношений
             /// </summary>
             /// <param name="A">Сравниваемая матрица</param>
             /// <param name="B">Сравниваемая матрица</param>
@@ -290,7 +288,7 @@ namespace KMZILib
             }
 
             /// <summary>
-            /// Разность двух матриц
+            ///     Разность двух матриц
             /// </summary>
             /// <param name="A"></param>
             /// <param name="B"></param>

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace KMZILib
 {
@@ -14,7 +12,6 @@ namespace KMZILib
             {
                 private static bool[][] Solve(string LRPNExpression, out char[] NamesOfVariables)
                 {
-
                     List<KeyValuePair<char, bool>> Variables = new List<KeyValuePair<char, bool>>();
                     for (int i = 0; i < LRPNExpression.Length; i++)
                     {
@@ -23,8 +20,9 @@ namespace KMZILib
                         if (Variables.TrueForAll(pair => pair.Key != LRPNExpression[i]))
                             Variables.Add(new KeyValuePair<char, bool>(LRPNExpression[i], false));
                     }
-                    Variables=Variables.OrderBy(pair => VariablesAlphabet.IndexOf(pair.Key)).ToList();
-                    bool[][] AnswerArray = new bool[(int)Math.Pow(2, Variables.Count)][];
+
+                    Variables = Variables.OrderBy(pair => VariablesAlphabet.IndexOf(pair.Key)).ToList();
+                    bool[][] AnswerArray = new bool[(int) Math.Pow(2, Variables.Count)][];
                     bool FirstOperand, SecondOperand;
                     for (int i = 0; i < Math.Pow(2, Variables.Count); i++)
                     {
@@ -40,6 +38,7 @@ namespace KMZILib
                                 Operands.Push(Variables.First(variable => variable.Key == LRPNExpression[j]).Value);
                                 continue;
                             }
+
                             switch (LRPNExpression[j])
                             {
                                 case '+':
@@ -70,10 +69,12 @@ namespace KMZILib
                                     break;
                             }
                         }
-                        AnswerArray[i]=new bool[Variables.Count+1];
-                        Variables.Select(pair => pair.Value).ToArray().CopyTo(AnswerArray[i],0);
+
+                        AnswerArray[i] = new bool[Variables.Count + 1];
+                        Variables.Select(pair => pair.Value).ToArray().CopyTo(AnswerArray[i], 0);
                         AnswerArray[i][AnswerArray[i].Length - 1] = Operands.Pop();
                     }
+
                     NamesOfVariables = Variables.Select(pair => pair.Key).ToArray();
                     return AnswerArray;
                 }
@@ -83,6 +84,7 @@ namespace KMZILib
                     bool[][] a = Solve(LRPNParser.GetRPN(Expression), out char[] _);
                     return a.Select(row => row.Last()).ToArray();
                 }
+
                 private static void SetByNumber(List<KeyValuePair<char, bool>> VariablesList, int Number)
                 {
                     //необходимо заполнить значения списка KeyValuePair двоичными кодами числа Number
@@ -114,7 +116,7 @@ namespace KMZILib
                             continue;
                         if (Input[i] == ')')
                         {
-                            Stack<byte> Brackets = new Stack<byte>(new byte[] { 0 });
+                            Stack<byte> Brackets = new Stack<byte>(new byte[] {0});
                             i--;
                             while (i >= 0 && Brackets.Count != 0)
                             {
@@ -124,15 +126,18 @@ namespace KMZILib
                                     Brackets.Pop();
                                 i--;
                             }
+
                             i++;
                             continue;
                         }
 
                         if (Input[i] == '>' && i > 1 && Input.Substring(i - 2, 3) == "<->")
-                            return $"{GetLevel2(Input.Substring(i + 1, Input.Length - i - 1))} {GetLevel1(Input.Substring(0, i - 2))} <->";
+                            return
+                                $"{GetLevel2(Input.Substring(i + 1, Input.Length - i - 1))} {GetLevel1(Input.Substring(0, i - 2))} <->";
                         //(распологаем их в обратном порядке, потому что обратная польская запись)
                         //(если вам здесь чего-то не понятно, то не волнуйтесь, я тоже уже нихера не понимаю)
                     }
+
                     //Если ничего не нашли - отдаем все выражение следующему уровню
                     return GetLevel2(Input);
                 }
@@ -147,7 +152,7 @@ namespace KMZILib
                             continue;
                         if (Input[i] == ')')
                         {
-                            Stack<byte> Brackets = new Stack<byte>(new byte[] { 0 });
+                            Stack<byte> Brackets = new Stack<byte>(new byte[] {0});
                             i--;
                             while (i >= 0 && Brackets.Count != 0)
                             {
@@ -157,13 +162,16 @@ namespace KMZILib
                                     Brackets.Pop();
                                 i--;
                             }
+
                             i++;
                             continue;
                         }
 
                         if (Input[i] == '>' && i > 0 && Input.Substring(i - 1, 2) == "->")
-                            return $"{GetLevel3(Input.Substring(i + 1, Input.Length - i - 1))} {GetLevel2(Input.Substring(0, i - 1))} ->";
+                            return
+                                $"{GetLevel3(Input.Substring(i + 1, Input.Length - i - 1))} {GetLevel2(Input.Substring(0, i - 1))} ->";
                     }
+
                     //Если ничего не нашли - отдаем все выражение следующему уровню
                     return GetLevel3(Input);
                 }
@@ -178,7 +186,7 @@ namespace KMZILib
                             continue;
                         if (Input[i] == ')')
                         {
-                            Stack<byte> Brackets = new Stack<byte>(new byte[] { 0 });
+                            Stack<byte> Brackets = new Stack<byte>(new byte[] {0});
                             i--;
                             while (i >= 0 && Brackets.Count != 0)
                             {
@@ -188,14 +196,18 @@ namespace KMZILib
                                     Brackets.Pop();
                                 i--;
                             }
+
                             i++;
                             continue;
                         }
 
                         if (Input[i] == '+')
+                        {
                             return
                                 $"{GetLevel4(Input.Substring(i + 1, Input.Length - i - 1))} {GetLevel3(Input.Substring(0, i))} +";
+                        }
                     }
+
                     //Если ничего не нашли - отдаем все выражение следующему уровню
                     return GetLevel4(Input);
                 }
@@ -210,7 +222,7 @@ namespace KMZILib
                             continue;
                         if (Input[i] == ')')
                         {
-                            Stack<byte> Brackets = new Stack<byte>(new byte[] { 0 });
+                            Stack<byte> Brackets = new Stack<byte>(new byte[] {0});
                             i--;
                             while (i >= 0 && Brackets.Count != 0)
                             {
@@ -220,12 +232,16 @@ namespace KMZILib
                                     Brackets.Pop();
                                 i--;
                             }
+
                             i++;
                             continue;
                         }
+
                         if (Input[i] == '*')
-                            return $"{GetLevel5(Input.Substring(i + 1, Input.Length - i - 1))} {GetLevel4(Input.Substring(0, i))} *";
+                            return
+                                $"{GetLevel5(Input.Substring(i + 1, Input.Length - i - 1))} {GetLevel4(Input.Substring(0, i))} *";
                     }
+
                     //Если ничего не нашли - отдаем все выражение следующему уровню
                     return GetLevel5(Input);
                 }
