@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using static KMZILib.Ciphers.Alphabets;
 
 namespace KMZILib
 {
@@ -212,7 +213,7 @@ namespace KMZILib
         {
             get
             {
-                switch (Ciphers.Alphabets.CurrentLanguage)
+                switch (CurrentLanguage)
                 {
                     case Ciphers.Language.Russian:
                         return FrequencyRus;
@@ -232,7 +233,7 @@ namespace KMZILib
         {
             get
             {
-                switch (Ciphers.Alphabets.CurrentLanguage)
+                switch (CurrentLanguage)
                 {
                     case Ciphers.Language.Russian:
                         return FrequencyWb1LRUS;
@@ -251,7 +252,7 @@ namespace KMZILib
         {
             get
             {
-                switch (Ciphers.Alphabets.CurrentLanguage)
+                switch (CurrentLanguage)
                 {
                     case Ciphers.Language.Russian:
                         return FrequencyWb2LRUS;
@@ -271,7 +272,7 @@ namespace KMZILib
         {
             get
             {
-                switch (Ciphers.Alphabets.CurrentLanguage)
+                switch (CurrentLanguage)
                 {
                     case Ciphers.Language.Russian:
                         return FrequencyBigramsRUS;
@@ -291,7 +292,7 @@ namespace KMZILib
         {
             get
             {
-                switch (Ciphers.Alphabets.CurrentLanguage)
+                switch (CurrentLanguage)
                 {
                     case Ciphers.Language.Russian:
                         return FrequencyThreegramsRUS;
@@ -386,9 +387,9 @@ namespace KMZILib
             for (i = 0; i < Text.Length - 2; i++)
 
             {
-                if (Ciphers.Alphabets.CurrentAlphabet.IndexOf(Text[i]) == -1 ||
-                    Ciphers.Alphabets.CurrentAlphabet.IndexOf(Text[i + 1]) == -1 ||
-                    Ciphers.Alphabets.CurrentAlphabet.IndexOf(Text[i + 2]) == -1) continue;
+                if (CurrentAlphabet.IndexOf(Text[i]) == -1 ||
+                    CurrentAlphabet.IndexOf(Text[i + 1]) == -1 ||
+                    CurrentAlphabet.IndexOf(Text[i + 2]) == -1) continue;
                 string buffer = Text[i] + Text[i + 1].ToString() + Text[i + 2];
                 if (statistic.ContainsKey(buffer)) statistic[buffer]++;
                 else
@@ -421,8 +422,8 @@ namespace KMZILib
             for (i = 0; i < Text.Length - 1; i++)
 
             {
-                if (Ciphers.Alphabets.CurrentAlphabet.IndexOf(Text[i]) == -1 ||
-                    Ciphers.Alphabets.CurrentAlphabet.IndexOf(Text[i + 1]) == -1) continue;
+                if (CurrentAlphabet.IndexOf(Text[i]) == -1 ||
+                    CurrentAlphabet.IndexOf(Text[i + 1]) == -1) continue;
                 string buffer = Text[i] + Text[i + 1].ToString();
                 if (statistic.ContainsKey(buffer)) statistic[buffer]++;
                 else

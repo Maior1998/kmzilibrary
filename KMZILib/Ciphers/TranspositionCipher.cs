@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using static KMZILib.Ciphers.Alphabets;
 
 namespace KMZILib
 {
@@ -13,16 +14,16 @@ namespace KMZILib
         {
             private static char GetEncryptedChar(char source, IReadOnlyList<byte> key)
             {
-                return Alphabets.CurrentLanguage == Language.Russian
-                    ? Alphabets.RussianAlphabet[key[Alphabets.RussianAlphabet.IndexOf(source)]]
-                    : Alphabets.EnglishAlphabet[key[Alphabets.EnglishAlphabet.IndexOf(source)]];
+                return CurrentLanguage == Language.Russian
+                    ? RussianAlphabet[key[RussianAlphabet.IndexOf(source)]]
+                    : EnglishAlphabet[key[EnglishAlphabet.IndexOf(source)]];
             }
 
             private static char GetDecryptedChar(char source, IList<byte> key)
             {
-                return Alphabets.CurrentLanguage == Language.Russian
-                    ? Alphabets.RussianAlphabet[key.IndexOf((byte) Alphabets.RussianAlphabet.IndexOf(source))]
-                    : Alphabets.EnglishAlphabet[key.IndexOf((byte) Alphabets.EnglishAlphabet.IndexOf(source))];
+                return CurrentLanguage == Language.Russian
+                    ? RussianAlphabet[key.IndexOf((byte) RussianAlphabet.IndexOf(source))]
+                    : EnglishAlphabet[key.IndexOf((byte) EnglishAlphabet.IndexOf(source))];
             }
 
             /// <summary>
@@ -38,9 +39,9 @@ namespace KMZILib
                 for (int i = 0; i < buffer.Length; i++)
                 {
                     if (char.IsWhiteSpace(buffer[i])) continue;
-                    if (Alphabets.CurrentLanguage == Language.Russian &&
-                        !Alphabets.RussianAlphabet.Contains(buffer[i]) ||
-                        Alphabets.CurrentLanguage == Language.English && !Alphabets.EnglishAlphabet.Contains(buffer[i]))
+                    if (CurrentLanguage == Language.Russian &&
+                        !RussianAlphabet.Contains(buffer[i]) ||
+                        CurrentLanguage == Language.English && !EnglishAlphabet.Contains(buffer[i]))
                     {
                         buffer[i] = '.';
                         continue;
@@ -68,7 +69,7 @@ namespace KMZILib
                 StringBuilder buffer = new StringBuilder(Source.ToUpper());
                 for (int i = 0; i < buffer.Length; i++)
                 {
-                    if (!Alphabets.CurrentAlphabet.Contains(buffer[i]))
+                    if (!CurrentAlphabet.Contains(buffer[i]))
                     {
                         buffer[i] = '.';
                         continue;

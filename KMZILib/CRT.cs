@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Numerics;
+using static KMZILib.Comparison;
 
 namespace KMZILib
 {
@@ -13,10 +14,10 @@ namespace KMZILib
         /// </summary>
         /// <param name="Comparisons"></param>
         /// <returns></returns>
-        public static Comparison.LinearComparison Solve(IEnumerable<Comparison.LinearComparison> Comparisons)
+        public static LinearComparison Solve(IEnumerable<LinearComparison> Comparisons)
         {
             ExpressByPair buffer = new ExpressByPair(0, 1);
-            foreach (Comparison.LinearComparison CurrentComparison in Comparisons)
+            foreach (LinearComparison CurrentComparison in Comparisons)
             {
                 int solution = 0;
                 for (;
@@ -27,7 +28,7 @@ namespace KMZILib
                 buffer.Second *= CurrentComparison.M;
             }
 
-            return new Comparison.LinearComparison((int) buffer.First, (int) buffer.Second);
+            return new LinearComparison((int) buffer.First, (int) buffer.Second);
         }
 
         /// <summary>
@@ -35,10 +36,10 @@ namespace KMZILib
         /// </summary>
         /// <param name="Comparisons"></param>
         /// <returns></returns>
-        public static BigInteger SolveBigInteger(IEnumerable<Comparison.LinearComparison> Comparisons)
+        public static BigInteger SolveBigInteger(IEnumerable<LinearComparison> Comparisons)
         {
             ExpressByPair buffer = new ExpressByPair(0, 1);
-            foreach (Comparison.LinearComparison CurrentComparison in Comparisons)
+            foreach (LinearComparison CurrentComparison in Comparisons)
             {
                 int solution = 0;
                 for (;

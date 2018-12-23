@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using static KMZILib.Comparison;
 
 namespace KMZILib
 {
@@ -119,7 +120,7 @@ namespace KMZILib
                     if (k == 2) FirstConvolutionLength = 2;
                     else
                     {
-                        Comparison.LinearComparison k0 = new Comparison.LinearComparison(ProbCop.Length, k - 1);
+                        LinearComparison k0 = new LinearComparison(ProbCop.Length, k - 1);
                         if (k0.A == 0)
                             FirstConvolutionLength = k - 1;
                         else if (k0.A == 1)

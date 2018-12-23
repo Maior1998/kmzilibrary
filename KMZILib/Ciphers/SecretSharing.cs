@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Security.Cryptography.X509Certificates;
 using static KMZILib.Comparison;
+using static KMZILib.Polynoms;
+using static KMZILib.PrimalityTests;
 
 namespace KMZILib
 {
@@ -18,19 +21,19 @@ namespace KMZILib
         {
             private static int GetBiggerRandomPrime(int current)
             {
-                if (Math.Abs(current) < PrimalityTests.PrimeNumbers.Last())
+                if (Math.Abs(current) < PrimeNumbers.Last())
                 {
-                    return PrimalityTests.PrimeNumbers[
+                    return PrimeNumbers[
                         RD.Rand.Next(
-                            PrimalityTests.PrimeNumbers.ToList().IndexOf(
-                                PrimalityTests.PrimeNumbers.First(
+                            PrimeNumbers.ToList().IndexOf(
+                                PrimeNumbers.First(
                                     num => num > Math.Abs(current))),
-                            PrimalityTests.PrimeNumbers.Length)
+                            PrimeNumbers.Length)
                     ];
                 }
 
-                int find = Math.Abs(current) + 1;
-                while (PrimalityTests.SSPTFull(find) == PrimalityTests.PrimalityTestResult.Composite) find++;
+                int find = current % 2 == 0 ? Math.Abs(current) + 1 : Math.Abs(current) + 2;
+                while (SSPTFull(find) == PrimalityTestResult.Composite) find += 2;
                 return find;
             }
 
@@ -58,7 +61,7 @@ namespace KMZILib
                     for (int i = 0; i < coefs.Length - 1; i++)
                         coefs[i] = RD.Rand.Next(1, module);
                     coefs[coefs.Length - 1] = Key;
-                    Polynoms.Polynom sharepolynom = new Polynoms.Polynom(coefs);
+                    Polynom sharepolynom = new Polynom(coefs);
                     KeyValuePair<int, BigInteger>[] Keys = new KeyValuePair<int, BigInteger>[CountOfFragments];
                     for (int i = 1; i <= CountOfFragments; i++)
                         Keys[i - 1] = new KeyValuePair<int, BigInteger>(i, sharepolynom.GetValue(i, module));

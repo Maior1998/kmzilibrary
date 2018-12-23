@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
+using static KMZILib.Comparison;
 
 namespace KMZILib
 {
@@ -14,7 +15,7 @@ namespace KMZILib
             private static char GetShiftedChar(char SourceChar, int Shift)
             {
                 return Alphabets.CurrentAlphabet[
-                    (int) new Comparison.LinearComparison(Alphabets.CurrentAlphabet.IndexOf(SourceChar) + Shift,
+                    (int) new LinearComparison(Alphabets.CurrentAlphabet.IndexOf(SourceChar) + Shift,
                         Alphabets.CurrentAlphabet.Length).A];
             }
 

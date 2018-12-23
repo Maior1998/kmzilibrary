@@ -13,17 +13,16 @@ namespace KMZILib
                 private static bool[][] Solve(string LRPNExpression, out char[] NamesOfVariables)
                 {
                     List<KeyValuePair<char, bool>> Variables = new List<KeyValuePair<char, bool>>();
-                    for (int i = 0; i < LRPNExpression.Length; i++)
+                    foreach (char symbol in LRPNExpression)
                     {
-                        if (!char.IsLetter(LRPNExpression[i]))
+                        if (!char.IsLetter(symbol))
                             continue;
-                        if (Variables.TrueForAll(pair => pair.Key != LRPNExpression[i]))
-                            Variables.Add(new KeyValuePair<char, bool>(LRPNExpression[i], false));
+                        if (Variables.TrueForAll(pair => pair.Key != symbol))
+                            Variables.Add(new KeyValuePair<char, bool>(symbol, false));
                     }
 
                     Variables = Variables.OrderBy(pair => VariablesAlphabet.IndexOf(pair.Key)).ToList();
                     bool[][] AnswerArray = new bool[(int) Math.Pow(2, Variables.Count)][];
-                    bool FirstOperand, SecondOperand;
                     for (int i = 0; i < Math.Pow(2, Variables.Count); i++)
                     {
                         SetByNumber(Variables, i);
@@ -39,6 +38,8 @@ namespace KMZILib
                                 continue;
                             }
 
+                            bool FirstOperand;
+                            bool SecondOperand;
                             switch (LRPNExpression[j])
                             {
                                 case '+':

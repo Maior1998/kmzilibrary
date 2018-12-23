@@ -5,6 +5,7 @@ using System.Numerics;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
+using static KMZILib.Ciphers.Alphabets;
 
 namespace KMZILib
 {
@@ -17,18 +18,18 @@ namespace KMZILib
         {
             private static char GetEncryptedChar(char SourceChar, char KeyChar)
             {
-                int SourceIndex = Alphabets.CurrentAlphabet.IndexOf(SourceChar);
-                int KeyIndex = Alphabets.CurrentAlphabet.IndexOf(KeyChar);
-                return Alphabets.CurrentAlphabet[(SourceIndex + KeyIndex) % Alphabets.CurrentAlphabet.Length];
+                int SourceIndex = CurrentAlphabet.IndexOf(SourceChar);
+                int KeyIndex = CurrentAlphabet.IndexOf(KeyChar);
+                return CurrentAlphabet[(SourceIndex + KeyIndex) % CurrentAlphabet.Length];
             }
 
             private static char GetDecryptedChar(char EncryptedShar, char KeyChar)
             {
-                int SourceIndex = Alphabets.CurrentAlphabet.IndexOf(EncryptedShar);
-                int KeyIndex = Alphabets.CurrentAlphabet.IndexOf(KeyChar);
+                int SourceIndex = CurrentAlphabet.IndexOf(EncryptedShar);
+                int KeyIndex = CurrentAlphabet.IndexOf(KeyChar);
                 int ResultIndex = SourceIndex - KeyIndex;
-                if (ResultIndex < 0) ResultIndex += Alphabets.CurrentAlphabet.Length;
-                return Alphabets.CurrentAlphabet[ResultIndex % Alphabets.CurrentAlphabet.Length];
+                if (ResultIndex < 0) ResultIndex += CurrentAlphabet.Length;
+                return CurrentAlphabet[ResultIndex % CurrentAlphabet.Length];
             }
 
             /// <summary>
@@ -41,7 +42,7 @@ namespace KMZILib
             {
                 StringBuilder buffer = new StringBuilder(Source);
                 for (int i = 0; i < buffer.Length; i++)
-                    if (!Alphabets.CurrentAlphabet.Contains(buffer[i]))
+                    if (!CurrentAlphabet.Contains(buffer[i]))
                         buffer[i] = '.';
 
                 buffer = buffer.Replace('.', ' ');
@@ -153,7 +154,7 @@ namespace KMZILib
                                 //Удалили все неподходящие подстроки, которые расположены не на нужном расстоянии друг от друга.
                                 //Теперь необходимо заполнить данные о длине ключевого слова
                                 //Получаем список делителей - список потенциальных длин ключа
-                                //TODO: так работает, когда таких блока всего два, что бывает не всегда
+
 
                                 int[] SubStrIndexes = Textes.Select(match => match.Index).ToArray();
                                 int[] Lengthes = new int[SubStrIndexes.Length - 1];
@@ -189,7 +190,7 @@ namespace KMZILib
                     }
 
                     //потом проходим осташийся цикл с длиной 3
-                    //TODO: придумать, как заставить все потоки завершиться одновременно.
+
                     while (ThreadsStatus.Any(status => !status))
                         Thread.Sleep(1000);
                     List<KER> LastResults = new List<KER>();
