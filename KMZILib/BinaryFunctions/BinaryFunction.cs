@@ -81,6 +81,8 @@ namespace KMZILib
         /// </summary>
         public byte CountOfVariables => (byte) Math.Log(ValuesArray.Length, 2);
 
+
+        //T0 T1 Ts Tm Tl
         /// <summary>
         ///     Свойство функции, показывающее, принадлежит ли она классу функций, сохраняющих нуль
         /// </summary>
@@ -96,6 +98,16 @@ namespace KMZILib
         /// </summary>
         public bool IsTsClass
         {
+            /*
+             * 1
+             * 1
+             * 0
+             * 1
+             * 0
+             * 1
+             * 0
+             * 0
+             */
             get
             {
                 for (int i = ValuesArray.Length / 2; i < ValuesArray.Length; i++)
@@ -112,13 +124,26 @@ namespace KMZILib
         {
             get
             {
+                //000
+                //|||
+                //vvv
+                //001
+
+                //0100
+                // |
+                // v
+                //1000
+
                 for (int i = 0; i < ValuesArray.Length - 1; i++)
-                for (int j = i + 1; j < ValuesArray.Length; j++)
                 {
                     DNF idnf = new DNF(GetBinaryArray(i, CountOfVariables).Select(val => new bool?(val)).ToArray());
-                    DNF jdnf = new DNF(GetBinaryArray(j, CountOfVariables).Select(val => new bool?(val)).ToArray());
-                    if (!idnf.IsPrecedeDNF(jdnf)) continue;
-                    if (ValuesArray[i] && !ValuesArray[j]) return false;
+                    for (int j = i + 1; j < ValuesArray.Length; j++)
+                    {
+
+                        DNF jdnf = new DNF(GetBinaryArray(j, CountOfVariables).Select(val => new bool?(val)).ToArray());
+                        if (!idnf.IsPrecedeDNF(jdnf)) continue;
+                        if (ValuesArray[i] && !ValuesArray[j]) return false;
+                    }
                 }
 
                 return true;
@@ -214,6 +239,7 @@ namespace KMZILib
         {
             get
             {
+                
                 if (ValuesArray.Distinct().Count() == 1)
                     return ValuesArray.First() ? "1" : "0";
                 List<List<bool?>> PDNF = new List<List<bool?>>();
@@ -576,11 +602,13 @@ namespace KMZILib
 
             internal bool IsPrecedeDNF(DNF Second)
             {
+                
                 //00-0 : 0000 0010
+
                 for (int i = 0; i < Length; i++)
                 {
                     if (!Values[i].HasValue) continue;
-                    if (Values[i].Value != Second[i].Value) return false;
+                    if (Values[i].Value && !Second[i].Value) return false;
                 }
 
                 return true;
