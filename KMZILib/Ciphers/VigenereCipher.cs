@@ -5,7 +5,6 @@ using System.Numerics;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
-using static KMZILib.Ciphers.Alphabets;
 
 namespace KMZILib
 {
@@ -18,18 +17,18 @@ namespace KMZILib
         {
             private static char GetEncryptedChar(char SourceChar, char KeyChar)
             {
-                int SourceIndex = CurrentAlphabet.IndexOf(SourceChar);
-                int KeyIndex = CurrentAlphabet.IndexOf(KeyChar);
-                return CurrentAlphabet[(SourceIndex + KeyIndex) % CurrentAlphabet.Length];
+                int SourceIndex = Languages.CurrentLanguage.Alphabet.IndexOf(SourceChar);
+                int KeyIndex = Languages.CurrentLanguage.Alphabet.IndexOf(KeyChar);
+                return Languages.CurrentLanguage.Alphabet[(SourceIndex + KeyIndex) % Languages.CurrentLanguage.Alphabet.Length];
             }
 
             private static char GetDecryptedChar(char EncryptedShar, char KeyChar)
             {
-                int SourceIndex = CurrentAlphabet.IndexOf(EncryptedShar);
-                int KeyIndex = CurrentAlphabet.IndexOf(KeyChar);
+                int SourceIndex = Languages.CurrentLanguage.Alphabet.IndexOf(EncryptedShar);
+                int KeyIndex = Languages.CurrentLanguage.Alphabet.IndexOf(KeyChar);
                 int ResultIndex = SourceIndex - KeyIndex;
-                if (ResultIndex < 0) ResultIndex += CurrentAlphabet.Length;
-                return CurrentAlphabet[ResultIndex % CurrentAlphabet.Length];
+                if (ResultIndex < 0) ResultIndex += Languages.CurrentLanguage.Alphabet.Length;
+                return Languages.CurrentLanguage.Alphabet[ResultIndex % Languages.CurrentLanguage.Alphabet.Length];
             }
 
             /// <summary>
@@ -42,7 +41,7 @@ namespace KMZILib
             {
                 StringBuilder buffer = new StringBuilder(Source);
                 for (int i = 0; i < buffer.Length; i++)
-                    if (!CurrentAlphabet.Contains(buffer[i]))
+                    if (!Languages.CurrentLanguage.Alphabet.Contains(buffer[i]))
                         buffer[i] = '.';
 
                 buffer = buffer.Replace('.', ' ');

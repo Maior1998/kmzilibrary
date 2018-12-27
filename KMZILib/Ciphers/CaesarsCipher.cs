@@ -14,9 +14,9 @@ namespace KMZILib
         {
             private static char GetShiftedChar(char SourceChar, int Shift)
             {
-                return Alphabets.CurrentAlphabet[
-                    (int) new LinearComparison(Alphabets.CurrentAlphabet.IndexOf(SourceChar) + Shift,
-                        Alphabets.CurrentAlphabet.Length).A];
+                return Languages.CurrentLanguage.Alphabet[
+                    (int) new LinearComparison(Languages.CurrentLanguage.Alphabet.IndexOf(SourceChar) + Shift,
+                        Languages.CurrentLanguage.Alphabet.Length).A];
             }
 
             /// <summary>
@@ -55,8 +55,8 @@ namespace KMZILib
                 if (Key != -1)
                     return new[] {Encrypt(Source, -Key)};
 
-                List<string> answer = new List<string>(Alphabets.CurrentAlphabet.Length);
-                for (int i = 1; i <= Alphabets.CurrentAlphabet.Length; i++)
+                List<string> answer = new List<string>(Languages.CurrentLanguage.Alphabet.Length);
+                for (int i = 1; i <= Languages.CurrentLanguage.Alphabet.Length; i++)
                     answer.Add($"(k = {i}) {Encrypt(Source, -i)}");
                 return answer.ToArray();
             }

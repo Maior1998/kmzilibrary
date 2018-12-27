@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using static KMZILib.Ciphers.Alphabets;
 
 namespace KMZILib
 {
@@ -14,16 +13,13 @@ namespace KMZILib
         {
             private static char GetEncryptedChar(char source, IReadOnlyList<byte> key)
             {
-                return CurrentLanguage == Language.Russian
-                    ? RussianAlphabet[key[RussianAlphabet.IndexOf(source)]]
-                    : EnglishAlphabet[key[EnglishAlphabet.IndexOf(source)]];
+                return Languages.CurrentLanguage.Alphabet[key[Languages.CurrentLanguage.Alphabet.IndexOf(source)]];
             }
 
             private static char GetDecryptedChar(char source, IList<byte> key)
             {
-                return CurrentLanguage == Language.Russian
-                    ? RussianAlphabet[key.IndexOf((byte) RussianAlphabet.IndexOf(source))]
-                    : EnglishAlphabet[key.IndexOf((byte) EnglishAlphabet.IndexOf(source))];
+                return Languages.CurrentLanguage.Alphabet[
+                    key.IndexOf((byte) Languages.CurrentLanguage.Alphabet.IndexOf(source))];
             }
 
             /// <summary>
@@ -39,9 +35,7 @@ namespace KMZILib
                 for (int i = 0; i < buffer.Length; i++)
                 {
                     if (char.IsWhiteSpace(buffer[i])) continue;
-                    if (CurrentLanguage == Language.Russian &&
-                        !RussianAlphabet.Contains(buffer[i]) ||
-                        CurrentLanguage == Language.English && !EnglishAlphabet.Contains(buffer[i]))
+                    if(Languages.CurrentLanguage.Alphabet.Contains(buffer[i]))
                     {
                         buffer[i] = '.';
                         continue;
@@ -69,7 +63,7 @@ namespace KMZILib
                 StringBuilder buffer = new StringBuilder(Source.ToUpper());
                 for (int i = 0; i < buffer.Length; i++)
                 {
-                    if (!CurrentAlphabet.Contains(buffer[i]))
+                    if (!Languages.CurrentLanguage.Alphabet.Contains(buffer[i]))
                     {
                         buffer[i] = '.';
                         continue;
