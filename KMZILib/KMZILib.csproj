@@ -43,6 +43,7 @@
     <Compile Include="BinaryFunctions\LRPN.cs" />
     <Compile Include="Ciphers\Alphabets.cs" />
     <Compile Include="Ciphers\CaesarsCipher.cs" />
+    <Compile Include="Ciphers\ILanguage.cs" />
     <Compile Include="Ciphers\Language.cs" />
     <Compile Include="Ciphers\SecretSharing.cs" />
     <Compile Include="Ciphers\TextStat.cs" />
