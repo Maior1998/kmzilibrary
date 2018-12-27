@@ -309,11 +309,20 @@ namespace KMZILib
                     /// </summary>
                     public int[] Indexes { get; set; }
 
+                    /// <summary>
+                    /// Определяет, совпадает ли данный результат анализа теста Касиски с указанным объектом
+                    /// </summary>
+                    /// <param name="obj">Объект, с котором необходимо провести сравнение</param>
+                    /// <returns>Совпадает ли данный объект с результатом анализа теста Касиски с заданным объектом?</returns>
                     public override bool Equals(object obj)
                     {
                         return FoundedSubstring.Equals(obj);
                     }
 
+                    /// <summary>
+                    /// Возвращает хеш-код данного результата анализа теста Касиски
+                    /// </summary>
+                    /// <returns></returns>
                     public override int GetHashCode()
                     {
                         return FoundedSubstring.GetHashCode();

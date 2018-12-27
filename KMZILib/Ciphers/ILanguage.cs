@@ -54,6 +54,9 @@ namespace KMZILib
             /// </summary>
             public class RussianLanguage : ALanguage
             {
+                /// <summary>
+                /// Инициализирует статистические данные русского алфавита
+                /// </summary>
                 public RussianLanguage()
                 {
                     Alphabet = "АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ";
@@ -137,6 +140,15 @@ namespace KMZILib
                     };
 
                 }
+
+                /// <summary>
+                /// Возвращает строковую запись имени данного языка
+                /// </summary>
+                /// <returns>Строковая запись имени данного языка</returns>
+                public override string ToString()
+                {
+                    return "Русский язык";
+                }
             }
 
             /// <summary>
@@ -144,6 +156,9 @@ namespace KMZILib
             /// </summary>
             public class EnglishLanguage : ALanguage
             {
+                /// <summary>
+                /// Инициализирует статистические данные английского алфавита
+                /// </summary>
                 public EnglishLanguage()
                 {
                     Alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -218,6 +233,15 @@ namespace KMZILib
                         "THA"
                     };
 
+                }
+
+                /// <summary>
+                /// Возвращает строковую запись имени данного языка
+                /// </summary>
+                /// <returns>Строковая запись имени данного языка</returns>
+                public override string ToString()
+                {
+                    return "Английский язык";
                 }
             }
         }
