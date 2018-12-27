@@ -8,20 +8,44 @@ namespace KMZILib
 {
     public static partial class Ciphers
     {
+        /// <summary>
+        /// Класс предоставляющий данные и методы для работы с естественными языками.
+        /// </summary>
         public static class Languages
         {
-
+            /// <summary>
+            /// Текущий язык, с которым оперируют методы.
+            /// </summary>
             public static ALanguage CurrentLanguage;
 
+            /// <summary>
+            /// Абстрактный класс, который указывает поля, которыми обладают все языки.
+            /// </summary>
             public abstract class ALanguage
             {
+                /// <summary>
+                /// Строковое представление алфавита языка.
+                /// </summary>
                 public static string Alphabet { get; protected set; }
+                /// <summary>
+                /// Представляет упорядоченный по частоте встречи список букв алфавита
+                /// </summary>
                 public static List<char> Frequency { get; protected set; }
-
+                /// <summary>
+                /// Упорядоченный по частоте встречи список слов длины 1
+                /// </summary>
                 public static List<char> FrequencyWb1L { get; protected set; }
+                /// <summary>
+                /// Упорядоченный по частоте встречи список слов длины 2
+                /// </summary>
                 public static List<string> FrequencyWb2L { get; protected set; }
-
+                /// <summary>
+                /// Упорядоченный по частоте встречи список пар букв, которые встречаются друг за другом
+                /// </summary>
                 public static List<string> FrequencyBigrams { get; protected set; }
+                /// <summary>
+                /// Упорядоченный по частоте встречи список троек букв, которые встречаются друг за другом
+                /// </summary>
                 public static List<string> FrequencyThreegrams { get; protected set; }
             }
 
@@ -192,5 +216,4 @@ namespace KMZILib
             }
         }
     }
-    
 }
