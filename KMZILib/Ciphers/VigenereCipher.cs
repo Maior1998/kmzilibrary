@@ -105,23 +105,28 @@ namespace KMZILib
                 /// </summary>
                 /// <param name="CipherText"></param>
                 /// <returns></returns>
-                public static KER[] GetKEHypotheses(string CipherText)
+                public static int[] GetKEHypotheses(string CipherText)
                 {
                     CipherText = string.Concat(Regex.Split(CipherText, @"\W"));
                     //На вход дали шифртекст. 
                     //Необходимо найти все повторяющиеся подстроки и сделать из них KasiskiExaminationResults.
-
-                    List<KER> GeneralResults = new List<KER>(10000);
-                    int CurrentSubstringLength = CipherText.Length / 2;
-                    bool[] ThreadsStatus = new bool[CipherText.Length / 2 - 3];
+                    /*
+                                 * TODO: алгоритм:
+                                 * Подсчитать расстояния между всеми совпадающими триграммами в тексте
+                                 * Подсчитать НОД для каждой пары таких расстояний
+                                 * Выбрать из этого НОДа наиболее встречаемые
+                                 */
+                    int CurrentSubstringLength = Math.Min((int) Math.Sqrt(CipherText.Length), 30);
+                    bool[] ThreadsStatus = new bool[CurrentSubstringLength - 3];
+                    Dictionary<int,int> Lengths=new Dictionary<int, int>();
                     //Сначала запускаем кучу потоков для для всех длин от 4 до длины текста, деленной на 2
+                    /*
                     for (; CurrentSubstringLength > 3; CurrentSubstringLength--)
                     {
                         int length = CurrentSubstringLength;
                         Thread Check = new Thread(() =>
                         {
-                            Console.WriteLine(
-                                $"Я поток {Thread.CurrentThread.Name} и я выполняю длину продстроки {length}");
+                            //Console.WriteLine($"Выполняю длину подстроки {length}");
                             List<KER> CurrentResults = new List<KER>();
                             for (int CurrentPosition = 0;
                                 CurrentPosition < CipherText.Length - length;
@@ -131,10 +136,7 @@ namespace KMZILib
                                 string CurrentSubString = CipherText.Substring(CurrentPosition, length);
                                 //Если такая строка уже встречалась, то просто пропускаем ее
                                 if (CurrentResults.Any(kasres => kasres.FoundedSubstring == CurrentSubString))
-                                {
-                                    Console.WriteLine($"{length}) Оказывается, подстрока {CurrentSubString} уже есть.");
                                     continue;
-                                }
 
                                 List<Match> Textes = new Regex(CurrentSubString).Matches(CipherText).Cast<Match>()
                                     .ToList();
@@ -142,40 +144,29 @@ namespace KMZILib
                                 //Если строка встречается всего один раз то тоже ее пропускаем
                                 if (Textes.Count == 1) continue;
 
-                                int gLength = Textes[1].Index - Textes[0].Index;
-                                for (int i = 0; i < Textes.Count - 1; i++)
-                                {
-                                    if (Textes[i + 1].Index - Textes[i].Index ==
-                                        gLength) continue;
-                                    Textes.RemoveAt(i-- + 1);
-                                }
-
-                                //Удалили все неподходящие подстроки, которые расположены не на нужном расстоянии друг от друга.
                                 //Теперь необходимо заполнить данные о длине ключевого слова
                                 //Получаем список делителей - список потенциальных длин ключа
 
 
                                 int[] SubStrIndexes = Textes.Select(match => match.Index).ToArray();
-                                int[] Lengthes = new int[SubStrIndexes.Length - 1];
-                                for (int i = 0; i < Lengthes.Length; i++)
-                                    Lengthes[i] = SubStrIndexes[i + 1] - SubStrIndexes[i];
-                                /*
-                                 * TODO: алгоритм:
-                                 * Подсчитать расстояния между всеми совпадающими триграммами в тексте
-                                 * Подсчитать НОД для каждой пары таких расстояний
-                                 * Выбрать из этого НОДа наиболее встречаемые
-                                 */
+                                for (int i = 0; i < SubStrIndexes.Length - 1; i++) 
+                                for (int j = i + 1; j < SubStrIndexes.Length; j++)
+                                {
+                                    int GCDRes =
+                                        (int)AdvancedEuclidsalgorithm.GCDResult(SubStrIndexes[i], SubStrIndexes[j]);
+                                    if (GCDRes <= 2) continue;
+                                        if (!Lengths.ContainsKey(GCDRes)) Lengths.Add(GCDRes, 0);
+                                    
+                                    Lengths[GCDRes]++;
+                                }
+                                
 
 
-                                int[] Dividers = Comparison.GetUniqueNumberDividersF(
-                                    (int) AdvancedEuclidsalgorithm.GCDResult(Lengthes.Select(len => new BigInteger(len))
-                                        .ToList()));
                                 //Кандидат - любой из них
                                 KER buffer = new KER
                                 {
                                     Indexes = SubStrIndexes,
-                                    gLength = gLength,
-                                    PossibleKeyLengthes = Dividers,
+                                    gLength = 0,
                                     SubstringsLength = length,
                                     FoundedSubstring = CurrentSubString
                                 };
@@ -183,8 +174,8 @@ namespace KMZILib
                                 CurrentResults.Add(buffer);
                             }
 
-                            GeneralResults.AddRange(CurrentResults);
                             ThreadsStatus[length - 4] = true;
+                            Console.WriteLine($"Длина {length} закончена. всего найдено {CurrentResults.Count} совпадений.");
                         }) {IsBackground = true, Name = CurrentSubstringLength.ToString()};
                         Check.Start();
                     }
@@ -192,16 +183,21 @@ namespace KMZILib
                     //потом проходим осташийся цикл с длиной 3
 
                     while (ThreadsStatus.Any(status => !status))
+                    {
+                        Console.WriteLine($"Длина {ThreadsStatus.ToList().FindIndex(status => !status)+4} все еще не закончена");
                         Thread.Sleep(1000);
+                    }
+                    */
                     List<KER> LastResults = new List<KER>();
                     for (int CurrentPosition = 0;
                         CurrentPosition < CipherText.Length - CurrentSubstringLength;
                         CurrentPosition++)
                     {
                         //Создаем текущую подстроку
-                        string CurrentSubString = CipherText.Substring(CurrentPosition, CurrentSubstringLength);
+                        string CurrentSubString = CipherText.Substring(CurrentPosition, 3);
                         //Если такая строка уже встречалась, то просто пропускаем ее
-                        if (LastResults.Any(kasres => kasres.Key == CurrentSubString)) continue;
+                        if (LastResults.Any(kasres => kasres.FoundedSubstring == CurrentSubString))
+                            continue;
 
                         List<Match> Textes = new Regex(CurrentSubString).Matches(CipherText).Cast<Match>()
                             .ToList();
@@ -209,31 +205,50 @@ namespace KMZILib
                         //Если строка встречается всего один раз то тоже ее пропускаем
                         if (Textes.Count == 1) continue;
 
-                        int gLength = Textes[1].Index - Textes[0].Index;
-                        for (int i = 0; i < Textes.Count - 1; i++)
-                        {
-                            if (Textes[i + 1].Index - Textes[i].Index ==
-                                gLength) continue;
-                            Textes.RemoveAt(i-- + 1);
-                        }
-
-                        //Удалили все неподходящие подстроки, которые расположены не на нужном расстоянии друг от друга.
                         //Теперь необходимо заполнить данные о длине ключевого слова
                         //Получаем список делителей - список потенциальных длин ключа
-                        int[] Dividers = Comparison.GetUniqueNumberDividers(gLength);
+
+
+                        int[] SubStrIndexes = Textes.Select(match => match.Index).ToArray();
+                        List<int> SubStrLengthes = new List<int>();
+                        for (int i = 0; i < SubStrIndexes.Length - 1; i++)
+                        for (int j = i + 1; j < SubStrIndexes.Length; j++)
+                            SubStrLengthes.Add(SubStrIndexes[j]-SubStrIndexes[i]-3);
+                                for (int i = 0; i < SubStrLengthes.Count - 1; i++)
+                            for (int j = i + 1; j < SubStrLengthes.Count; j++)
+                            {
+                                int GCDRes =
+                                    (int)AdvancedEuclidsalgorithm.GCDResult(SubStrLengthes[i], SubStrLengthes[j]);
+                                if (GCDRes <= 2) continue;
+                                if (!Lengths.ContainsKey(GCDRes)) Lengths.Add(GCDRes, 0);
+
+                                Lengths[GCDRes]++;
+                            }
+                        /*
+                         * TODO: алгоритм:
+                         * Подсчитать расстояния между всеми совпадающими триграммами в тексте
+                         * Подсчитать НОД для каждой пары таких расстояний
+                         * Выбрать из этого НОДа наиболее встречаемые
+                         */
+
+
+                        //Кандидат - любой из них
                         KER buffer = new KER
                         {
-                            Indexes = Textes.Select(match => match.Index).ToArray(),
-                            gLength = gLength,
-                            PossibleKeyLengthes = Dividers,
-                            SubstringsLength = CurrentSubstringLength,
+                            Indexes = SubStrIndexes,
+                            gLength = 0,
+                            SubstringsLength = 3,
                             FoundedSubstring = CurrentSubString
                         };
+
                         LastResults.Add(buffer);
                     }
-
-                    GeneralResults.AddRange(LastResults);
-                    return GeneralResults.ToArray();
+                    //словарь НОДов длин заполнен. теперь необходимо выбрать самые частые
+                    return Lengths.
+                        OrderByDescending(pair => pair.Value).
+                        Select(pair => pair.Key).
+                        Take(10).
+                        ToArray();
                 }
 
                 /// <summary>
