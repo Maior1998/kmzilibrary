@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -19,12 +20,23 @@ namespace KMZILib
             public static ALanguage CurrentLanguage;
 
             /// <summary>
+            /// Список всех имеющихся языков.
+            /// </summary>
+            public static List<ALanguage> LanguagesList=new List<ALanguage>()
+            {
+                RussianLanguage.GetInstanse(),
+                EnglishLanguage.GetInstanse(),
+            };
+
+            /// <summary>
             /// Абстрактный класс, который указывает поля, которыми обладают все языки.
             /// </summary>
             public abstract class ALanguage
             {
+                protected static ALanguage instance;
+
                 /// <summary>
-                /// Строковое представление алфавита языка.
+                /// Строковое представление алфавита языка в верхнем регистре.
                 /// </summary>
                 public string Alphabet { get; protected set; }
                 /// <summary>
@@ -50,6 +62,19 @@ namespace KMZILib
             }
 
             /// <summary>
+            /// Возвращает язык, который содержит указанный символ. Если язык найти не удалось, вернет null.
+            /// </summary>
+            /// <param name="Symbol"></param>
+            /// <returns>Если язык найден - сам язык. Если не найден - null</returns>
+            public static ALanguage LangByChar(char Symbol)
+            {
+                foreach (ALanguage language in LanguagesList)
+                    if (language.Alphabet.Contains(char.ToUpper(Symbol)))
+                        return language;
+                return null;
+            }
+
+            /// <summary>
             /// Представляет данные для работы с русским языком
             /// </summary>
             public class RussianLanguage : ALanguage
@@ -57,7 +82,7 @@ namespace KMZILib
                 /// <summary>
                 /// Инициализирует статистические данные русского алфавита
                 /// </summary>
-                public RussianLanguage()
+                private RussianLanguage()
                 {
                     Alphabet = "АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ";
                     Frequency = new List<char>
@@ -149,6 +174,18 @@ namespace KMZILib
                 {
                     return "Русский язык";
                 }
+
+                /// <inheritdoc />
+                /// <summary>
+                /// Получает комплект данных о русском языке.
+                /// </summary>
+                /// <returns>Набор данных (включая алфавит) текущего русского языка.</returns>
+                public static ALanguage GetInstanse()
+                {
+                    if (ReferenceEquals(instance, null))
+                        return instance = new RussianLanguage();
+                    return instance;
+                }
             }
 
             /// <summary>
@@ -159,7 +196,7 @@ namespace KMZILib
                 /// <summary>
                 /// Инициализирует статистические данные английского алфавита
                 /// </summary>
-                public EnglishLanguage()
+                private EnglishLanguage()
                 {
                     Alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
                     Frequency = new List<char>
@@ -242,6 +279,18 @@ namespace KMZILib
                 public override string ToString()
                 {
                     return "Английский язык";
+                }
+
+                /// <inheritdoc />
+                /// <summary>
+                /// Получает комплект данных об английском языке.
+                /// </summary>
+                /// <returns>Набор данных (включая алфавит) текущего английского языка.</returns>
+                public static ALanguage GetInstanse()
+                {
+                    if (ReferenceEquals(instance, null))
+                        return instance = new EnglishLanguage();
+                    return instance;
                 }
             }
         }
