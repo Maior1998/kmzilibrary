@@ -33,7 +33,10 @@ namespace KMZILib
             /// </summary>
             public abstract class ALanguage
             {
-                protected static ALanguage instance;
+                /// <summary>
+                /// Содержит сущность текущего языка. Это поле необходимо для того, чтобы не создавать кучу копий одних и тех же статистических параметров.
+                /// </summary>
+                private static ALanguage instance;
 
                 /// <summary>
                 /// Строковое представление алфавита языка в верхнем регистре.
@@ -79,6 +82,8 @@ namespace KMZILib
             /// </summary>
             public class RussianLanguage : ALanguage
             {
+                private static ALanguage instance;
+
                 /// <summary>
                 /// Инициализирует статистические данные русского алфавита
                 /// </summary>
@@ -193,6 +198,8 @@ namespace KMZILib
             /// </summary>
             public class EnglishLanguage : ALanguage
             {
+                private static ALanguage instance;
+
                 /// <summary>
                 /// Инициализирует статистические данные английского алфавита
                 /// </summary>
