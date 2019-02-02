@@ -77,27 +77,6 @@ namespace KMZILib
         }
 
         /// <summary>
-        ///     Возвращает строковое представление частотного анализа для всех слов длины 3 в заданной строке
-        /// </summary>
-        /// <param name="Text"></param>
-        /// <returns></returns>
-        public static IOrderedEnumerable<KeyValuePair<string, int>> GetStatisticWb3L(string Text)
-        {
-            Text = Text.ToUpper();
-            Regex bigrams = new Regex(@"\b[" +
-                                      Ciphers.Languages.CurrentLanguage.Alphabet +
-                                      @"]{3}\b");
-            Dictionary<string, int> statistic = new Dictionary<string, int>();
-            foreach (Match match in bigrams.Matches(Text))
-            {
-                if (!statistic.ContainsKey(match.Value))
-                    statistic.Add(match.Value, 0);
-                statistic[match.Value]++;
-            }
-            return statistic.OrderByDescending(pair => pair.Value);
-        }
-
-        /// <summary>
         ///     Возвращает строковое представление частотного анализа для всех слов длины 1 в заданной строке
         /// </summary>
         /// <param name="Text"></param>
@@ -129,6 +108,27 @@ namespace KMZILib
             Regex bigrams = new Regex(@"\b[" +
                                       Ciphers.Languages.CurrentLanguage.Alphabet +
                                       @"]{2}\b");
+            Dictionary<string, int> statistic = new Dictionary<string, int>();
+            foreach (Match match in bigrams.Matches(Text))
+            {
+                if (!statistic.ContainsKey(match.Value))
+                    statistic.Add(match.Value, 0);
+                statistic[match.Value]++;
+            }
+            return statistic.OrderByDescending(pair => pair.Value);
+        }
+
+        /// <summary>
+        ///     Возвращает строковое представление частотного анализа для всех слов длины 3 в заданной строке
+        /// </summary>
+        /// <param name="Text"></param>
+        /// <returns></returns>
+        public static IOrderedEnumerable<KeyValuePair<string, int>> GetStatisticWb3L(string Text)
+        {
+            Text = Text.ToUpper();
+            Regex bigrams = new Regex(@"\b[" +
+                                      Ciphers.Languages.CurrentLanguage.Alphabet +
+                                      @"]{3}\b");
             Dictionary<string, int> statistic = new Dictionary<string, int>();
             foreach (Match match in bigrams.Matches(Text))
             {
