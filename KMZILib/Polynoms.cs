@@ -224,7 +224,7 @@ namespace KMZILib
                 /// </summary>
                 /// <param name="sign">Знак одночлена (-1/0/1)</param>
                 /// <param name="value">Значение одночлена. Целое число</param>
-                /// <param name="degree">Стпень одночлена. Целое неотрицательное число</param>
+                /// <param name="degree">Степень одночлена. Целое неотрицательное число</param>
                 public Nom(int sign, int value, int degree)
                 {
                     Sign = sign;

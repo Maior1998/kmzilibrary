@@ -10,110 +10,22 @@ namespace KMZILib
     /// </summary>
     public static class TextStat
     {
-        
         /// <summary>
-        ///     Получает процентную статистику по всем буквам, входящим в заданную упорядоченную последовательность
+        /// Возвращает результат статистического анализа для каждой буквы, входящей в 
         /// </summary>
-        /// <param name="arr"></param>
+        /// <param name="SourceText"></param>
         /// <returns></returns>
-        public static string GetStatistic(IOrderedEnumerable<KeyValuePair<char, double>> arr)
+        public static IOrderedEnumerable<KeyValuePair<char, int>> GetStatisticOnegram(string SourceText)
         {
-            StringBuilder Answer = new StringBuilder();
-
-            int i = 0;
-            foreach (KeyValuePair<char, double> stat in arr)
-                Answer.Append('{' + $"{stat.Key} - {stat.Value}" + '}' + $" ({Ciphers.Languages.CurrentLanguage.Frequency[i++]} ?)\n");
-
-            return Answer.ToString();
-        }
-
-        /// <summary>
-        ///     Возвращает строковое представление частотного анализа для всех слов длины 2 в заданной строке
-        /// </summary>
-        /// <param name="Text"></param>
-        /// <returns></returns>
-        public static string GetStatisticWb2L(string Text)
-        {
-            Text = Text.ToUpper();
-            Regex bigrams = new Regex(@"\b\w{2}\b");
-            Dictionary<string, int> statistic = new Dictionary<string, int>();
-            foreach (Match match in bigrams.Matches(Text))
-                if (statistic.ContainsKey(match.Value))
-                    statistic[match.Value]++;
-                else
-                    statistic.Add(match.Value, 1);
-
-            StringBuilder answer = new StringBuilder();
-            int i = 0;
-            foreach (KeyValuePair<string, int> pair in statistic.OrderByDescending(pair => pair.Value))
+            SourceText = SourceText.ToUpper();
+            Dictionary<char, int> Result = Ciphers.Languages.CurrentLanguage.AlphabetArray.ToDictionary<char, char, int>(letter => letter, letter => 0);
+            foreach (char symbol in SourceText)
             {
-                if (i == Ciphers.Languages.CurrentLanguage.FrequencyWb2L.Count) break;
-                answer.Append($"{pair.Key} - ({pair.Value}) ({Ciphers.Languages.CurrentLanguage.FrequencyWb2L[i++]}?)\n");
+                if (!Ciphers.Languages.CurrentLanguage.Alphabet.Contains(symbol))
+                    continue;
+                Result[symbol]++;
             }
-
-            return answer.ToString();
-        }
-
-        /// <summary>
-        ///     Возвращает строковое представление частотного анализа для всех слов длины 1 в заданной строке
-        /// </summary>
-        /// <param name="Text"></param>
-        /// <returns></returns>
-        public static string GetStatisticWb1L(string Text)
-        {
-            Text = Text.ToUpper();
-            Regex bigrams = new Regex(@"\b\w\b");
-            Dictionary<string, int> statistic = new Dictionary<string, int>();
-            foreach (Match match in bigrams.Matches(Text))
-                if (statistic.ContainsKey(match.Value))
-                    statistic[match.Value]++;
-                else
-                    statistic.Add(match.Value, 1);
-
-            StringBuilder answer = new StringBuilder();
-            int i = 0;
-            foreach (KeyValuePair<string, int> pair in statistic.OrderByDescending(pair => pair.Value))
-            {
-                if (i == Ciphers.Languages.CurrentLanguage.FrequencyWb1L.Count) break;
-                answer.Append($"{pair.Key} - ({pair.Value}) ({Ciphers.Languages.CurrentLanguage.FrequencyWb1L[i++]}?)\n");
-            }
-
-            return answer.ToString();
-        }
-
-        /// <summary>
-        ///     Возвращает строковое представление частотного анализа для всех последовательностей букв 3 в заданной строке
-        /// </summary>
-        /// <param name="Text"></param>
-        /// <returns></returns>
-        public static string GetStatisticThreegram(string Text)
-        {
-            Text = Text.ToUpper();
-            Dictionary<string, int> statistic = new Dictionary<string, int>();
-            int i;
-            for (i = 0; i < Text.Length - 2; i++)
-                
-            {
-                if (Ciphers.Languages.CurrentLanguage.Alphabet.IndexOf(Text[i]) == -1 ||
-                    Ciphers.Languages.CurrentLanguage.Alphabet.IndexOf(Text[i + 1]) == -1 ||
-                    Ciphers.Languages.CurrentLanguage.Alphabet.IndexOf(Text[i + 2]) == -1) continue;
-                string buffer = Text[i] + Text[i + 1].ToString() + Text[i + 2];
-                if (statistic.ContainsKey(buffer)) statistic[buffer]++;
-                else
-                    statistic.Add(buffer, 1);
-            }
-
-            StringBuilder answer = new StringBuilder();
-            statistic = statistic.OrderByDescending(pair => pair.Value)
-                .ToDictionary(pair => pair.Key, pair => pair.Value);
-            i = 0;
-            foreach (string key in statistic.Keys)
-            {
-                if (i >= Ciphers.Languages.CurrentLanguage.FrequencyThreegrams.Count) break;
-                answer.Append($"{key} - ({statistic[key]}) ({Ciphers.Languages.CurrentLanguage.FrequencyThreegrams[i++]}?)\n");
-            }
-
-            return answer.ToString();
+            return Result.OrderByDescending(a => a.Value);
         }
 
         /// <summary>
@@ -121,31 +33,110 @@ namespace KMZILib
         /// </summary>
         /// <param name="Text"></param>
         /// <returns></returns>
-        public static string GetStatisticBigram(string Text)
+        public static IOrderedEnumerable<KeyValuePair<string, int>> GetStatisticBigram(string Text)
         {
             Text = Text.ToUpper();
             Dictionary<string, int> statistic = new Dictionary<string, int>();
-            int i;
-            for (i = 0; i < Text.Length - 1; i++)
+            for (int i = 0; i < Text.Length - 1; i++)
 
             {
                 if (Ciphers.Languages.CurrentLanguage.Alphabet.IndexOf(Text[i]) == -1 ||
-                    Ciphers.Languages.CurrentLanguage.Alphabet.IndexOf(Text[i + 1]) == -1) continue;
-                string buffer = Text[i] + Text[i + 1].ToString();
-                if (statistic.ContainsKey(buffer)) statistic[buffer]++;
-                else
-                    statistic.Add(buffer, 1);
+                    Ciphers.Languages.CurrentLanguage.Alphabet.IndexOf(Text[i + 1]) == -1)
+                    continue;
+                string buffer = string.Concat(Text[i], Text[i + 1]);
+                if (!statistic.ContainsKey(buffer))
+                    statistic.Add(buffer, 0);
+                statistic[buffer]++;
             }
 
-            StringBuilder answer = new StringBuilder();
-            i = 0;
-            foreach (KeyValuePair<string, int> pair in statistic.OrderByDescending(pair => pair.Value))
+            return statistic.OrderByDescending(pair => pair.Value);
+        }
+
+        /// <summary>
+        ///     Возвращает строковое представление частотного анализа для всех последовательностей букв 3 в заданной строке
+        /// </summary>
+        /// <param name="Text"></param>
+        /// <returns></returns>
+        public static IOrderedEnumerable<KeyValuePair<string, int>> GetStatisticThreegram(string Text)
+        {
+            Text = Text.ToUpper();
+            Dictionary<string, int> statistic = new Dictionary<string, int>();
+            for (int i = 0; i < Text.Length - 2; i++)
+
             {
-                if (i == Ciphers.Languages.CurrentLanguage.FrequencyBigrams.Count) break;
-                answer.Append($"{pair.Key} - ({pair.Value}) ({Ciphers.Languages.CurrentLanguage.FrequencyBigrams[i++]}?)\n");
+                if (Ciphers.Languages.CurrentLanguage.Alphabet.IndexOf(Text[i]) == -1 ||
+                    Ciphers.Languages.CurrentLanguage.Alphabet.IndexOf(Text[i + 1]) == -1 ||
+                    Ciphers.Languages.CurrentLanguage.Alphabet.IndexOf(Text[i + 2]) == -1)
+                    continue;
+                string buffer = string.Concat(Text[i], Text[i + 1], Text[i + 1]);
+                if (!statistic.ContainsKey(buffer))
+                    statistic.Add(buffer, 0);
+                statistic[buffer]++;
             }
+            return statistic.OrderByDescending(pair => pair.Value);
+        }
 
-            return answer.ToString();
+        /// <summary>
+        ///     Возвращает строковое представление частотного анализа для всех слов длины 3 в заданной строке
+        /// </summary>
+        /// <param name="Text"></param>
+        /// <returns></returns>
+        public static IOrderedEnumerable<KeyValuePair<string, int>> GetStatisticWb3L(string Text)
+        {
+            Text = Text.ToUpper();
+            Regex bigrams = new Regex(@"\b[" +
+                                      Ciphers.Languages.CurrentLanguage.Alphabet +
+                                      @"]{3}\b");
+            Dictionary<string, int> statistic = new Dictionary<string, int>();
+            foreach (Match match in bigrams.Matches(Text))
+            {
+                if (!statistic.ContainsKey(match.Value))
+                    statistic.Add(match.Value, 0);
+                statistic[match.Value]++;
+            }
+            return statistic.OrderByDescending(pair => pair.Value);
+        }
+
+        /// <summary>
+        ///     Возвращает строковое представление частотного анализа для всех слов длины 1 в заданной строке
+        /// </summary>
+        /// <param name="Text"></param>
+        /// <returns></returns>
+        public static IOrderedEnumerable<KeyValuePair<string, int>> GetStatisticWb1L(string Text)
+        {
+            Text = Text.ToUpper();
+            Regex bigrams = new Regex(@"\b[" +
+                                      Ciphers.Languages.CurrentLanguage.Alphabet +
+                                      @"]\b");
+            Dictionary<string, int> statistic = new Dictionary<string, int>();
+            foreach (Match match in bigrams.Matches(Text))
+            {
+                if (!statistic.ContainsKey(match.Value))
+                    statistic.Add(match.Value, 0);
+                statistic[match.Value]++;
+            }
+            return statistic.OrderByDescending(pair => pair.Value);
+        }
+
+        /// <summary>
+        ///     Возвращает строковое представление частотного анализа для всех слов длины 2 в заданной строке
+        /// </summary>
+        /// <param name="Text"></param>
+        /// <returns></returns>
+        public static IOrderedEnumerable<KeyValuePair<string, int>> GetStatisticWb2L(string Text)
+        {
+            Text = Text.ToUpper();
+            Regex bigrams = new Regex(@"\b[" +
+                                      Ciphers.Languages.CurrentLanguage.Alphabet +
+                                      @"]{2}\b");
+            Dictionary<string, int> statistic = new Dictionary<string, int>();
+            foreach (Match match in bigrams.Matches(Text))
+            {
+                if (!statistic.ContainsKey(match.Value))
+                    statistic.Add(match.Value, 0);
+                statistic[match.Value]++;
+            }
+            return statistic.OrderByDescending(pair => pair.Value);
         }
     }
 }

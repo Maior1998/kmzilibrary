@@ -62,6 +62,19 @@ namespace KMZILib
                 /// Упорядоченный по частоте встречи список троек букв, которые встречаются друг за другом
                 /// </summary>
                 public List<string> FrequencyThreegrams { get; protected set; }
+                /// <summary>
+                /// Алфавит языка, представленный в виде массива символов в верхнем регистре.
+                /// </summary>
+                public char[] AlphabetArray
+                {
+                    get
+                    {
+                        char[] Result=new char[Alphabet.Length];
+                        for (int i = 0; i < Alphabet.Length; i++)
+                            Result[i] = char.ToUpper(Alphabet[i]);
+                        return Result;
+                    }
+                }
             }
 
             /// <summary>
@@ -299,6 +312,8 @@ namespace KMZILib
                         return instance = new EnglishLanguage();
                     return instance;
                 }
+
+                
             }
         }
     }
