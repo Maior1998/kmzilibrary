@@ -28,7 +28,7 @@ namespace KMZILib
                 buffer.Second *= CurrentComparison.M;
             }
 
-            return new LinearComparison((int) buffer.First, (int) buffer.Second);
+            return new LinearComparison(buffer.First, buffer.Second);
         }
 
         /// <summary>
