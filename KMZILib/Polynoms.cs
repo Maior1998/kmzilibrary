@@ -120,7 +120,7 @@ namespace KMZILib
             /// <param name="x">Точка, в которой нужно вычислить многочлен</param>
             /// <param name="module">Модуль, по которому происходит вычисление</param>
             /// <returns></returns>
-            public BigInteger GetValue(int x, int module)
+            public BigInteger GetValue(BigInteger x, BigInteger module)
             {
                 return GetValueArray(x, module).Last();
             }
@@ -132,7 +132,7 @@ namespace KMZILib
             /// <param name="x"></param>
             /// <param name="module"></param>
             /// <returns></returns>
-            public BigInteger[] GetValueArray(int x, int module)
+            public BigInteger[] GetValueArray(BigInteger x, BigInteger module)
             {
                 LinearComparison[] ResultArray = new LinearComparison[Coefficients.Length];
                 ResultArray[0] = new LinearComparison(Coefficients[0], module);

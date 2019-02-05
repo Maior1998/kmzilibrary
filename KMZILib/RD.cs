@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 
 namespace KMZILib
 {
@@ -16,7 +17,7 @@ namespace KMZILib
 
         /// <summary>
         ///     Генерирует равномерно распределенные случайные числа в указанном размере и диапазоне. Без повторений. В порядке
-        ///     возрастания.
+        ///     возрастания. Если в количесто послать 0, выведет весь диапазон.
         /// </summary>
         /// <param name="Count">
         ///     Число генерируемых чисел. Если опускается, возвращается весь диапазон от нижнейграницы до верхней
@@ -29,10 +30,10 @@ namespace KMZILib
         ///     Число генерируемых чисел в диапазоне не может быть больше длины самого
         ///     диапазона.
         /// </exception>
-        public static int[] UniformDistribution(int Min, int Max, int Count = -1)
+        public static BigInteger[] UniformDistribution(BigInteger Min, BigInteger Max, BigInteger Count)
         {
-            SortedSet<int> numbersenum = new SortedSet<int>();
-            if (Count == -1)
+            SortedSet<BigInteger> numbersenum = new SortedSet<BigInteger>();
+            if (Count == 0)
                 Count = Max - Min + 1;
             if (Count > Max - Min + 1)
                 throw new ArgumentException("Число переменных не может превышать длину диапазона", nameof(Count));
@@ -40,19 +41,32 @@ namespace KMZILib
             if (Count < (Max - Min + 1) / 2)
             {
                 while (numbersenum.Count != Count)
-                    numbersenum.Add(Rand.Next(Min, Max + 1));
+                {
+                    BigInteger MinCopy = Min;
+                    BigInteger MaxCopy = Max;
+
+                    while (MaxCopy - MinCopy > 1)
+                    {
+                        if (Rand.Next(2) == 0)
+                            MaxCopy = (MaxCopy - MinCopy + 1) / 2;
+                        else
+                            MinCopy = (MaxCopy - MinCopy + 1) / 2 + (MaxCopy - MinCopy + 1) % 2;
+                    }
+
+                    BigInteger randomResult = Rand.Next(2) == 0 ? MinCopy : MaxCopy;
+                    if(!numbersenum.Contains(randomResult))
+                        numbersenum.Add(randomResult);
+                }
             }
             else
             {
-                List<int> buffer = new List<int>();
-                for (int i = Min; i <= Max; i++)
+                List<BigInteger> buffer = new List<BigInteger>();
+                for (BigInteger i = Min; i <= Max; i++)
                     buffer.Add(i);
                 while (buffer.Count != Count)
                     buffer.RemoveAt(Rand.Next(numbersenum.Count));
-                numbersenum = new SortedSet<int>(buffer);
+                numbersenum = new SortedSet<BigInteger>(buffer);
             }
-
-
             return numbersenum.ToArray();
         }
     }

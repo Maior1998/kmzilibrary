@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 
 namespace KMZILib
@@ -421,14 +422,15 @@ namespace KMZILib
         /// <param name="Number">Число, которое необходимо перевести в двоичную систему счисления</param>
         /// <param name="Count">Число разрядов. Отсчет ведется от младших к старщим</param>
         /// <returns>Массив двоичных значение - двоичное представление числа</returns>
-        public static bool[] GetBinaryArray(int Number, int Count)
+        public static bool[] GetBinaryArray(BigInteger Number, int Count)
         {
-            BitArray number = new BitArray(new[] {Number});
-            if (Count > number.Count) throw new InvalidOperationException("Число бит не может превосходить 32 бита");
-            bool[] Result = new bool[Count];
-            for (int i = Count - 1; i >= 0; i--)
-                Result[Count - 1 - i] = number[i];
-            return Result;
+            if (Number < 0)
+                throw new InvalidOperationException("Число должно быть положительным.");
+            BitArray number = new BitArray(Number.ToByteArray());
+            bool[] buffer = number.Cast<bool>().Reverse().SkipWhile(val => !val).ToArray();
+            List<bool> Result = new List<bool>(new bool[Count - buffer.Length]);
+            Result.AddRange(buffer);
+            return Result.ToArray();
         }
 
         /// <summary>
@@ -436,11 +438,10 @@ namespace KMZILib
         /// </summary>
         /// <param name="Number">Число, которое необходимо перевести в двоичную систему счисления</param>
         /// <returns>Массив двоичных значение - двоичное представление числа</returns>
-        public static bool[] GetBinaryArray(int Number)
+        public static bool[] GetBinaryArray(BigInteger Number)
         {
-            if (Number < 0) throw new InvalidOperationException("Число должно быть положительным");
-            if (Number == 0) return new[] {false};
-            BitArray number = new BitArray(new[] {Number});
+            if (Number < 0) throw new InvalidOperationException("Число должно быть положительным.");
+            BitArray number = new BitArray(Number.ToByteArray());
 
             int i = number.Count - 1;
             while (i >= 0 && !number[i])

@@ -479,11 +479,11 @@ namespace KMZILib
                     "Тестируемое число и число его прогонов должны быть положительными числами!");
             }
 
-            int[] RestVariants = RD.UniformDistribution(2, source - 1, count);
+            BigInteger[] RestVariants = RD.UniformDistribution(2, source - 1, count);
             //отрезок [2,n-1]
             for (int i = 1; i <= count; i++)
             {
-                int CurrentValue = RestVariants[i - 1];
+                BigInteger CurrentValue = RestVariants[i - 1];
                 if (AdvancedEuclidsalgorithm.GCDResult(CurrentValue, source) != 1) return PrimalityTestResult.Composite;
                 LinearComparison comparison = new LinearComparison(CurrentValue, source);
                 if (MultiplicativeInverse.BinaryPowLinearComparison(comparison, source - 1).A != 1)
@@ -510,18 +510,15 @@ namespace KMZILib
         /// <param name="source">Число, которое необходмио протестировать</param>
         /// <param name="count">Число прогонов теста</param>
         /// <returns></returns>
-        public static PrimalityTestResult SSPT(int source, int count)
+        public static PrimalityTestResult SSPT(BigInteger source, BigInteger count)
         {
             if (count >= source)
                 throw new InvalidOperationException("Число прогонов теста не должно быть меньше тестируемого числа.");
-            switch (source)
-            {
-                case 0:
-                    return PrimalityTestResult.Composite;
-                case 1:
-                    throw new InvalidOperationException("Единица не является ни простым, ни составным числом.");
-            }
-
+            if(source==0)
+                return PrimalityTestResult.Composite;
+            if (source == 1)
+                return PrimalityTestResult.Unknown;
+            
             if (source < 0 || count <= 0)
             {
                 throw new InvalidOperationException(
@@ -530,11 +527,11 @@ namespace KMZILib
 
             //нам необходимо, чтобы число было нечетным, поэтому мы отсеиваем все четные числа.
             if (source % 2 == 0) return PrimalityTestResult.Composite;
-            int[] RestVariants = RD.UniformDistribution(2, source - 1, count);
+            BigInteger[] RestVariants = RD.UniformDistribution(2, source - 1, count);
             //отрезок [2,n-1]
             for (int i = 0; i < count; i++)
             {
-                int CurrentValue = RestVariants[i];
+                BigInteger CurrentValue = RestVariants[i];
                 if (AdvancedEuclidsalgorithm.GCDResult(CurrentValue, source) != 1) return PrimalityTestResult.Composite;
                 //значение символа якоби
                 int jacobi = (int) JacobiSymbol.Get(CurrentValue, source);
@@ -552,7 +549,7 @@ namespace KMZILib
         /// <param name="source"></param>
         /// <returns></returns>
         /// <exception cref="InvalidOperationException"></exception>
-        public static PrimalityTestResult SSPTFull(int source)
+        public static PrimalityTestResult SSPTFull(BigInteger source)
         {
             return SSPT(source, source - 2);
         }
@@ -593,11 +590,11 @@ namespace KMZILib
             //n-1 = (2^s) * t
 
 
-            int[] RestVariants = RD.UniformDistribution(2, source - 1, count);
+            BigInteger[] RestVariants = RD.UniformDistribution(2, source - 1, count);
             //отрезок [2,n-1]
             for (int i = 0; i < count; i++)
             {
-                int CurrentValue = RestVariants[i];
+                BigInteger CurrentValue = RestVariants[i];
                 if (AdvancedEuclidsalgorithm.GCDResult(CurrentValue, source) != 1) return PrimalityTestResult.Composite;
                 //значение символа якоби
                 LinearComparison comparison = new LinearComparison(CurrentValue, source);

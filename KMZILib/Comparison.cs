@@ -348,7 +348,7 @@ namespace KMZILib
             /// <param name="source"></param>
             /// <param name="degree"></param>
             /// <returns></returns>
-            public static LinearComparison BinaryPowLinearComparison(LinearComparison source, int degree)
+            public static LinearComparison BinaryPowLinearComparison(LinearComparison source, BigInteger degree)
             {
                 BigInteger a = 5;
                 LinearComparison Result = new LinearComparison(source.A, source.M);

@@ -19,20 +19,20 @@ namespace KMZILib
         /// </summary>
         public static class SecretSharing
         {
-            private static int GetBiggerRandomPrime(int current)
+            private static BigInteger GetBiggerRandomPrime(BigInteger current)
             {
-                if (Math.Abs(current) < PrimeNumbers.Last())
+                if (BigInteger.Abs(current) < PrimeNumbers.Last())
                 {
                     return PrimeNumbers[
                         RD.Rand.Next(
                             PrimeNumbers.ToList().IndexOf(
                                 PrimeNumbers.First(
-                                    num => num > Math.Abs(current))),
+                                    num => num > BigInteger.Abs(current))),
                             PrimeNumbers.Length)
                     ];
                 }
 
-                int find = current % 2 == 0 ? Math.Abs(current) + 1 : Math.Abs(current) + 2;
+                BigInteger find = current % 2 == 0 ? BigInteger.Abs(current) + 1 : BigInteger.Abs(current) + 2;
                 while (SSPTFull(find) == PrimalityTestResult.Composite) find += 2;
                 return find;
             }
@@ -50,16 +50,16 @@ namespace KMZILib
                 /// <param name="module">Модуль, который будет определен исходя из ключа</param>
                 /// <param name="Limit">Порог количества фрагментов, начиная с которого можно будет восстановить ключ</param>
                 /// <returns>Массив наборов (x,y). x можно публиковать. y должен находиться в секрете.</returns>
-                public static KeyValuePair<int, BigInteger>[] Share(int Key, int CountOfFragments, out int module,
+                public static KeyValuePair<int, BigInteger>[] Share(BigInteger Key, int CountOfFragments, out BigInteger module,
                     int Limit = -1)
                 {
                     if (Limit == -1) Limit = CountOfFragments;
                     module = GetBiggerRandomPrime(Key);
 
                     //Вычислили модуль многочлена и знаем порог - пора генерировать многочлен.
-                    int[] coefs = new int[Limit];
+                    BigInteger[] coefs = new BigInteger[Limit];
                     for (int i = 0; i < coefs.Length - 1; i++)
-                        coefs[i] = RD.Rand.Next(1, module);
+                        coefs[i] = RD.UniformDistribution(1, module - 1, 1)[0];
                     coefs[coefs.Length - 1] = Key;
                     Polynom sharepolynom = new Polynom(coefs);
                     KeyValuePair<int, BigInteger>[] Keys = new KeyValuePair<int, BigInteger>[CountOfFragments];
@@ -182,57 +182,21 @@ namespace KMZILib
             }
 
             /// <summary>
-            ///     Разделение секрета на основе Греко-Китайской теореме об остатках. Основана на схеме Асмута — Блума.
+            ///     Разделение секрета на основе Греко-Китайской теореме об остатках.
             /// </summary>
             public static class CRT
             {
                 /// <summary>
-                ///     Разделение секрета при помощи Греко-Китайской теоремы об остатках
+                /// Схема Асмута-Блума.
                 /// </summary>
-                /// <param name="Key"></param>
-                /// <param name="Count"></param>
-                /// <param name="Limit"></param>
-                /// <returns></returns>
-                public static int[][] Share(int Key, int Count, int Limit)
+                public static class AsmuthBloomScheme
                 {
-                    int p = GetBiggerRandomPrime(Key);
-                    //p - первое простое число ,первосходящее Key
-                    List<int> NumEnum = new List<int>(new[] {GetBiggerRandomPrime(p)});
-                    while (NumEnum.Count != Count)
-                        NumEnum.Add(GetBiggerRandomPrime(NumEnum.Last()));
-                    while (!IsGoodEnum(NumEnum, Limit, p))
+                    public static IEnumerable<LinearComparison> Share(BigInteger Key,int Count, int Limit=0)
                     {
-                        NumEnum.RemoveAt(0);
-                        NumEnum.Add(GetBiggerRandomPrime(NumEnum.Last()));
+                        if (Limit == 0) Limit = Count;
+                        BigInteger p = GetBiggerRandomPrime(Key);
+                        return null;
                     }
-
-                    int Key_ = Key + p * RD.Rand.Next(2, 101);
-                    int[][] Result = new int[Count][];
-                    for (int i = 0; i < Count; i++)
-                        Result[i] = new[] {p, NumEnum[i], Key_ % NumEnum[i]};
-                    return Result;
-                }
-
-                /// <summary>
-                ///     Восстановление ключа при помощи Греко-Китайской теоремы об остатках
-                /// </summary>
-                /// <param name="comparisons"></param>
-                /// <returns></returns>
-                public static int RestoreKey(int[][] comparisons)
-                {
-                    //{p, m, x}
-                    int p = comparisons.First()[0];
-                    LinearComparison[] comparisonsarray =
-                        comparisons.Select(comp => new LinearComparison(comp[2], comp[1])).ToArray();
-                    BigInteger supres = KMZILib.CRT.SolveBigInteger(comparisonsarray);
-                    return (int) (supres % new BigInteger(p));
-                }
-
-                private static bool IsGoodEnum(List<int> numenum, int m, int p)
-                {
-                    int leftmult = numenum.Take(m).Aggregate(1, (current, VARIABLE) => current * VARIABLE);
-                    int rightmult = numenum.Skip(m - 1).Aggregate(p, (current, VARIABLE) => current * VARIABLE);
-                    return leftmult > rightmult;
                 }
             }
         }
