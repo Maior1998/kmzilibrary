@@ -22,7 +22,7 @@ namespace KMZILib
         /// <param name="Length">Длина столбца-значений функции</param>
         public BinaryFunction(byte Length)
         {
-            ValuesArray = new bool[(int) Math.Pow(2, Length)];
+            ValuesArray = new bool[(int)Math.Pow(2, Length)];
 
             Random rand = new Random();
             for (int i = 0; i < ValuesArray.Length; i++)
@@ -36,7 +36,8 @@ namespace KMZILib
         public BinaryFunction(bool[] Function)
         {
             List<bool> Vector = new List<bool>(Function);
-            if (Vector.Count == 1) Vector.Add(Vector[0]);
+            if (Vector.Count == 1)
+                Vector.Add(Vector[0]);
             while (Math.Abs(Math.Truncate(Math.Log(Vector.Count, 2)) - Math.Log(Vector.Count, 2)) > 0)
                 Vector.Insert(0, false);
             ValuesArray = new bool[Vector.Count];
@@ -63,7 +64,7 @@ namespace KMZILib
         {
             get
             {
-                int TableLength = (int) Math.Pow(2, CountOfVariables);
+                int TableLength = (int)Math.Pow(2, CountOfVariables);
                 bool[,] Result = new bool[TableLength, CountOfVariables + 1];
                 for (int i = 0; i < TableLength; i++)
                 {
@@ -80,7 +81,7 @@ namespace KMZILib
         /// <summary>
         ///     Число переменных аргументов функции
         /// </summary>
-        public byte CountOfVariables => (byte) Math.Log(ValuesArray.Length, 2);
+        public byte CountOfVariables => (byte)Math.Log(ValuesArray.Length, 2);
 
 
         //T0 T1 Ts Tm Tl
@@ -142,8 +143,10 @@ namespace KMZILib
                     {
 
                         DNF jdnf = new DNF(GetBinaryArray(j, CountOfVariables).Select(val => new bool?(val)).ToArray());
-                        if (!idnf.IsPrecedeDNF(jdnf)) continue;
-                        if (ValuesArray[i] && !ValuesArray[j]) return false;
+                        if (!idnf.IsPrecedeDNF(jdnf))
+                            continue;
+                        if (ValuesArray[i] && !ValuesArray[j])
+                            return false;
                     }
                 }
 
@@ -172,8 +175,10 @@ namespace KMZILib
                 //Треугольник Паскаля заполнен.
                 for (int i = 0; i < ValuesArray.Length; i++)
                 {
-                    if (!PascalTriangle[i][0]) continue;
-                    if (GetBinaryArray(i).Count(val => val) > 1) return false;
+                    if (!PascalTriangle[i][0])
+                        continue;
+                    if (GetBinaryArray(i).Count(val => val) > 1)
+                        return false;
                 }
 
                 return true;
@@ -192,7 +197,8 @@ namespace KMZILib
                 List<string> answer = new List<string>();
                 for (byte i = 0; i < ValuesArray.Length; i++)
                 {
-                    if (!ValuesArray[i]) continue;
+                    if (!ValuesArray[i])
+                        continue;
 
                     bool[] variables = GetBinaryArray(i, CountOfVariables);
                     List<string> buffer = new List<string>();
@@ -219,7 +225,8 @@ namespace KMZILib
                 List<string> answer = new List<string>();
                 for (byte i = 0; i < ValuesArray.Length; i++)
                 {
-                    if (ValuesArray[i]) continue;
+                    if (ValuesArray[i])
+                        continue;
                     bool[] variables = GetBinaryArray(i, CountOfVariables);
                     List<string> buffer = new List<string>();
                     for (int j = 0; j < CountOfVariables; j++)
@@ -240,14 +247,15 @@ namespace KMZILib
         {
             get
             {
-                
+
                 if (ValuesArray.Distinct().Count() == 1)
                     return ValuesArray.First() ? "1" : "0";
                 List<List<bool?>> PDNF = new List<List<bool?>>();
                 for (byte i = 0; i < ValuesArray.Length; i++)
                 {
-                    if (!ValuesArray[i]) continue;
-                    PDNF.Add(GetBinaryArray(i, CountOfVariables).Select(elem => (bool?) elem).ToList());
+                    if (!ValuesArray[i])
+                        continue;
+                    PDNF.Add(GetBinaryArray(i, CountOfVariables).Select(elem => (bool?)elem).ToList());
                 }
                 //Получили наборы СДНФ
 
@@ -318,14 +326,16 @@ namespace KMZILib
                 List<string> answer = new List<string>();
                 for (int i = 0; i < ValuesArray.Length; i++)
                 {
-                    if (!PascalTriangle[i][0]) continue;
+                    if (!PascalTriangle[i][0])
+                        continue;
                     bool[] variables = GetBinaryArray(i, CountOfVariables);
 
                     List<string> buffer = new List<string>();
                     for (int j = 0; j < CountOfVariables; j++)
                         if (variables[j])
                             buffer.Add(VariablesAlphabet[j].ToString());
-                    if (buffer.Count == 0) buffer.Add("1");
+                    if (buffer.Count == 0)
+                        buffer.Add("1");
                     answer.Add(string.Join("", buffer));
                 }
 
@@ -339,8 +349,8 @@ namespace KMZILib
             DNF[] TargetingColumns =
                 QuineTable[TargetRow].Keys.Where(key => QuineTable[TargetRow][key]).ToArray();
             foreach (KeyValuePair<DNF, Dictionary<DNF, bool>> row in QuineTable)
-            foreach (DNF targetingColumn in TargetingColumns)
-                row.Value.Remove(targetingColumn);
+                foreach (DNF targetingColumn in TargetingColumns)
+                    row.Value.Remove(targetingColumn);
         }
 
         /// <summary>
@@ -351,7 +361,8 @@ namespace KMZILib
         /// <returns></returns>
         private static DNF GetColumnByCount(Dictionary<DNF, Dictionary<DNF, bool>> QuineTable, int Count)
         {
-            if (QuineTable.First().Value.Keys.All(sdnf => PrecedesDNFsCount(QuineTable, sdnf) != Count)) return null;
+            if (QuineTable.First().Value.Keys.All(sdnf => PrecedesDNFsCount(QuineTable, sdnf) != Count))
+                return null;
             return QuineTable.First().Value.Keys.First(sdnf => PrecedesDNFsCount(QuineTable, sdnf) == Count);
         }
 
@@ -377,12 +388,14 @@ namespace KMZILib
                     bufferDnF.IsParticiated = false;
                 for (int i = 0; i < BufferDNFs.Count - 1; i++)
                 {
-                    if (buffer.Contains(BufferDNFs[i])) continue;
+                    if (buffer.Contains(BufferDNFs[i]))
+                        continue;
                     //фиксируем набор и пробуем его со всеми склеить
                     for (int j = i + 1; j < BufferDNFs.Count; j++)
                     {
                         //Если получается склеить - делаем склейку и вставляем ее во временный список
-                        if (!BufferDNFs[i].CanGluing(BufferDNFs[j])) continue;
+                        if (!BufferDNFs[i].CanGluing(BufferDNFs[j]))
+                            continue;
                         DNF GluinedDNF = new DNF(DNF.Gluing(BufferDNFs[i], BufferDNFs[j]));
                         if (!buffer.Contains(GluinedDNF))
                             buffer.Add(GluinedDNF);
@@ -393,14 +406,17 @@ namespace KMZILib
                     }
 
                     //Если же переменная ни с кем не склеивалась, то копируем ее во временный список без изменений
-                    if (!BufferDNFs[i].IsParticiated) buffer.Add(BufferDNFs[i]);
+                    if (!BufferDNFs[i].IsParticiated)
+                        buffer.Add(BufferDNFs[i]);
                 }
 
-                if (!BufferDNFs.Last().IsParticiated) buffer.Add(BufferDNFs.Last());
+                if (!BufferDNFs.Last().IsParticiated)
+                    buffer.Add(BufferDNFs.Last());
                 //Обвновляем текущий список измененным
                 BufferDNFs = buffer;
                 //Если никаких изменений в результате прохода не произошло - можно останавливаться - достигли тупика.
-                if (!IsHereAnyDifferences) break;
+                if (!IsHereAnyDifferences)
+                    break;
             }
 
             return BufferDNFs;
@@ -428,8 +444,9 @@ namespace KMZILib
                 throw new InvalidOperationException("Число должно быть положительным.");
             BitArray number = new BitArray(Number.ToByteArray());
             bool[] buffer = number.Cast<bool>().Reverse().SkipWhile(val => !val).ToArray();
-            List<bool> Result = new List<bool>(new bool[Count - buffer.Length]);
-            Result.AddRange(buffer);
+            bool[] Result = new bool[Count];
+            Array.Copy(buffer, 0, Result, Count < buffer.Length ? 0 : Count - buffer.Length,
+                Math.Min(Count, buffer.Length));
             return Result.ToArray();
         }
 
@@ -440,7 +457,8 @@ namespace KMZILib
         /// <returns>Массив двоичных значение - двоичное представление числа</returns>
         public static bool[] GetBinaryArray(BigInteger Number)
         {
-            if (Number < 0) throw new InvalidOperationException("Число должно быть положительным.");
+            if (Number < 0)
+                throw new InvalidOperationException("Число должно быть положительным.");
             BitArray number = new BitArray(Number.ToByteArray());
 
             int i = number.Count - 1;
@@ -488,13 +506,15 @@ namespace KMZILib
                 bool IsColumnOK = true;
                 for (int i = 0; i < Functions.Count; i++)
                 {
-                    if (PostResult[i, j]) continue;
+                    if (PostResult[i, j])
+                        continue;
 
                     IsColumnOK = false;
                     break;
                 }
 
-                if (IsColumnOK) return false;
+                if (IsColumnOK)
+                    return false;
             }
 
             return true;
@@ -513,13 +533,15 @@ namespace KMZILib
                 bool IsColumnOK = true;
                 for (int i = 0; i < PostTable.GetLength(0); i++)
                 {
-                    if (PostTable[i, j]) continue;
+                    if (PostTable[i, j])
+                        continue;
 
                     IsColumnOK = false;
                     break;
                 }
 
-                if (IsColumnOK) return false;
+                if (IsColumnOK)
+                    return false;
             }
 
             return true;
@@ -551,7 +573,8 @@ namespace KMZILib
                     List<string> Variables = new List<string>();
                     for (int i = 0; i < Values.Length; i++)
                     {
-                        if (!Values[i].HasValue) continue;
+                        if (!Values[i].HasValue)
+                            continue;
                         Variables.Add(Values[i].Value ? VariablesAlphabet[i].ToString() : $"!{VariablesAlphabet[i]}");
                     }
 
@@ -569,14 +592,16 @@ namespace KMZILib
 
             public bool Equals(DNF other)
             {
-                if (ReferenceEquals(null, other)) return false;
+                if (ReferenceEquals(null, other))
+                    return false;
                 return this == other;
             }
 
             public override bool Equals(object obj)
             {
-                if (ReferenceEquals(null, obj)) return false;
-                return Equals((DNF) obj);
+                if (ReferenceEquals(null, obj))
+                    return false;
+                return Equals((DNF)obj);
             }
 
             public override int GetHashCode()
@@ -586,13 +611,17 @@ namespace KMZILib
 
             public bool CanGluing(DNF Other)
             {
-                if (Length != Other.Length) return false;
+                if (Length != Other.Length)
+                    return false;
                 bool IsDifferentValuesFound = false;
                 for (int i = 0; i < Values.Length; i++)
                 {
-                    if (Values[i].HasValue != Other[i].HasValue) return false;
-                    if (!Values[i].HasValue) continue;
-                    if (Values[i].Value == Other[i].Value) continue;
+                    if (Values[i].HasValue != Other[i].HasValue)
+                        return false;
+                    if (!Values[i].HasValue)
+                        continue;
+                    if (Values[i].Value == Other[i].Value)
+                        continue;
                     if (IsDifferentValuesFound)
                         return false;
                     IsDifferentValuesFound = true;
@@ -603,13 +632,15 @@ namespace KMZILib
 
             internal bool IsPrecedeDNF(DNF Second)
             {
-                
+
                 //00-0 : 0000 0010
 
                 for (int i = 0; i < Length; i++)
                 {
-                    if (!Values[i].HasValue) continue;
-                    if (Values[i].Value && !Second[i].Value) return false;
+                    if (!Values[i].HasValue)
+                        continue;
+                    if (Values[i].Value && !Second[i].Value)
+                        return false;
                 }
 
                 return true;
@@ -621,7 +652,8 @@ namespace KMZILib
                 for (int i = 0; i < Result.Length; i++)
                 {
                     if (!First[i].HasValue ||
-                        First[i].Value == Second[i].Value) continue;
+                        First[i].Value == Second[i].Value)
+                        continue;
                     Result[i] = null;
                     break;
                 }
@@ -633,12 +665,16 @@ namespace KMZILib
             {
                 if (ReferenceEquals(First, null) || ReferenceEquals(Second, null))
                     return ReferenceEquals(First, Second);
-                if (First.Values.Length != Second.Values.Length) return false;
+                if (First.Values.Length != Second.Values.Length)
+                    return false;
                 for (int i = 0; i < First.Values.Length; i++)
                 {
-                    if (First.Values[i].HasValue != Second.Values[i].HasValue) return false;
-                    if (!First.Values[i].HasValue) continue;
-                    if (First.Values[i].Value == Second.Values[i].Value) continue;
+                    if (First.Values[i].HasValue != Second.Values[i].HasValue)
+                        return false;
+                    if (!First.Values[i].HasValue)
+                        continue;
+                    if (First.Values[i].Value == Second.Values[i].Value)
+                        continue;
                     return false;
                 }
 
@@ -647,13 +683,18 @@ namespace KMZILib
 
             public static bool operator !=(DNF First, DNF Second)
             {
-                if (ReferenceEquals(Second, null)) return true;
-                if (First.Values.Length != Second.Values.Length) return true;
+                if (ReferenceEquals(Second, null))
+                    return true;
+                if (First.Values.Length != Second.Values.Length)
+                    return true;
                 for (int i = 0; i < First.Values.Length; i++)
                 {
-                    if (First.Values[i].HasValue != Second.Values[i].HasValue) return true;
-                    if (!First.Values[i].HasValue) continue;
-                    if (First.Values[i].Value != Second.Values[i].Value) return true;
+                    if (First.Values[i].HasValue != Second.Values[i].HasValue)
+                        return true;
+                    if (!First.Values[i].HasValue)
+                        continue;
+                    if (First.Values[i].Value != Second.Values[i].Value)
+                        return true;
                 }
 
                 return false;

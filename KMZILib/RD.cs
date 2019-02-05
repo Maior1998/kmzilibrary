@@ -45,15 +45,15 @@ namespace KMZILib
                     BigInteger MinCopy = Min;
                     BigInteger MaxCopy = Max;
 
-                    while (MaxCopy - MinCopy > 1)
+                    while (MaxCopy - MinCopy +1> int.MaxValue)
                     {
                         if (Rand.Next(2) == 0)
-                            MaxCopy = (MaxCopy - MinCopy + 1) / 2;
+                            MaxCopy = (MaxCopy + MinCopy) / 2;
                         else
-                            MinCopy = (MaxCopy - MinCopy + 1) / 2 + (MaxCopy - MinCopy + 1) % 2;
+                            MinCopy = (MaxCopy + MinCopy) / 2 + (MaxCopy + MinCopy) % 2;
                     }
 
-                    BigInteger randomResult = Rand.Next(2) == 0 ? MinCopy : MaxCopy;
+                    BigInteger randomResult = MinCopy + Rand.Next((int)(MaxCopy-MinCopy+1));
                     if(!numbersenum.Contains(randomResult))
                         numbersenum.Add(randomResult);
                 }
