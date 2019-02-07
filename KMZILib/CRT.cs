@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using static KMZILib.Comparison;
 
@@ -16,61 +17,17 @@ namespace KMZILib
         /// <returns></returns>
         public static LinearComparison Solve(IEnumerable<LinearComparison> Comparisons)
         {
-            ExpressByPair buffer = new ExpressByPair(0, 1);
-            foreach (LinearComparison CurrentComparison in Comparisons)
-            {
-                int solution = 0;
-                for (;
-                    solution < CurrentComparison.M &&
-                    (solution * buffer.Second + buffer.First) % CurrentComparison.M != CurrentComparison.A;
-                    solution++) ;
-                buffer.First += buffer.Second * solution;
-                buffer.Second *= CurrentComparison.M;
-            }
+            BigInteger M = Comparisons.Select(comp => comp.M)
+                .Aggregate<BigInteger, BigInteger>(1, (Current, line) => Current * line);
+            BigInteger[] Mi = Comparisons.Select(Line => M / Line.M).ToArray();
 
-            return new LinearComparison(buffer.First, buffer.Second);
+            return new LinearComparison(
+                Comparisons.Select((comp, miindex) =>
+                        comp.A * Mi[miindex] * MultiplicativeInverse.Solve(Mi[miindex], comp.M))
+                    .Aggregate<BigInteger, BigInteger>(0, (Current, line) => Current + line), M);
+
         }
 
-        /// <summary>
-        ///     Осуществляет решение системы сравнений со взаимнопростыми модулями.
-        /// </summary>
-        /// <param name="Comparisons"></param>
-        /// <returns></returns>
-        public static BigInteger SolveBigInteger(IEnumerable<LinearComparison> Comparisons)
-        {
-            ExpressByPair buffer = new ExpressByPair(0, 1);
-            foreach (LinearComparison CurrentComparison in Comparisons)
-            {
-                int solution = 0;
-                for (;
-                    solution < CurrentComparison.M &&
-                    (solution * buffer.Second + buffer.First) % CurrentComparison.M != CurrentComparison.A;
-                    solution++)
-                {
-                }
 
-                buffer.First += buffer.Second * solution;
-                buffer.Second *= CurrentComparison.M;
-            }
-
-            return (int) buffer.First;
-        }
-
-        internal class ExpressByPair
-        {
-            internal BigInteger First;
-            internal BigInteger Second;
-
-            internal ExpressByPair(int first, int second)
-            {
-                First = first;
-                Second = second;
-            }
-
-            public override string ToString()
-            {
-                return $"{First} + {Second}t";
-            }
-        }
     }
 }
