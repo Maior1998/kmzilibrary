@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using KMZILib;
+using KMZILib.Maths;
 
 namespace Ручной_тест
 {
@@ -25,10 +26,11 @@ namespace Ручной_тест
         };
         static void Main(string[] args)
         {
-            //Console.WriteLine("Исходная:");
-            //Console.WriteLine(string.Join("\n",TestArray.Select(str=>string.Join("\t",str))));
-            Console.WriteLine("-----------------------------------------------------");
-            Console.WriteLine(string.Join("\n", LinearEquations.GaussianElimination(TestArray)));
+            //Console.WriteLine(string.Join("\n", LinearEquations.GaussianElimination(TestArray)));
+
+            Matrix a = new Matrix(new[] {new[] {1.0, 2}, new[] {3.0, 4}});
+            Matrix b = new Matrix(new[] { new[] { 1.0, 2 }, new[] { 3.0, 4 } });
+            Matrix c = a * b;
         }
     }
 }

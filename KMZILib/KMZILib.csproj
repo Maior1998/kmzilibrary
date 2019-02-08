@@ -53,6 +53,7 @@
     <Compile Include="Maths\DiophantineEquation.cs" />
     <Compile Include="Maths\JacobiSymbol.cs" />
     <Compile Include="Maths\LinearEquation.cs" />
+    <Compile Include="Maths\Matrix.cs" />
     <Compile Include="Maths\MMA.cs" />
     <Compile Include="Maths\Polynoms.cs" />
     <Compile Include="Maths\PrimalityTests.cs" />
