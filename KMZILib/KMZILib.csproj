@@ -37,7 +37,7 @@
     <Reference Include="System.Numerics" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AdvancedEuclidsalgorithm.cs" />
+    <Compile Include="Maths\AdvancedEuclidsalgorithm.cs" />
     <Compile Include="BinaryFunctions\BinaryFunction.cs" />
     <Compile Include="BinaryFunctions\BinaryRelationMatrix.cs" />
     <Compile Include="BinaryFunctions\LRPN.cs" />
@@ -47,16 +47,16 @@
     <Compile Include="Ciphers\TextStat.cs" />
     <Compile Include="Ciphers\TranspositionCipher.cs" />
     <Compile Include="Ciphers\VigenereCipher.cs" />
-    <Compile Include="CodingTheory.cs" />
-    <Compile Include="Comparison.cs" />
-    <Compile Include="CRT.cs" />
-    <Compile Include="DiophantineEquation.cs" />
-    <Compile Include="JacobiSymbol.cs" />
-    <Compile Include="MMA.cs" />
-    <Compile Include="Polynoms.cs" />
-    <Compile Include="PrimalityTests.cs" />
+    <Compile Include="Ciphers\CodingTheory.cs" />
+    <Compile Include="Maths\Comparison.cs" />
+    <Compile Include="Maths\CRT.cs" />
+    <Compile Include="Maths\DiophantineEquation.cs" />
+    <Compile Include="Maths\JacobiSymbol.cs" />
+    <Compile Include="Maths\MMA.cs" />
+    <Compile Include="Maths\Polynoms.cs" />
+    <Compile Include="Maths\PrimalityTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RD.cs" />
+    <Compile Include="Ciphers\RD.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
