@@ -20,9 +20,14 @@ namespace KMZILib
             Unknown,
 
             /// <summary>
-            ///     Составное. Тест выявил, что число является составным.
+            ///     Число составное.
             /// </summary>
-            Composite
+            Composite,
+
+            /// <summary>
+            ///     Число простое.
+            /// </summary>
+            Prime
         }
 
         /// <summary>
@@ -454,6 +459,15 @@ namespace KMZILib
         };
 
         /// <summary>
+        /// Содержит все простые числа до 15,485,863 включительно. При первом обращении произойдет очень долгая загрузка с файла.
+        /// </summary>
+        public static class PrimeNumberExtended
+        {
+            //TODO: Лучше через какую нибудь базу данных а-ля MySQL? Нужно ли вообще?
+
+        }
+
+        /// <summary>
         ///     Fermat Primality Test - тест на основе теоремы Ферма. Имеет псевдопростые числа
         /// </summary>
         /// <param name="source">Число, которое необходимо проверить на простотоу</param>
@@ -464,7 +478,7 @@ namespace KMZILib
         public static PrimalityTestResult FPT(int source, int count)
         {
             if (count >= source)
-                throw new InvalidOperationException("Число прогонов теста не должно быть меньше тестируемого числа.");
+                throw new InvalidOperationException("Число прогонов теста должно быть меньше тестируемого числа.");
             switch (source)
             {
                 case 0:
@@ -474,10 +488,8 @@ namespace KMZILib
             }
 
             if (source < 0 || count <= 0)
-            {
                 throw new InvalidOperationException(
-                    "Тестируемое число и число его прогонов должны быть положительными числами!");
-            }
+                    "Тестируемое число и количество прогонов должны быть положительными числами!");
 
             BigInteger[] RestVariants = RD.UniformDistribution(2, source - 1, count);
             //отрезок [2,n-1]
@@ -534,7 +546,7 @@ namespace KMZILib
                 BigInteger CurrentValue = RestVariants[i];
                 if (AdvancedEuclidsalgorithm.GCDResult(CurrentValue, source) != 1) return PrimalityTestResult.Composite;
                 //значение символа якоби
-                int jacobi = (int) JacobiSymbol.Get(CurrentValue, source);
+                BigInteger jacobi = JacobiSymbol.Get(CurrentValue, source);
                 LinearComparison comparison = new LinearComparison(CurrentValue, source);
                 if (MultiplicativeInverse.BinaryPowLinearComparison(comparison, (source - 1) / 2).LeastModulo != jacobi)
                     return PrimalityTestResult.Composite;
