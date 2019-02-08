@@ -95,6 +95,11 @@ namespace KMZILib
             }
         }
 
+        /// <summary>
+        /// Осуществляет решение системы линейных уравнений заданных в виде матрицы методом Гаусса.
+        /// </summary>
+        /// <param name="Matrix"></param>
+        /// <returns></returns>
         public static double[] GaussianElimination(double[][] Matrix)
         {
             //Прямой ход
@@ -130,13 +135,5 @@ namespace KMZILib
                 Sum += Matrix[index][i] * ResultArray[i];
             return Sum;
         }
-
-        private static void SwapLine(double[][] Matrix, int i, int j)
-        {
-            double[] buffer = Matrix[i];
-            Matrix[i] = Matrix[j];
-            Matrix[j] = buffer;
-        }
-
     }
 }
