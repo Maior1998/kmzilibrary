@@ -9,7 +9,7 @@ using static KMZILib.Comparison;
 namespace KMZILib
 {
     /// <summary>
-    ///     Статический класс для работы с многочленами
+    ///     Статический класс для работы с многочленами.
     /// </summary>
     public static class Polynoms
     {
@@ -19,17 +19,17 @@ namespace KMZILib
         public class Polynom
         {
             /// <summary>
-            ///     Массив коэффициентов многочлена. От старших степеней к младшим.
+            ///     Массив коэффициентов многочлена. От старших степеней к младшим. Длинными числами могут быть только коэффициенты.
             /// </summary>
             private readonly BigInteger[] Coefficients;
 
             /// <summary>
             ///     Инициализация нового многочлена с помощью готового массива его коэффициентов
             /// </summary>
-            public Polynom(IReadOnlyCollection<int> coefficients)
+            public Polynom(IReadOnlyCollection<BigInteger> coefficients)
             {
                 Coefficients = new BigInteger[coefficients.Count];
-                coefficients.Select(cod => new BigInteger(cod)).ToArray().CopyTo(Coefficients, 0);
+                coefficients.ToArray().CopyTo(Coefficients, 0);
             }
 
             /// <summary>
@@ -42,11 +42,12 @@ namespace KMZILib
             }
 
             /// <summary>
-            ///     Инициализация нового многочлена с помощью его строкового представления
+            ///     Инициализация нового многочлена с помощью его строкового представления. Пока что работает только с интами.
             /// </summary>
             /// <param name="polynom"></param>
             public Polynom(string polynom)
             {
+                //TODO: Пока что работает только с интами.
                 /*Возможные варианты:
                  * C
                  * X
@@ -65,8 +66,8 @@ namespace KMZILib
                 foreach (Match polynommatch in PolynomRegex.Matches(polynom))
                 {
                     int sign = polynommatch.Groups["sign"].Value.Contains("-") ? -1 : 1;
-                    int value = polynommatch.Groups["value"].Value != ""
-                        ? Convert.ToInt32(polynommatch.Groups["value"].Value)
+                    BigInteger value = polynommatch.Groups["value"].Value != ""
+                        ? BigInteger.Parse(polynommatch.Groups["value"].Value)
                         : 1;
                     int degree = polynommatch.Groups["degree"].Value != ""
                         ? Convert.ToInt32(polynommatch.Groups["degree"].Value)
@@ -77,6 +78,8 @@ namespace KMZILib
                     //заносим в таблицу
                     noms.Add(new Nom(sign, value, degree));
                 }
+                
+
 
                 Coefficients = new BigInteger[noms.Max(nom => nom.Degree) + 1];
 
@@ -85,7 +88,7 @@ namespace KMZILib
             }
 
             /// <summary>
-            ///     Степень данного многочлена
+            ///     Степень данного многочлена.
             /// </summary>
             public int Degree => Coefficients.Length - 1;
 
@@ -94,7 +97,7 @@ namespace KMZILib
             /// </summary>
             /// <param name="x">Точка, в которой нужно вычислить многочлен</param>
             /// <returns>Значение многочлена в точке x</returns>
-            public BigInteger GetValue(int x)
+            public BigInteger GetValue(BigInteger x)
             {
                 return GetValueArray(x).Last();
             }
@@ -105,7 +108,7 @@ namespace KMZILib
             /// </summary>
             /// <param name="x">Точка, в которой нужно вычислить многочлен</param>
             /// <returns>Значение многочлена в точке x</returns>
-            public BigInteger[] GetValueArray(int x)
+            public BigInteger[] GetValueArray(BigInteger x)
             {
                 BigInteger[] ResultArray = new BigInteger[Coefficients.Length];
                 ResultArray[0] = Coefficients[0];
@@ -146,9 +149,9 @@ namespace KMZILib
             /// </summary>
             /// <param name="module">Модуль, по которому происходит нахожлдение корней.</param>
             /// <returns>Пары "корень-кратность"</returns>
-            public Dictionary<int, int> SolveResults(int module)
+            public Dictionary<BigInteger, BigInteger> SolveResults(int module)
             {
-                Dictionary<int, int> Roots = new Dictionary<int, int>();
+                Dictionary<BigInteger, BigInteger> Roots = new Dictionary<BigInteger, BigInteger>();
                 Stack<BigInteger[]> rows = new Stack<BigInteger[]>();
                 rows.Push(Coefficients.ToArray());
                 //поместили изначальный массив коэффициентов 
@@ -200,7 +203,7 @@ namespace KMZILib
             }
 
             /// <summary>
-            ///     Класс, представляющий собой одночлен
+            ///     Класс, представляющий собой одночлен. Нужен для парсинга строкового представления многочлена.
             /// </summary>
             private class Nom
             {
@@ -217,7 +220,7 @@ namespace KMZILib
                 /// <summary>
                 ///     Значение одночлена по модулю
                 /// </summary>
-                public readonly int Value;
+                public readonly BigInteger Value;
 
                 /// <summary>
                 ///     Конструктор одночлена, использующий все имеющиеся поля
@@ -225,7 +228,7 @@ namespace KMZILib
                 /// <param name="sign">Знак одночлена (-1/0/1)</param>
                 /// <param name="value">Значение одночлена. Целое число</param>
                 /// <param name="degree">Степень одночлена. Целое неотрицательное число</param>
-                public Nom(int sign, int value, int degree)
+                public Nom(int sign, BigInteger value, int degree)
                 {
                     Sign = sign;
                     Value = value;
