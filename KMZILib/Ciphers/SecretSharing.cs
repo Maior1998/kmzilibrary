@@ -77,14 +77,14 @@ namespace KMZILib
                 /// <param name="module">Модуль, по которому необходимо производить вычисления</param>
                 /// <param name="key">Ключ, который будет вычислен в процессе</param>
                 /// <returns>Получилось ли восстановить ключ</returns>
-                public static bool Restore(KeyValuePair<int, BigInteger>[] Fragments, int module, out BigInteger key)
+                public static bool Restore(KeyValuePair<int, BigInteger>[] Fragments, BigInteger module, out BigInteger key)
                 {
                     key = SolveByGaussianMethod(Fragments, module);
                     //Limit - степень предполагаемого многочлена?
                     return key != int.MaxValue;
                 }
 
-                private static BigInteger SolveByGaussianMethod(KeyValuePair<int, BigInteger>[] Fragments, int module)
+                private static BigInteger SolveByGaussianMethod(KeyValuePair<int, BigInteger>[] Fragments, BigInteger module)
                 {
                     int polynomdegree = Fragments.Length;
                     LinearComparison[][] Matrix = new LinearComparison[polynomdegree][];
@@ -154,7 +154,7 @@ namespace KMZILib
                 /// <param name="module">Модуль, по которому необходимо производить вычисления</param>
                 /// <returns>Значение ключа</returns>
                 public static BigInteger RestoreByLagrangePolynomial(KeyValuePair<int, BigInteger>[] Fragments,
-                    int module)
+                    BigInteger module)
                 {
                     LinearComparison Result = new LinearComparison(0, module);
                     LinearComparison buffer = new LinearComparison(1, module);
