@@ -28,9 +28,13 @@ namespace Ручной_тест
         {
             //Console.WriteLine(string.Join("\n", LinearEquations.GaussianElimination(TestArray)));
 
-            Matrix a = new Matrix(new[] {new[] {1.0, 2}, new[] {3.0, 4}});
-            Matrix b = new Matrix(new[] { new[] { 1.0, 2 }, new[] { 3.0, 4 } });
-            Matrix c = a * b;
+            //Matrix a = new Matrix(new[] {new[] {1.0, 2}, new[] {3.0, 4}});
+            //Matrix b = new Matrix(new[] { new[] { 1.0, 2 }, new[] { 3.0, 4 } });
+            //Matrix c = a * b;
+
+            KMZILib.Vector vector1 = new KMZILib.Vector(new[] { 1, 0, 1.0 });
+            KMZILib.Vector vector2 = new KMZILib.Vector(new[] { 1,1, 0, 0.0 });
+            Console.WriteLine(vector1-vector2);
         }
     }
 }
