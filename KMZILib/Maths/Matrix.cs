@@ -6,12 +6,24 @@ using System.Threading.Tasks;
 
 namespace KMZILib.Maths
 {
+    /// <summary>
+    /// Представляет собой матрицу. Необязательно прямоугольную.
+    /// </summary>
     public class Matrix
     {
+        /// <summary>
+        /// Массив коэффициентов матрицы в виде вещественных чисел.
+        /// </summary>
         public double[][] Values;
 
+        /// <summary>
+        /// Число строк матрицы.
+        /// </summary>
         public int LengthY => Values.Length;
 
+        /// <summary>
+        /// Число столбцов матрицы. Вернёт -1, если нет строчек или если матрица не прямоугольная.
+        /// </summary>
         public int LengthX
         {
             get
@@ -25,6 +37,10 @@ namespace KMZILib.Maths
             }
         }
 
+        /// <summary>
+        /// Инициализирует новую матрицу с заданным массивом коэффициентов.
+        /// </summary>
+        /// <param name="Source"></param>
         public Matrix(double[][] Source)
         {
             Values = new double[Source.Length][];
@@ -35,6 +51,12 @@ namespace KMZILib.Maths
             }
         }
 
+        /// <summary>
+        /// Осуществляет умножение двух матриц и возвращает результат - новую матрицу.
+        /// </summary>
+        /// <param name="First"></param>
+        /// <param name="Second"></param>
+        /// <returns></returns>
         public static Matrix operator *(Matrix First, Matrix Second)
         {
             if (First.LengthY != Second.LengthX)
