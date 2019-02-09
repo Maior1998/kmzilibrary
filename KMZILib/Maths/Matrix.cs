@@ -71,5 +71,46 @@ namespace KMZILib.Maths
             return new Matrix(Result);
         }
 
+        /// <summary>
+        /// Осуществляет сложение двух матриц и возвращает результат - новую матрицу.
+        /// </summary>
+        /// <param name="First"></param>
+        /// <param name="Second"></param>
+        /// <returns></returns>
+        public static Matrix operator +(Matrix First, Matrix Second)
+        {
+            if (First.LengthX != Second.LengthX ||
+               First.LengthY != Second.LengthY)
+                throw new InvalidOperationException("Размеры матриц должны быть одинаковыми.");
+            double[][] Result = new double[First.LengthY][];
+            for (int i = 0; i < Result.Length; i++)
+                Result[i] = First.Values[i].Select((element, index) => element + Second.Values[i][index]).ToArray();
+            return new Matrix(Result);
+        }
+
+        /// <summary>
+        /// Осуществляет разность двух матриц и возвращает результат - новую матрицу.
+        /// </summary>
+        /// <param name="First"></param>
+        /// <param name="Second"></param>
+        /// <returns></returns>
+        public static Matrix operator -(Matrix First, Matrix Second)
+        {
+            if (First.LengthX != Second.LengthX ||
+                First.LengthY != Second.LengthY)
+                throw new InvalidOperationException("Размеры матриц должны быть одинаковыми.");
+            double[][] Result = new double[First.LengthY][];
+            for (int i = 0; i < Result.Length; i++)
+                Result[i] = First.Values[i].Select((element, index) => element - Second.Values[i][index]).ToArray();
+            return new Matrix(Result);
+        }
+        /// <summary>
+        /// Возвращает строковое представление матрицы.
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString()
+        {
+            return string.Join("\n", Values.Select(row => string.Join("\t", row)));
+        }
     }
 }

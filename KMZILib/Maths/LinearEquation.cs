@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using KMZILib.Maths;
 
 namespace KMZILib
 {
@@ -100,30 +101,31 @@ namespace KMZILib
         /// </summary>
         /// <param name="Matrix"></param>
         /// <returns></returns>
-        public static double[] GaussianElimination(double[][] Matrix)
+        public static double[] GaussianElimination(double[][] MatrixArray)
         {
+            Matrix MatrixCopy=new Matrix(MatrixArray);
             //Прямой ход
-            for (int i = 0; i < Matrix.Length; i++)
+            for (int i = 0; i < MatrixCopy.Values.Length; i++)
             {
-                Console.WriteLine(string.Join("\n", Matrix.Select(str => string.Join("\t", str))));
+                Console.WriteLine(string.Join("\n", MatrixCopy.Values.Select(str => string.Join("\t", str))));
                 Console.WriteLine("---------------------------------------------------------\n");
-                Matrix[i] = Matrix[i].Select(val => val / Matrix[i][i]).ToArray();
+                MatrixCopy.Values[i] = MatrixCopy.Values[i].Select(val => val / MatrixCopy.Values[i][i]).ToArray();
                 //Сделали первый ненулевой элемент единицей
                 
-                for (int j = i + 1; j < Matrix.Length; j++)
+                for (int j = i + 1; j < MatrixCopy.Values.Length; j++)
                 {
-                    double Multiplier = -(Matrix[j][i] /Matrix[i][i]);
-                    Matrix[j] = Matrix[j].Select((val, index) => val + Matrix[i][index] * Multiplier).ToArray();
+                    double Multiplier = -(MatrixCopy.Values[j][i] /MatrixCopy.Values[i][i]);
+                    MatrixCopy.Values[j] = MatrixCopy.Values[j].Select((val, index) => val + MatrixCopy.Values[i][index] * Multiplier).ToArray();
                 }
                 //У всех остальных строчек обнулили i-ый столбец
             }
-            Console.WriteLine(string.Join("\n", Matrix.Select(str => string.Join("\t", str))));
+            Console.WriteLine(string.Join("\n", MatrixCopy.Values.Select(str => string.Join("\t", str))));
             Console.WriteLine("---------------------------------------------------------\n");
             //Обратный ход
-            double[] Result=new double[Matrix.Length];
-            Result[Result.Length - 1] = Matrix[Matrix.Length - 1].Last();
+            double[] Result=new double[MatrixCopy.Values.Length];
+            Result[Result.Length - 1] = MatrixCopy.Values[MatrixCopy.Values.Length - 1].Last();
             for (int i = Result.Length - 2; i >= 0; i--)
-                Result[i] = Matrix[i].Last() - CalcSum(Matrix, i, Result);
+                Result[i] = MatrixCopy.Values[i].Last() - CalcSum(MatrixCopy.Values, i, Result);
             return Result;
 
         }

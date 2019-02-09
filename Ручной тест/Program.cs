@@ -4,6 +4,7 @@ using System.Linq;
 using System.Numerics;
 using KMZILib;
 using KMZILib.Maths;
+using Vector=KMZILib.Vector;
 
 namespace Ручной_тест
 {
@@ -26,15 +27,24 @@ namespace Ручной_тест
         };
         static void Main(string[] args)
         {
-            //Console.WriteLine(string.Join("\n", LinearEquations.GaussianElimination(TestArray)));
-
-            //Matrix a = new Matrix(new[] {new[] {1.0, 2}, new[] {3.0, 4}});
+            double[] GaussResult=LinearEquations.GaussianElimination(TestArray);
+            Vector GaussResultVector = new Vector(GaussResult);
+            Matrix GaussResultMatrix = new Matrix(new []{GaussResult});
+            Console.WriteLine($"Результат - {GaussResultVector}");
+            Matrix A = new Matrix(TestArray.Select(row=>row.Take(row.Length-1).ToArray()).ToArray());
+            Matrix B = new Matrix(TestArray.Select(row => row.Skip(row.Length - 1).ToArray()).ToArray());
+            Matrix deltaB = B - A * GaussResultMatrix;
+            double Delta = new Vector(deltaB.Values.Select(row => row.First()).ToArray()).Length;
+            double dB = Delta / new Vector(B.Values.Select(row => row.First()).ToArray()).Length;
+            Console.WriteLine($"\n\n\nΔB = {new Vector(deltaB.Values.Select(row => row.First()).ToArray())}\n\nδB={dB}");
+            //Matrix a = new Matrix(new[] { new[] { 1.0, 2 }, new[] { 3.0, 4 } });
             //Matrix b = new Matrix(new[] { new[] { 1.0, 2 }, new[] { 3.0, 4 } });
-            //Matrix c = a * b;
+            //Matrix c = a + b;
+            //Console.WriteLine(c);
 
-            KMZILib.Vector vector1 = new KMZILib.Vector(new[] { 1, 0, 1.0 });
-            KMZILib.Vector vector2 = new KMZILib.Vector(new[] { 1,1, 0, 0.0 });
-            Console.WriteLine(vector1-vector2);
+            //KMZILib.Vector vector1 = new KMZILib.Vector(new[] { 1, 0, 1.0 });
+            //KMZILib.Vector vector2 = new KMZILib.Vector(new[] { 1,1, 0, 0.0 });
+            //Console.WriteLine(vector1-vector2);
         }
     }
 }

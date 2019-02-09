@@ -43,38 +43,30 @@ namespace KMZILib
                 /// </summary>
                 public string Alphabet { get; protected set; }
                 /// <summary>
-                /// Представляет упорядоченный по частоте встречи список букв алфавита
+                /// Представляет упорядоченный по частоте встречи список букв алфавита.
                 /// </summary>
                 public List<char> Frequency { get; protected set; }
                 /// <summary>
-                /// Упорядоченный по частоте встречи список слов длины 1
+                /// Упорядоченный по частоте встречи список слов длины 1.
                 /// </summary>
                 public List<char> FrequencyWb1L { get; protected set; }
                 /// <summary>
-                /// Упорядоченный по частоте встречи список слов длины 2
+                /// Упорядоченный по частоте встречи список слов длины 2.
                 /// </summary>
                 public List<string> FrequencyWb2L { get; protected set; }
                 /// <summary>
-                /// Упорядоченный по частоте встречи список пар букв, которые встречаются друг за другом
+                /// Упорядоченный по частоте встречи список пар букв, которые встречаются друг за другом.
                 /// </summary>
                 public List<string> FrequencyBigrams { get; protected set; }
                 /// <summary>
-                /// Упорядоченный по частоте встречи список троек букв, которые встречаются друг за другом
+                /// Упорядоченный по частоте встречи список троек букв, которые встречаются друг за другом.
                 /// </summary>
                 public List<string> FrequencyThreegrams { get; protected set; }
                 /// <summary>
                 /// Алфавит языка, представленный в виде массива символов в верхнем регистре.
                 /// </summary>
-                public char[] AlphabetArray
-                {
-                    get
-                    {
-                        char[] Result=new char[Alphabet.Length];
-                        for (int i = 0; i < Alphabet.Length; i++)
-                            Result[i] = char.ToUpper(Alphabet[i]);
-                        return Result;
-                    }
-                }
+                public char[] AlphabetArray => Alphabet.ToCharArray();
+
             }
 
             /// <summary>
