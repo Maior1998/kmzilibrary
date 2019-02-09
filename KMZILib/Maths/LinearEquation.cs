@@ -119,8 +119,6 @@ namespace KMZILib
                 }
                 //У всех остальных строчек обнулили i-ый столбец
             }
-            Console.WriteLine(string.Join("\n", MatrixCopy.Values.Select(str => string.Join("\t", str))));
-            Console.WriteLine("---------------------------------------------------------\n");
             //Обратный ход
             double[] Result=new double[MatrixCopy.Values.Length];
             Result[Result.Length - 1] = MatrixCopy.Values[MatrixCopy.Values.Length - 1].Last();

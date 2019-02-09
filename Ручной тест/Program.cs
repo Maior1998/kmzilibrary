@@ -27,16 +27,13 @@ namespace Ручной_тест
         };
         static void Main(string[] args)
         {
-            double[] GaussResult=LinearEquations.GaussianElimination(TestArray);
-            Vector GaussResultVector = new Vector(GaussResult);
-            Matrix GaussResultMatrix = new Matrix(new []{GaussResult});
-            Console.WriteLine($"Результат - {GaussResultVector}");
-            Matrix A = new Matrix(TestArray.Select(row=>row.Take(row.Length-1).ToArray()).ToArray());
-            Matrix B = new Matrix(TestArray.Select(row => row.Skip(row.Length - 1).ToArray()).ToArray());
-            Matrix deltaB = B - A * GaussResultMatrix;
-            double Delta = new Vector(deltaB.Values.Select(row => row.First()).ToArray()).Length;
-            double dB = Delta / new Vector(B.Values.Select(row => row.First()).ToArray()).Length;
-            Console.WriteLine($"\n\n\nΔB = {new Vector(deltaB.Values.Select(row => row.First()).ToArray())}\n\nδB={dB}");
+            Matrix A = new Matrix(new double[][]{new double[]{1,2.0}, new double[] { 3,4.0}, new double[] { 5,6.0 } });
+            Matrix B = new Matrix(new double[][] { new double[] { 1, 3.0,5 }, new double[] { 2,4,6.0 }});
+            Console.WriteLine(A);
+            Console.WriteLine("--------------");
+            Console.WriteLine(B);
+            Console.WriteLine("--------------");
+            Console.WriteLine(A*B);
             //Matrix a = new Matrix(new[] { new[] { 1.0, 2 }, new[] { 3.0, 4 } });
             //Matrix b = new Matrix(new[] { new[] { 1.0, 2 }, new[] { 3.0, 4 } });
             //Matrix c = a + b;
@@ -45,6 +42,20 @@ namespace Ручной_тест
             //KMZILib.Vector vector1 = new KMZILib.Vector(new[] { 1, 0, 1.0 });
             //KMZILib.Vector vector2 = new KMZILib.Vector(new[] { 1,1, 0, 0.0 });
             //Console.WriteLine(vector1-vector2);
+        }
+
+        public static void task()
+        {
+            double[] GaussResult = LinearEquations.GaussianElimination(TestArray);
+            Vector GaussResultVector = new Vector(GaussResult);
+            Matrix GaussResultMatrix = new Matrix(new[] { GaussResult });
+            Console.WriteLine($"Результат - {GaussResultVector}");
+            Matrix A = new Matrix(TestArray.Select(row => row.Take(row.Length - 1).ToArray()).ToArray());
+            Matrix B = new Matrix(TestArray.Select(row => row.Skip(row.Length - 1).ToArray()).ToArray());
+            Matrix deltaB = B - A * GaussResultMatrix;
+            double Delta = new Vector(deltaB.Values.Select(row => row.First()).ToArray()).Length;
+            double dB = Delta / new Vector(B.Values.Select(row => row.First()).ToArray()).Length;
+            Console.WriteLine($"\n\n\nnewB = {new Vector((A * GaussResultMatrix).Values.Select(row => row.First()).ToArray())}\n\ndmB={dB}");
         }
     }
 }
