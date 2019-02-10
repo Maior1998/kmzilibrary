@@ -211,6 +211,26 @@ namespace KMZILib
         }
 
         /// <summary>
+        /// Возвращает максимальный по модулю элемент в строке с заданным индексом.
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public double GetMaxAbsInRow(int index)
+        {
+            return GetRow(index).Select(Math.Abs).Max();
+        }
+
+        /// <summary>
+        /// Возвращает максимальный по модулю элемент в столбце с заданным индексом.
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public double GetMaxAbsInColumn(int index)
+        {
+            return GetColumn(index).Select(Math.Abs).Max();
+        }
+
+        /// <summary>
         /// Возвращает максимальный элемент в столбце с заданным индексом.
         /// </summary>
         /// <param name="index"></param>
@@ -227,8 +247,19 @@ namespace KMZILib
         /// <returns></returns>
         public int GetMaxInRowIndex(int index)
         {
-            double[] TargetRow = GetRow(index);
-            return TargetRow.ToList().IndexOf(TargetRow.Max());
+            List<double> TargetRow = GetRow(index).ToList();
+            return TargetRow.IndexOf(TargetRow.Max());
+        }
+
+        /// <summary>
+        /// Возвращает индекс максимального по модулю элемента в строке с заданным индексом.
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public int GetMaxAbsInRowIndex(int index)
+        {
+            List<double> TargetRow = GetRow(index).Select(Math.Abs).ToList();
+            return TargetRow.IndexOf(TargetRow.Max());
         }
 
         /// <summary>
@@ -238,8 +269,19 @@ namespace KMZILib
         /// <returns></returns>
         public int GetMaxInColumnIndex(int index)
         {
-            double[] TargetColumn = GetColumn(index);
-            return TargetColumn.ToList().IndexOf(TargetColumn.Max());
+            List<double> TargetColumn= GetColumn(index).ToList();
+            return TargetColumn.IndexOf(TargetColumn.Max());
+        }
+
+        /// <summary>
+        /// Возвращает индекс максимального по модулю элемента в столбце с заданным индексом.
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public int GetMaxAbsInColumnIndex(int index)
+        {
+            List<double> TargetColumn = GetColumn(index).Select(Math.Abs).ToList();
+            return TargetColumn.IndexOf(TargetColumn.Max());
         }
 
         /// <summary>
@@ -275,6 +317,15 @@ namespace KMZILib
         }
 
         /// <summary>
+        /// Возвращает максимальный по модулю элемент в матрице.
+        /// </summary>
+        /// <returns></returns>
+        public double GetMaxAbs()
+        {
+            return Values.Select(row => row.Select(Math.Abs).Max()).Max();
+        }
+
+        /// <summary>
         /// Возвращает индекс максимального элемента в матрице.
         /// </summary>
         /// <returns></returns>
@@ -288,6 +339,23 @@ namespace KMZILib
             }
 
             return new[]{-1,-1};
+        }
+
+        /// <summary>
+        /// Возвращает индекс максимального по модулю элемента в матрице.
+        /// </summary>
+        /// <returns></returns>
+        public int[] GetMaxAbsIndex()
+        {
+            double Max = GetMaxAbs();
+            for (int i = 0; i < Values.Length; i++)
+            {
+                int index = Values[i].Select(Math.Abs).ToList().IndexOf(Max);
+                if (index != -1)
+                    return new[] { i, index };
+            }
+
+            return new[] { -1, -1 };
         }
 
         /// <summary>
