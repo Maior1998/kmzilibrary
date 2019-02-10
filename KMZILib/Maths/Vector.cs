@@ -15,7 +15,7 @@ namespace KMZILib
         /// <summary>
         /// Координаты в виде списка вещественных чисел.
         /// </summary>
-        public double[] Coordinates;
+        public double[] Coordinates { get; private set; }
 
         /// <summary>
         /// Число координат вектора.
@@ -35,6 +35,28 @@ namespace KMZILib
         {
             Coordinates = new double[coords.Length];
             coords.CopyTo(Coordinates, 0);
+        }
+
+        /// <summary>
+        /// Доступ к координатам вектора по индексам.
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public double this[int index]
+        {
+            get => Coordinates[index];
+            set => Coordinates[index] = value;
+        }
+
+        /// <summary>
+        /// Возвращает координаты вектора в виде массива.
+        /// </summary>
+        /// <returns></returns>
+        public double[] ToArray()
+        {
+            double[] Result = new double[CoordinatesLength];
+            Coordinates.CopyTo(Result, 0);
+            return Result;
         }
 
         /// <summary>

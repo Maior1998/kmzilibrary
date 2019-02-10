@@ -104,17 +104,18 @@ namespace KMZILib
         {
             Matrix MatrixCopy=new Matrix(MatrixArray);
             //Прямой ход
-            for (int i = 0; i < MatrixCopy.Values.Length; i++)
+            for (int i = 0; i < MatrixCopy.LengthY; i++)
             {
+                //TODO: После показа лабораторной можно убрать
                 Console.WriteLine(string.Join("\n", MatrixCopy.Values.Select(str => string.Join("\t", str))));
                 Console.WriteLine("---------------------------------------------------------\n");
-                MatrixCopy.Values[i] = MatrixCopy.Values[i].Select(val => val / MatrixCopy.Values[i][i]).ToArray();
+                MatrixCopy.Values[i] = MatrixCopy[i].Select(val => val / MatrixCopy.Values[i][i]).ToArray();
                 //Сделали первый ненулевой элемент единицей
                 
-                for (int j = i + 1; j < MatrixCopy.Values.Length; j++)
+                for (int j = i + 1; j < MatrixCopy.LengthY; j++)
                 {
-                    double Multiplier = -(MatrixCopy.Values[j][i] /MatrixCopy.Values[i][i]);
-                    MatrixCopy.Values[j] = MatrixCopy.Values[j].Select((val, index) => val + MatrixCopy.Values[i][index] * Multiplier).ToArray();
+                    double Multiplier = -(MatrixCopy[j][i] /MatrixCopy.Values[i][i]);
+                    MatrixCopy[j] = MatrixCopy[j].Select((val, index) => val + MatrixCopy.Values[i][index] * Multiplier).ToArray();
                 }
                 //У всех остальных строчек обнулили i-ый столбец
             }
@@ -122,16 +123,16 @@ namespace KMZILib
             double[] Result=new double[MatrixCopy.Values.Length];
             Result[Result.Length - 1] = MatrixCopy.Values[MatrixCopy.Values.Length - 1].Last();
             for (int i = Result.Length - 2; i >= 0; i--)
-                Result[i] = MatrixCopy.Values[i].Last() - CalcSum(MatrixCopy.Values, i, Result);
+                Result[i] = MatrixCopy.Values[i].Last() - CalcSum(MatrixCopy, i, Result);
             return Result;
 
         }
 
-        private static double CalcSum(double[][] Matrix, int index, double[] ResultArray)
+        private static double CalcSum(Matrix matrix, int index, double[] ResultArray)
         {
             double Sum = 0;
-            for (int i = index + 1; i < Matrix.Length; i++)
-                Sum += Matrix[index][i] * ResultArray[i];
+            for (int i = index + 1; i < matrix.LengthY; i++)
+                Sum += matrix[index][i] * ResultArray[i];
             return Sum;
         }
     }

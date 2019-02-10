@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Runtime.InteropServices;
 using KMZILib;
 using Vector = KMZILib.Vector;
 
@@ -54,9 +55,10 @@ namespace Ручной_тест
             Matrix A = new Matrix(TestArray.Select(row => row.Take(row.Length - 1).ToArray()).ToArray());
             Matrix B = new Matrix(TestArray.Select(row => row.Skip(row.Length - 1).ToArray()).ToArray());
             Matrix deltaB = B - A * GaussResultMatrix.TransposedCopy();
-            double Delta = new Vector(deltaB.Values.Select(row => row.First()).ToArray()).Length;
-            double dB = Delta / new Vector(B.Values.Select(row => row.First()).ToArray()).Length;
-            Console.WriteLine($"\n\n\nnewB = {new Vector((A * GaussResultMatrix.TransposedCopy()).Values.Select(row => row.First()).ToArray())}\n\ndmB={dB}");
+            double Delta = new Vector(deltaB).Length;
+            double dB = Delta / new Vector(B).Length;
+            Console.WriteLine($"Source B = {new Vector(B)}");
+            Console.WriteLine($"newB = {new Vector(A * GaussResultMatrix.TransposedCopy())}\n\ndmB={dB}");
         }
     }
 }
