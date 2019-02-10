@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace KMZILib.Maths
+namespace KMZILib
 {
     /// <summary>
     /// Представляет собой матрицу. Необязательно прямоугольную.

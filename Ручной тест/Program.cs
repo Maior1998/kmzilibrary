@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using KMZILib;
-using KMZILib.Maths;
 using Vector=KMZILib.Vector;
 
 namespace Ручной_тест
