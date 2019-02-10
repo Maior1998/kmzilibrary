@@ -197,11 +197,28 @@ namespace KMZILib
                 /// </summary>
                 public static class AsmuthBloomScheme
                 {
+                    /// <summary>
+                    /// Часть секрета в схеме Асмута-Блума.
+                    /// </summary>
                     public class CRTPart
                     {
+                        /// <summary>
+                        /// Первая часть секрета - p.
+                        /// </summary>
                         public BigInteger P;
+                        /// <summary>
+                        /// Втория и третья части секрета - r и d.
+                        /// </summary>
                         public LinearComparison Comparison;
                     }
+
+                    /// <summary>
+                    /// Возвращает результат разбиения ключа с заданным числом долей и порогом. Если порог не указать, он будет равен числу долей.
+                    /// </summary>
+                    /// <param name="Key">Ключ, который необходимо разбить. Натуральное число.</param>
+                    /// <param name="Count">Число долей.</param>
+                    /// <param name="Limit">Порог.</param>
+                    /// <returns></returns>
                     public static IEnumerable<CRTPart> Share(BigInteger Key, int Count, int Limit = 0)
                     {
                         /*
@@ -234,6 +251,12 @@ namespace KMZILib
                         }
                     }
 
+                    /// <summary>
+                    /// Возвращает результат восстановления секрета по имеющимся частям и пороговому значению.
+                    /// </summary>
+                    /// <param name="Parts"></param>
+                    /// <param name="Limit"></param>
+                    /// <returns></returns>
                     public static BigInteger Restore(List<CRTPart> Parts, int Limit)
                     {
                         if(Parts.Count<Limit)

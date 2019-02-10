@@ -98,7 +98,7 @@ namespace KMZILib
         /// <summary>
         /// Осуществляет решение системы линейных уравнений заданных в виде матрицы методом Гаусса.
         /// </summary>
-        /// <param name="Matrix"></param>
+        /// <param name="MatrixArray"></param>
         /// <returns></returns>
         public static double[] GaussianElimination(double[][] MatrixArray)
         {

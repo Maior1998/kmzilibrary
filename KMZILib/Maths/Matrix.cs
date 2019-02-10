@@ -52,6 +52,12 @@ namespace KMZILib
         }
 
         /// <summary>
+        /// Инициализирует новую матрицу, которая является копией заданной матрицы.
+        /// </summary>
+        /// <param name="Source"></param>
+        public Matrix(Matrix Source):this(Source.Values){}
+
+        /// <summary>
         /// Осуществляет умножение двух матриц и возвращает результат - новую матрицу.
         /// </summary>
         /// <param name="First"></param>
@@ -75,7 +81,10 @@ namespace KMZILib
             return new Matrix(Result);
         }
 
-        public void Transpose()
+        /// <summary>
+        /// Осуществляет транспонирование текущей матрицы
+        /// </summary>
+        public Matrix Transpose()
         {
             double[][]NewMatrix=new double[LengthX][];
             for (int i = 0; i < NewMatrix.Length; i++)
@@ -84,10 +93,29 @@ namespace KMZILib
                 for (int j = 0; j < NewMatrix[i].Length; j++)
                     NewMatrix[i][j] = Values[j][i];
             }
-
             Values = NewMatrix;
+            return this;
         }
 
+        /// <summary>
+        /// Возвращает транспонированную копию текущей матрицы.
+        /// </summary>
+        /// <returns></returns>
+        public Matrix TransposedCopy()
+        {
+            Matrix Copy = new Matrix(this);
+            Copy.Transpose();
+            return Copy;
+        }
+
+        /// <summary>
+        /// Возвращает копию текущей матрицы.
+        /// </summary>
+        /// <returns></returns>
+        public Matrix Copy()
+        {
+            return new Matrix(this);
+        }
 
         /// <summary>
         /// Осуществляет сложение двух матриц и возвращает результат - новую матрицу.
