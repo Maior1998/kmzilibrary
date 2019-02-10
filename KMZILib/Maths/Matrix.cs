@@ -58,6 +58,12 @@ namespace KMZILib
         public Matrix(Matrix Source):this(Source.Values){}
 
         /// <summary>
+        /// Инициализирует новую матрицу по заданному вектору значений.
+        /// </summary>
+        /// <param name="Source"></param>
+        public Matrix(Vector Source):this(new[]{Source.Coordinates}){}
+
+        /// <summary>
         /// Осуществляет умножение двух матриц и возвращает результат - новую матрицу.
         /// </summary>
         /// <param name="First"></param>
@@ -115,6 +121,17 @@ namespace KMZILib
         public Matrix Copy()
         {
             return new Matrix(this);
+        }
+        
+        /// <summary>
+        /// Переводит матрицу в формат вектора.
+        /// </summary>
+        /// <returns></returns>
+        public Vector ToVector()
+        {
+            List<double>VectorArray = new List<double>();
+            foreach (double[] row in Values) VectorArray.AddRange(row);
+            return new Vector(VectorArray.ToArray());
         }
 
         /// <summary>

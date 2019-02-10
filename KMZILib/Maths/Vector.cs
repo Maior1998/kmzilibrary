@@ -38,6 +38,18 @@ namespace KMZILib
         }
 
         /// <summary>
+        /// Инициализирует новый вектор по заданной матрице.
+        /// </summary>
+        /// <param name="Source"></param>
+        public Vector(Matrix Source)
+        {
+            List<double> VectorArray = new List<double>();
+            foreach (double[] row in Source.Values)
+                VectorArray.AddRange(row);
+            Coordinates = VectorArray.ToArray();
+        }
+
+        /// <summary>
         /// Сложение двух векторов. Длины координат вектором не обязательно должны быть равными.
         /// </summary>
         /// <param name="First"></param>
@@ -79,6 +91,15 @@ namespace KMZILib
         public static Vector operator -(Vector First)
         {
             return new Vector(First.Coordinates.Select(val => -val).ToArray());
+        }
+
+        /// <summary>
+        /// Возвращает матрицу, заданную по текущему вектору.
+        /// </summary>
+        /// <returns></returns>
+        public Matrix ToMatrix()
+        {
+            return new Matrix(this);
         }
 
         /// <summary>
