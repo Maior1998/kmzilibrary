@@ -48,7 +48,7 @@ namespace Ручной_тест
 
         public static void task()
         {
-            double[] GaussResult = LinearEquations.GaussianElimination(TestArray);
+            double[] GaussResult = LinearEquations.GaussianElimination(TestArray,LinearEquations.GEModification.LeadingOnTheLine);
             Vector GaussResultVector = new Vector(GaussResult);
             Matrix GaussResultMatrix = new Matrix(new[] { GaussResult });
             Console.WriteLine($"Результат - {GaussResultVector}");

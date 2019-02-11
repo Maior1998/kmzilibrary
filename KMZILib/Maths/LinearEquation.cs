@@ -103,7 +103,7 @@ namespace KMZILib
         public static double[] GaussianElimination(double[][] MatrixArray, GEModification style=GEModification.Standart)
         {
 
-            Matrix MatrixCopy = new Matrix(MatrixArray);
+            Matrix MatrixCopy = new Matrix(MatrixArray){HasFreeCoefficient = true};
             //Прямой ход
             Dictionary<int, int> offset = new Dictionary<int, int>();
             for (int i = 0; i < MatrixArray.Length; i++)

@@ -39,6 +39,11 @@ namespace KMZILib
         }
 
         /// <summary>
+        /// Обозначает, имеет ли матрица столбец свободных членов.
+        /// </summary>
+        public bool HasFreeCoefficient;
+
+        /// <summary>
         /// Инициализирует новую матрицу с заданным массивом коэффициентов.
         /// </summary>
         /// <param name="Source"></param>
@@ -184,7 +189,8 @@ namespace KMZILib
         {
             if (index < 0 || index >= Values.Length)
                 throw new InvalidOperationException($"Индекс лежит вне допустимого диапазона! (Min = 0, Max = {Values.Length - 1})");
-            return Values[index];
+
+            return HasFreeCoefficient ? Values[index].Take(Values[index].Length - 1).ToArray() : Values[index];
         }
 
         /// <summary>
