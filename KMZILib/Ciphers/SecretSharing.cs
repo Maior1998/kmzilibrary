@@ -235,11 +235,14 @@ namespace KMZILib
                         BigInteger p = GetBiggerRandomPrime(Key);
 
                         BigInteger[] primes = new BigInteger[Count];
-                        primes[0] = GetBiggerRandomPrime(p);
-                        for (int i = 1; i < primes.Length; i++)
-                            primes[i] = GetBiggerRandomPrime(primes[i - 1]);
+                        primes[0] = GetBiggerRandomPrime(p-1);
                         while (true)
                         {
+                            primes[0] = GetBiggerRandomPrime(primes[0]);
+                            for (int i = 1; i < primes.Length; i++)
+                                primes[i] = GetBiggerRandomPrime(primes[i - 1]);
+
+
                             BigInteger FirstMul = primes.Take(Limit).Aggregate<BigInteger, BigInteger>(1, (Current, val) => Current * val);
                             BigInteger SecondMul = p;
                             for (int i = Count - Limit + 1; i < Count; i++)
