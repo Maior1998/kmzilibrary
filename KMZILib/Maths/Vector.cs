@@ -130,7 +130,7 @@ namespace KMZILib
         /// <returns></returns>
         public override string ToString()
         {
-            return $"({string.Join(", ", Coordinates)})";
+            return $"({string.Join(", ", Coordinates.Select(coord=>Math.Round(coord)==coord?coord.ToString():$"{coord:F3}"))})";
         }
     }
 }

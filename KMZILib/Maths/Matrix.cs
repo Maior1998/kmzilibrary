@@ -319,7 +319,9 @@ namespace KMZILib
         /// <returns></returns>
         public double GetMax()
         {
-            return Values.Select(row => row.Max()).Max();
+            return HasFreeCoefficient
+                ? Values.Select(row => row.Take(row.Length - 1).Max()).Max()
+                : Values.Select(row => row.Max()).Max();
         }
 
         /// <summary>
@@ -328,7 +330,9 @@ namespace KMZILib
         /// <returns></returns>
         public double GetMaxAbs()
         {
-            return Values.Select(row => row.Select(Math.Abs).Max()).Max();
+            return HasFreeCoefficient
+                ? Values.Select(row => row.Take(row.Length - 1).Select(Math.Abs).Max()).Max()
+                : Values.Select(row => row.Select(Math.Abs).Max()).Max();
         }
 
         /// <summary>
@@ -338,12 +342,12 @@ namespace KMZILib
         public int[] GetMaxIndex()
         {
             double Max = GetMax();
-            for(int i=0;i<Values.Length;i++)
+            for (int i = 0; i < LengthY; i++)
             {
-                int index = Values[i].ToList().IndexOf(Max);
-                if (index != -1) return new []{i,index};
+                List<double> arr = GetRow(i).ToList();
+                int index = arr.IndexOf(Max);
+                if (index != -1) return new[] { i, index };
             }
-
             return new[]{-1,-1};
         }
 
@@ -356,7 +360,7 @@ namespace KMZILib
             double Max = GetMaxAbs();
             for (int i = 0; i < Values.Length; i++)
             {
-                int index = Values[i].Select(Math.Abs).ToList().IndexOf(Max);
+                int index = GetRow(i).Take(Values[i].Length-1).Select(Math.Abs).ToList().IndexOf(Max);
                 if (index != -1)
                     return new[] { i, index };
             }
@@ -419,7 +423,8 @@ namespace KMZILib
         /// <returns></returns>
         public override string ToString()
         {
-            return string.Join("\n", Values.Select(row => string.Join("\t", row)));
+            return string.Join("\n", Values.Select(row => string.Join("\t", row.Select(
+                element => $"{(Math.Round(element) == element ? element.ToString() : $"{element:F3}")}"))));
         }
     }
 }

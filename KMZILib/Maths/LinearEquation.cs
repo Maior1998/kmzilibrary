@@ -100,10 +100,10 @@ namespace KMZILib
         /// </summary>
         /// <param name="MatrixArray"></param>
         /// <returns></returns>
-        public static double[] GaussianElimination(double[][] MatrixArray, GEModification style=GEModification.Standart)
+        public static double[] GaussianElimination(double[][] MatrixArray, GEModification style = GEModification.Standart)
         {
 
-            Matrix MatrixCopy = new Matrix(MatrixArray){HasFreeCoefficient = true};
+            Matrix MatrixCopy = new Matrix(MatrixArray) { HasFreeCoefficient = true };
             //Прямой ход
             Dictionary<int, int> offset = new Dictionary<int, int>();
             for (int i = 0; i < MatrixArray.Length; i++)
@@ -111,39 +111,48 @@ namespace KMZILib
             for (int i = 0; i < MatrixCopy.LengthY; i++)
             {
                 //TODO: После показа лабораторной можно убрать
-                Console.WriteLine(string.Join("\n", MatrixCopy.Values.Select(str => string.Join("\t", str))));
+                Console.WriteLine(MatrixCopy);
                 Console.WriteLine("---------------------------------------------------------\n");
-                MatrixCopy.Values[i] = MatrixCopy[i].Select(val => val / MatrixCopy.Values[i][i]).ToArray();
-                //Сделали первый ненулевой элемент единицей
                 int MaxIndex;
                 switch (style)
                 {
                     case GEModification.LeadingOnTheLine:
                         //получили индекс максимального по модулю элемента в текущей строке
                         MaxIndex = MatrixCopy.GetMaxAbsInRowIndex(i);
-                        MatrixCopy.SwapColumns(i, MaxIndex);
-                        SwapDict(offset,i,MaxIndex);
+                        if (i < MaxIndex)
+                        {
+                            MatrixCopy.SwapColumns(i, MaxIndex);
+                            SwapDict(offset, i, MaxIndex);
+                        }
+
                         break;
                     case GEModification.LeadingOnTheColumn:
                         MaxIndex = MatrixCopy.GetMaxAbsInColumnIndex(i);
-                        MatrixCopy.SwapLines(i, MaxIndex);
-                        SwapDict(offset, i, MaxIndex);
+                        if (i < MaxIndex)
+                            MatrixCopy.SwapLines(i, MaxIndex);
+
                         break;
                     case GEModification.LeadingOnWholeMatrix:
                         int MaxIndexI, MaxIndexJ;
                         int[] max = MatrixCopy.GetMaxAbsIndex();
                         MaxIndexI = max[0];
                         MaxIndexJ = max[1];
-                        MatrixCopy.SwapLines(i, MaxIndexI);
-                        SwapDict(offset, i, MaxIndexI);
-
-                        MatrixCopy.SwapColumns(i, MaxIndexJ);
-                        SwapDict(offset, i, MaxIndexJ);
+                        if (i <= MaxIndexI && i <= MaxIndexJ)
+                        {
+                            MatrixCopy.SwapLines(i, MaxIndexI);
+                            MatrixCopy.SwapColumns(i, MaxIndexJ);
+                            SwapDict(offset, i, MaxIndexJ);
+                        }
                         break;
                     default:
                         break;
 
                 }
+                MatrixCopy.Values[i] = MatrixCopy[i].Select(val => val / MatrixCopy.Values[i][i]).ToArray();
+                //Сделали первый ненулевой элемент единицей
+                //TODO: После показа лабораторной можно убрать
+                Console.WriteLine(MatrixCopy);
+                Console.WriteLine("---------------------------------------------------------\n");
                 for (int j = i + 1; j < MatrixCopy.LengthY; j++)
                 {
                     double Multiplier = -(MatrixCopy[j][i] / MatrixCopy.Values[i][i]);
