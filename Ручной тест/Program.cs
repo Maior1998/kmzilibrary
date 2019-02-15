@@ -27,7 +27,8 @@ namespace Ручной_тест
         };
         static void Main(string[] args)
         {
-            task();
+            Matrix test = new Matrix(new[] { new[] { 1.0, 2, 3 }, new[] { 3.0, 4, 6 }, new[] { 6.0, 3, 5 } }); 
+            Console.WriteLine(test.Definite);
             return;
             Matrix A = new Matrix(new double[][] { new double[] { 1, 2.0 }, new double[] { 3, 4.0 }, new double[] { 5, 6.0 } });
             Matrix B = new Matrix(new double[][] { new double[] { 1, 3.0, 5 }, new double[] { 2, 4, 6.0 } });

@@ -34,7 +34,7 @@ namespace KMZILib
                 int Length = Values.First().Length;
                 if (Values.Any(Doubles => Doubles.Length != Length))
                     return -1;
-                return Length;
+                return HasFreeCoefficient? Length-1: Length;
             }
         }
 
@@ -42,6 +42,11 @@ namespace KMZILib
         /// Обозначает, имеет ли матрица столбец свободных членов.
         /// </summary>
         public bool HasFreeCoefficient;
+
+        /// <summary>
+        /// Обозначает, является ли матрица квадратной. Зависит от стобца свободных членов <see cref="HasFreeCoefficient"/>.
+        /// </summary>
+        public bool IsSquare => LengthY == LengthX;
 
         /// <summary>
         /// Инициализирует новую матрицу с заданным массивом коэффициентов.
@@ -61,13 +66,17 @@ namespace KMZILib
         /// Инициализирует новую матрицу, которая является копией заданной матрицы.
         /// </summary>
         /// <param name="Source"></param>
-        public Matrix(Matrix Source) : this(Source.Values) { }
+        public Matrix(Matrix Source) : this(Source.Values)
+        {
+        }
 
         /// <summary>
         /// Инициализирует новую матрицу по заданному вектору значений.
         /// </summary>
         /// <param name="Source"></param>
-        public Matrix(Vector Source) : this(new[] { Source.ToArray() }) { }
+        public Matrix(Vector Source) : this(new[] { Source.ToArray() })
+        {
+        }
 
         /// <summary>
         /// Осуществляет умножение двух матриц и возвращает результат - новую матрицу.
@@ -90,6 +99,7 @@ namespace KMZILib
                         Sum += First.Values[ResultRow][i] * Second.Values[i][ResultColumn];
                     Result[ResultRow][ResultColumn] = Sum;
                 }
+
             return new Matrix(Result);
         }
 
@@ -105,6 +115,7 @@ namespace KMZILib
                 for (int j = 0; j < NewMatrix[i].Length; j++)
                     NewMatrix[i][j] = Values[j][i];
             }
+
             Values = NewMatrix;
             return this;
         }
@@ -127,6 +138,38 @@ namespace KMZILib
         public Matrix Copy()
         {
             return new Matrix(this);
+        }
+
+        /// <summary>
+        /// Определитель данной матрицы.
+        /// </summary>
+        public double Definite
+        {
+            get
+            {
+                Matrix MatrixCopy = new Matrix(this);
+                //Прямой ход
+                if (!MatrixCopy.IsSquare)
+                    throw new InvalidOperationException(
+                        "Нахождение определителя возможно только для квардратной матрицы.");
+                double Result = 1;
+                for (int i = 0; i < MatrixCopy.LengthY; i++)
+                {
+                    Result *= MatrixCopy[i][i];
+                    MatrixCopy[i] = MatrixCopy[i].Select(val => val / MatrixCopy[i][i]).ToArray();
+                    //Сделали первый ненулевой элемент единицей
+                    for (int j = i + 1; j < MatrixCopy.LengthY; j++)
+                    {
+                        double Multiplier = -(MatrixCopy[j][i] / MatrixCopy[i][i]);
+                        MatrixCopy[j] = MatrixCopy[j].Select((val, index) => val + MatrixCopy[i][index] * Multiplier)
+                            .ToArray();
+                    }
+
+                    //У всех остальных строчек обнулили i-ый столбец
+                }
+
+                return Result;
+            }
         }
 
         /// <summary>
@@ -275,7 +318,7 @@ namespace KMZILib
         /// <returns></returns>
         public int GetMaxInColumnIndex(int index)
         {
-            List<double> TargetColumn= GetColumn(index).ToList();
+            List<double> TargetColumn = GetColumn(index).ToList();
             return TargetColumn.IndexOf(TargetColumn.Max());
         }
 
@@ -346,9 +389,10 @@ namespace KMZILib
             {
                 List<double> arr = GetRow(i).ToList();
                 int index = arr.IndexOf(Max);
-                if (index != -1) return new[] { i, index };
+                if (index != -1)
+                    return new[] { i, index };
             }
-            return new[]{-1,-1};
+            return new[] { -1, -1 };
         }
 
         /// <summary>
@@ -360,7 +404,7 @@ namespace KMZILib
             double Max = GetMaxAbs();
             for (int i = 0; i < Values.Length; i++)
             {
-                int index = GetRow(i).Take(Values[i].Length-1).Select(Math.Abs).ToList().IndexOf(Max);
+                int index = GetRow(i).Take(Values[i].Length - 1).Select(Math.Abs).ToList().IndexOf(Max);
                 if (index != -1)
                     return new[] { i, index };
             }
@@ -374,7 +418,7 @@ namespace KMZILib
         /// <returns></returns>
         public double[][] ToArray()
         {
-            double[][]Result = new double[Values.Length][];
+            double[][] Result = new double[Values.Length][];
             for (int i = 0; i < Values.Length; i++)
             {
                 Values[i] = new double[Values[i].Length];
