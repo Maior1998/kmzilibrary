@@ -27,8 +27,7 @@ namespace Ручной_тест
         };
         static void Main(string[] args)
         {
-            Matrix test = new Matrix(new[] { new[] { 1.0, 2, 3 }, new[] { 3.0, 4, 6 }, new[] { 6.0, 3, 5 } }); 
-            Console.WriteLine(test.Definite);
+            task2();
             return;
             Matrix A = new Matrix(new double[][] { new double[] { 1, 2.0 }, new double[] { 3, 4.0 }, new double[] { 5, 6.0 } });
             Matrix B = new Matrix(new double[][] { new double[] { 1, 3.0, 5 }, new double[] { 2, 4, 6.0 } });
@@ -47,7 +46,12 @@ namespace Ручной_тест
             //Console.WriteLine(vector1-vector2);
         }
 
-        public static void task()
+        public static void task2()
+        {
+            LinearEquations.LUMethod(TestArray);
+        }
+
+        public static void task1()
         {
             double[] GaussResult = LinearEquations.GaussianElimination(TestArray,LinearEquations.GEModification.LeadingOnWholeMatrix);
             Vector GaussResultVector = new Vector(GaussResult);

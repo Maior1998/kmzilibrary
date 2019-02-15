@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.ExceptionServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -176,6 +177,45 @@ namespace KMZILib
             int buffer = Source[i];
             Source[i] = Source[j];
             Source[j] = buffer;
+        }
+
+        public static double[] LUMethod(double[][] MatrixArray)
+        {
+            int n = MatrixArray.Length;
+            Matrix MatrixCopy = new Matrix(MatrixArray) { HasFreeCoefficient = true };
+            Matrix L = new Matrix(new double[MatrixCopy.LengthX][].Select(row => row = new double[MatrixCopy.LengthX]).ToArray());
+            for (int i = 0; i < n; i++)
+                L[i][i] = 1;
+            Matrix U = new Matrix(new double[MatrixCopy.LengthX][].Select(row => row = new double[MatrixCopy.LengthX]).ToArray());
+
+            //1 формула
+            double Sum = 0;
+            for (int k = 0; k < n - 1; k++)
+                Sum += L[n-1][k] * U[k][n-1];
+            U[n - 1][n - 1] = MatrixCopy[n - 1][n - 1] - Sum;
+
+            //2 формула
+            for (int j = 1; j < n; j++)
+                for (int i = 0; i <= j; i++)
+                {
+                    Sum = 0;
+                    for (int k = 0; k < n - 1; k++)
+                        Sum += L[i][k] * U[k][j];
+                    U[n - 1][n - 1] = MatrixCopy[n - 1][n - 1] - Sum;
+                }
+
+            //3 формула
+            for (int i = 0; i < n; i++)
+                for (int j = 0; j < i; j++)
+                {
+                    L[i][j] = MatrixCopy[i][j];
+                    for (int k = 0; k < j - 1; k++)
+                        L[i][j] -= L[i][k] * U[k][j];
+                    L[i][j] /= U[j][j];
+                }
+
+            Console.WriteLine($"L:\n{L}\n\nU:\n{U}");
+            return null;
         }
 
         /// <summary>
