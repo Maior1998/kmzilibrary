@@ -189,19 +189,16 @@ namespace KMZILib
             Matrix U = new Matrix(new double[MatrixCopy.LengthX][].Select(row => row = new double[MatrixCopy.LengthX]).ToArray());
 
             //1 формула
-            double Sum = 0;
+            U[n - 1][n - 1] = MatrixCopy[n - 1][n - 1];
             for (int k = 0; k < n - 1; k++)
-                Sum += L[n-1][k] * U[k][n-1];
-            U[n - 1][n - 1] = MatrixCopy[n - 1][n - 1] - Sum;
-
+                U[n - 1][n - 1] -= L[n-1][k] * U[k][n-1];
             //2 формула
-            for (int j = 1; j < n; j++)
+            for (int j = 0; j < n; j++)
                 for (int i = 0; i <= j; i++)
                 {
-                    Sum = 0;
-                    for (int k = 0; k < n - 1; k++)
-                        Sum += L[i][k] * U[k][j];
-                    U[n - 1][n - 1] = MatrixCopy[n - 1][n - 1] - Sum;
+                    U[n - 1][n - 1] = MatrixCopy[n - 1][n - 1];
+                    for (int k = 0; k < i - 1; k++)
+                        U[n - 1][n - 1] -= L[i][k] * U[k][j];
                 }
 
             //3 формула
