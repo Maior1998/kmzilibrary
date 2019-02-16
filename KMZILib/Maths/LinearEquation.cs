@@ -96,81 +96,7 @@ namespace KMZILib
             }
         }
 
-
-        /// <summary>
-        /// Осуществляет решение системы линейных уравнений заданных в виде матрицы методом Гаусса.
-        /// </summary>
-        /// <param name="MatrixArray"></param>
-        /// <param name="style"></param>
-        /// <returns></returns>
-        public static double[] GaussianElimination(double[][] MatrixArray, GEModification style = GEModification.Standart)
-        {
-
-            Matrix MatrixCopy = new Matrix(MatrixArray) { HasFreeCoefficient = true };
-            //Прямой ход
-            Dictionary<int, int> offset = new Dictionary<int, int>();
-            for (int i = 0; i < MatrixArray.Length; i++)
-                offset.Add(i, i);
-            for (int i = 0; i < MatrixCopy.LengthY; i++)
-            {
-                //TODO: После показа лабораторной можно убрать
-                Console.WriteLine(MatrixCopy);
-                Console.WriteLine("---------------------------------------------------------\n");
-                int MaxIndex;
-                switch (style)
-                {
-                    case GEModification.LeadingOnTheLine:
-                        //получили индекс максимального по модулю элемента в текущей строке
-                        MaxIndex = MatrixCopy.GetMaxAbsInRowIndex(i);
-                        if (i < MaxIndex)
-                        {
-                            MatrixCopy.SwapColumns(i, MaxIndex);
-                            SwapDict(offset, i, MaxIndex);
-                        }
-
-                        break;
-                    case GEModification.LeadingOnTheColumn:
-                        MaxIndex = MatrixCopy.GetMaxAbsInColumnIndex(i);
-                        if (i < MaxIndex)
-                            MatrixCopy.SwapLines(i, MaxIndex);
-
-                        break;
-                    case GEModification.LeadingOnWholeMatrix:
-                        int MaxIndexI, MaxIndexJ;
-                        int[] max = MatrixCopy.GetMaxAbsIndex();
-                        MaxIndexI = max[0];
-                        MaxIndexJ = max[1];
-                        if (i <= MaxIndexI && i <= MaxIndexJ)
-                        {
-                            MatrixCopy.SwapLines(i, MaxIndexI);
-                            MatrixCopy.SwapColumns(i, MaxIndexJ);
-                            SwapDict(offset, i, MaxIndexJ);
-                        }
-                        break;
-                    default:
-                        break;
-
-                }
-                MatrixCopy.Values[i] = MatrixCopy[i].Select(val => val / MatrixCopy.Values[i][i]).ToArray();
-                //Сделали первый ненулевой элемент единицей
-                //TODO: После показа лабораторной можно убрать
-                Console.WriteLine(MatrixCopy);
-                Console.WriteLine("---------------------------------------------------------\n");
-                for (int j = i + 1; j < MatrixCopy.LengthY; j++)
-                {
-                    double Multiplier = -(MatrixCopy[j][i] / MatrixCopy.Values[i][i]);
-                    MatrixCopy[j] = MatrixCopy[j].Select((val, index) => val + MatrixCopy.Values[i][index] * Multiplier).ToArray();
-                }
-                //У всех остальных строчек обнулили i-ый столбец
-            }
-            //Обратный ход
-            double[] Result = new double[MatrixCopy.Values.Length];
-            Result[Result.Length - 1] = MatrixCopy.Values[MatrixCopy.Values.Length - 1].Last();
-            for (int i = Result.Length - 2; i >= 0; i--)
-                Result[i] = MatrixCopy.Values[i].Last() - CalcSum(MatrixCopy, i, Result);
-            return offset.OrderBy(row => row.Value).Select(row => Result[row.Key]).ToArray();
-
-        }
+        
 
         private static void SwapDict(Dictionary<int, int> Source, int i, int j)
         {
@@ -179,86 +105,224 @@ namespace KMZILib
             Source[j] = buffer;
         }
 
-        public static double[] LUMethod(double[][] MatrixArray)
+        public static class GaussMethod
         {
-            //https://habr.com/ru/sandbox/35982/
-            int n = MatrixArray.Length;
-            Matrix A = new Matrix(MatrixArray) { HasFreeCoefficient = true }.WithoutFreeCoefficients;
-            Matrix L = new Matrix(new double[n][].Select(row => new double[n]).ToArray());
-            Matrix U = new Matrix(new double[n][].Select(row => new double[n]).ToArray());
 
-            for (int i = 0; i < n; i++)
+            /// <summary>
+            /// Модификации метода Гаусса.
+            /// </summary>
+            public enum GEModification
             {
-                //Переносим то, что можно просто скопировать
-                //и что будет служить в качестве необходимых
-                //начальных данных для дальнейших вычислений
-
-                //Первая строка матрицы U будет совпадать с соответствующей у А
-                U[0][i] = A[0][i];
-
-                //Диагональ у матрицы L состоит из единичек
-                L[i][i] = 1;
-
-                //Первый столбец матрицы A имеет вид A[i][0] = L[i][0] * U[0][0]
-                //Очевидно, можно сразу найти элементы L[i][0], зная U[0][0].
-                //А мы его уже знаем, это A[0][0]
-                L[i][0] = A[i][0] / A[0][0];
-            }
-            //Теперь можно вычислить остальные коэффициенты
-
-            for (int dimension = 1; dimension < n; dimension++)
-            {
-                //dimension - индекс "уголка" матрицы A
-
-                //Пробегаем каждый столбец в уголке,
-                //таким образом задавая всю строчку
-                //от U[dimension][dimension] до U[dimension][n-1]
-                for (int j = dimension; j < n; j++)
-                {
-                    U[dimension][j] = A[dimension][j];
-                    for (int i = 0; i < dimension; i++)
-                        U[dimension][j] -= L[dimension][i] * U[i][j];
-
-                }
-
-                //Теперь пробегаем каждую строку,
-                //таким образом задавая весь столбец
-                //от U[dimension+1][dimension] до U[n-1][dimension]
-                for (int j = dimension + 1; j < n; j++)
-                {
-                    L[j][dimension] = A[j][dimension];
-                    for (int i = 0; i < dimension; i++)
-                        L[j][dimension] -= L[j][i] * U[i][dimension];
-                    L[j][dimension] /= U[dimension][dimension];
-                }
+                /// <summary>
+                /// Стандартный алгоритм.
+                /// </summary>
+                Standart,
+                /// <summary>
+                /// Выбор ведущего элемента в строке.
+                /// </summary>
+                LeadingOnTheLine,
+                /// <summary>
+                /// Выбор ведущего элемента в столбце.
+                /// </summary>
+                LeadingOnTheColumn,
+                /// <summary>
+                /// Выбор ведущего элемента в матрице.
+                /// </summary>
+                LeadingOnWholeMatrix
             }
 
-            Console.WriteLine($"L:\n{L}\n\nU:\n{U}");
-            return null;
+            /// <summary>
+            /// Осуществляет решение системы линейных уравнений заданных в виде матрицы методом Гаусса.
+            /// </summary>
+            /// <param name="MatrixArray"></param>
+            /// <param name="style"></param>
+            /// <param name="Debug"></param>
+            /// <returns></returns>
+            public static Vector Solve(double[][] MatrixArray, GEModification style = GEModification.Standart, bool Debug = false)
+            {
+                Matrix MatrixCopy = Straight(MatrixArray, out Dictionary<int, int> offset, style, Debug);
+                return Reverse(MatrixCopy, offset);
+
+            }
+
+            public static Vector Reverse(Matrix MatrixCopy, Dictionary<int, int> offset)
+            {
+                //Обратный ход
+                double[] Result = new double[MatrixCopy.Values.Length];
+                Result[Result.Length - 1] = MatrixCopy.Values[MatrixCopy.Values.Length - 1].Last();
+                for (int i = Result.Length - 2; i >= 0; i--)
+                    Result[i] = MatrixCopy.Values[i].Last() - CalcSum(MatrixCopy, i, Result);
+                return new Vector(offset.OrderBy(row => row.Value).Select(row => Result[row.Key]).ToArray());
+            }
+
+            public static Matrix Straight(double[][] MatrixArray,out Dictionary<int, int> offset, GEModification style = GEModification.Standart,
+                bool Debug = false)
+            {
+                Matrix MatrixCopy = new Matrix(MatrixArray) { HasFreeCoefficient = true };
+                //Прямой ход
+                offset = new Dictionary<int, int>();
+                for (int i = 0; i < MatrixArray.Length; i++)
+                    offset.Add(i, i);
+                for (int i = 0; i < MatrixCopy.LengthY; i++)
+                {
+                    //TODO: После показа лабораторной можно убрать
+                    if (Debug)
+                    {
+                        Console.WriteLine(MatrixCopy);
+                        Console.WriteLine("---------------------------------------------------------\n");
+                    }
+
+                    int MaxIndex;
+                    switch (style)
+                    {
+                        case GEModification.LeadingOnTheLine:
+                            //получили индекс максимального по модулю элемента в текущей строке
+                            MaxIndex = MatrixCopy.GetMaxAbsInRowIndex(i);
+                            if (i < MaxIndex)
+                            {
+                                MatrixCopy.SwapColumns(i, MaxIndex);
+                                SwapDict(offset, i, MaxIndex);
+                            }
+
+                            break;
+                        case GEModification.LeadingOnTheColumn:
+                            MaxIndex = MatrixCopy.GetMaxAbsInColumnIndex(i);
+                            if (i < MaxIndex)
+                                MatrixCopy.SwapLines(i, MaxIndex);
+
+                            break;
+                        case GEModification.LeadingOnWholeMatrix:
+                            int MaxIndexI, MaxIndexJ;
+                            int[] max = MatrixCopy.GetMaxAbsIndex();
+                            MaxIndexI = max[0];
+                            MaxIndexJ = max[1];
+                            if (i <= MaxIndexI && i <= MaxIndexJ)
+                            {
+                                MatrixCopy.SwapLines(i, MaxIndexI);
+                                MatrixCopy.SwapColumns(i, MaxIndexJ);
+                                SwapDict(offset, i, MaxIndexJ);
+                            }
+                            break;
+                        default:
+                            break;
+
+                    }
+                    MatrixCopy.Values[i] = MatrixCopy[i].Select(val => val / MatrixCopy.Values[i][i]).ToArray();
+                    //Сделали первый ненулевой элемент единицей
+                    if (Debug)
+                    {
+                        Console.WriteLine(MatrixCopy);
+                        Console.WriteLine("---------------------------------------------------------\n");
+                    }
+
+                    for (int j = i + 1; j < MatrixCopy.LengthY; j++)
+                    {
+                        double Multiplier = -(MatrixCopy[j][i] / MatrixCopy.Values[i][i]);
+                        MatrixCopy[j] = MatrixCopy[j].Select((val, index) => val + MatrixCopy.Values[i][index] * Multiplier).ToArray();
+                    }
+                    //У всех остальных строчек обнулили i-ый столбец
+                }
+
+                return MatrixCopy;
+            }
         }
 
-        /// <summary>
-        /// Модификации метода Гаусса.
-        /// </summary>
-        public enum GEModification
+
+        public static class LUMethod
         {
+            public static double GetDefinite(Matrix Source)
+            {
+                return GetLU(Source.Values)[1].Definite;
+            }
+
             /// <summary>
-            /// Стандартный алгоритм.
+            /// LU метод решения СЛУ.
             /// </summary>
-            Standart,
+            /// <param name="MatrixArray"></param>
+            /// <param name="Debug"></param>
+            /// <returns></returns>
+            public static Vector Solve(double[][] MatrixArray, bool Debug = false)
+            {
+                Matrix[] buffer = GetLU(MatrixArray, Debug);
+                Matrix L = buffer[0];
+                Matrix U = buffer[1];
+
+                Console.WriteLine($"L:\n{L}\n\nU:\n{U}");
+
+                Vector Y = GaussMethod.Solve(L.Values.Select((row, index) => row.Concat(new[] { MatrixArray[index].Last() }).ToArray()).ToArray());
+                Console.WriteLine($"\nY:\n{Y}");
+
+                Vector X = GaussMethod.Solve(U.Values.Select((row, index) => row.Concat(new[] { Y[index] }).ToArray()).ToArray());
+
+                return X;
+            }
+
             /// <summary>
-            /// Выбор ведущего элемента в строке.
+            /// Осуществляет разложение заданной матрицы на произвдение матриц L*U.
             /// </summary>
-            LeadingOnTheLine,
-            /// <summary>
-            /// Выбор ведущего элемента в столбце.
-            /// </summary>
-            LeadingOnTheColumn,
-            /// <summary>
-            /// Выбор ведущего элемента в матрице.
-            /// </summary>
-            LeadingOnWholeMatrix
+            /// <param name="MatrixArray"></param>
+            /// <param name="Debug"></param>
+            /// <returns></returns>
+            public static Matrix[] GetLU(double[][] MatrixArray, bool Debug = false)
+            {
+                int n = MatrixArray.Length;
+                Matrix A = new Matrix(MatrixArray) { HasFreeCoefficient = true }.WithoutFreeCoefficients;
+                Matrix L = new Matrix(new double[n][].Select(row => new double[n]).ToArray());
+                Matrix U = new Matrix(new double[n][].Select(row => new double[n]).ToArray());
+
+                for (int i = 0; i < n; i++)
+                {
+                    //Переносим то, что можно просто скопировать
+                    //и что будет служить в качестве необходимых
+                    //начальных данных для дальнейших вычислений
+
+                    //Первая строка матрицы U будет совпадать с соответствующей у А
+                    U[0][i] = A[0][i];
+
+                    //Диагональ у матрицы L состоит из единичек
+                    L[i][i] = 1;
+
+                    //Первый столбец матрицы A имеет вид A[i][0] = L[i][0] * U[0][0]
+                    //Очевидно, можно сразу найти элементы L[i][0], зная U[0][0].
+                    //А мы его уже знаем, это A[0][0]
+                    L[i][0] = A[i][0] / A[0][0];
+                }
+                //Теперь можно вычислить остальные коэффициенты
+
+                for (int dimension = 1; dimension < n; dimension++)
+                {
+                    //dimension - индекс "уголка" матрицы A
+
+                    //Пробегаем каждый столбец в уголке,
+                    //таким образом задавая всю строчку
+                    //от U[dimension][dimension] до U[dimension][n-1]
+                    for (int j = dimension; j < n; j++)
+                    {
+                        U[dimension][j] = A[dimension][j];
+                        for (int i = 0; i < dimension; i++)
+                            U[dimension][j] -= L[dimension][i] * U[i][j];
+
+                    }
+
+                    //Теперь пробегаем каждую строку,
+                    //таким образом задавая весь столбец
+                    //от U[dimension+1][dimension] до U[n-1][dimension]
+                    for (int j = dimension + 1; j < n; j++)
+                    {
+                        L[j][dimension] = A[j][dimension];
+                        for (int i = 0; i < dimension; i++)
+                            L[j][dimension] -= L[j][i] * U[i][dimension];
+                        L[j][dimension] /= U[dimension][dimension];
+                    }
+                }
+                return new []{L,U};
+            }
+
         }
+
+        
+
+        
 
         private static double CalcSum(Matrix matrix, int index, double[] ResultArray)
         {
