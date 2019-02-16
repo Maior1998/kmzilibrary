@@ -183,101 +183,55 @@ namespace KMZILib
         {
             //https://habr.com/ru/sandbox/35982/
             int n = MatrixArray.Length;
-            Matrix MatrixCopy = new Matrix(MatrixArray) {HasFreeCoefficient = true}.WithoutFreeCoefficients;
-            Matrix L = new Matrix(new double[MatrixCopy.LengthX][].Select(row => new double[MatrixCopy.LengthX]).ToArray());
-            Matrix U = new Matrix(MatrixCopy);
+            Matrix A = new Matrix(MatrixArray) { HasFreeCoefficient = true }.WithoutFreeCoefficients;
+            Matrix L = new Matrix(new double[n][].Select(row => new double[n]).ToArray());
+            Matrix U = new Matrix(new double[n][].Select(row => new double[n]).ToArray());
 
-            for (int i = 0; i < n; i++)
-                for (int j = i; j < n; j++)
-                    L[j][i] = U[j][i] / U[i][i];
-
-            for (int k = 1; k < n; k++)
-            {
-                for (int i = k - 1; i < n; i++)
-                    for (int j = i; j < n; j++)
-                        L[j][i] = U[j][i] / U[i][i];
-
-                for (int i = k; i < n; i++)
-                    for (int j = k - 1; j < n; j++)
-                        U[i][j] = U[i][j] - L[i][k - 1] * U[k - 1][j];
-            }
-
-            Console.WriteLine($"L:\n{L}\n\nU:\n{U}");
-            return null;
-        }
-
-        public static double[] LUMethod3(double[][] MatrixArray)
-        {
-            int n = MatrixArray.Length;
-            Matrix MatrixCopy = new Matrix(MatrixArray) { HasFreeCoefficient = true }.WithoutFreeCoefficients;
-            Matrix L = new Matrix(new double[MatrixCopy.LengthX][].Select(row => new double[MatrixCopy.LengthX]).ToArray());
-            Matrix U = new Matrix(MatrixCopy);
             for (int i = 0; i < n; i++)
             {
-                for (int j = 0; j < n; j++)
-                {
-                    U[0, i] = MatrixCopy[0, i];
-                    L[i, 0] = MatrixCopy[i, 0] / U[0, 0];
-                    double sum = 0;
-                    for (int k = 0; k < i; k++)
-                    {
-                        sum += L[i, k] * U[k, j];
-                    }
-                    U[i, j] = MatrixCopy[i, j] - sum;
-                    if (i > j)
-                    {
-                        L[j, i] = 0;
-                    }
-                    else
-                    {
-                        sum = 0;
-                        for (int k = 0; k < i; k++)
-                        {
-                            sum += L[j, k] * U[k, i];
-                        }
-                        L[j, i] = (MatrixCopy[j, i] - sum) / U[i, i];
-                    }
-                }
-            }
-            Console.WriteLine($"L:\n{L}\n\nU:\n{U}");
-            return null;
-        }
+                //Переносим то, что можно просто скопировать
+                //и что будет служить в качестве необходимых
+                //начальных данных для дальнейших вычислений
 
-        private static double[] LUMethod2(double[][] MatrixArray)
-        {
-            /*
-             * Возможно стоит попробовать алгоритм
-             * http://ru.math.wikia.com/wiki/LU-%D1%80%D0%B0%D0%B7%D0%BB%D0%BE%D0%B6%D0%B5%D0%BD%D0%B8%D0%B5
-             */
-            int n = MatrixArray.Length;
-            Matrix MatrixCopy = new Matrix(MatrixArray) { HasFreeCoefficient = true };
-            Matrix L = new Matrix(new double[MatrixCopy.LengthX][].Select(row => new double[MatrixCopy.LengthX]).ToArray());
-            for (int i = 0; i < n; i++)
+                //Первая строка матрицы U будет совпадать с соответствующей у А
+                U[0][i] = A[0][i];
+
+                //Диагональ у матрицы L состоит из единичек
                 L[i][i] = 1;
-            Matrix U = new Matrix(new double[MatrixCopy.LengthX][].Select(row => new double[MatrixCopy.LengthX]).ToArray());
 
-            //1 формула
-            U[n - 1][n - 1] = MatrixCopy[n - 1][n - 1];
-            for (int k = 0; k < n - 1; k++)
-                U[n - 1][n - 1] -= L[n - 1][k] * U[k][n - 1];
-            //2 формула
-            for (int j = 0; j < n; j++)
-                for (int i = 0; i <= j; i++)
+                //Первый столбец матрицы A имеет вид A[i][0] = L[i][0] * U[0][0]
+                //Очевидно, можно сразу найти элементы L[i][0], зная U[0][0].
+                //А мы его уже знаем, это A[0][0]
+                L[i][0] = A[i][0] / A[0][0];
+            }
+            //Теперь можно вычислить остальные коэффициенты
+
+            for (int dimension = 1; dimension < n; dimension++)
+            {
+                //dimension - индекс "уголка" матрицы A
+
+                //Пробегаем каждый столбец в уголке,
+                //таким образом задавая всю строчку
+                //от U[dimension][dimension] до U[dimension][n-1]
+                for (int j = dimension; j < n; j++)
                 {
-                    U[n - 1][n - 1] = MatrixCopy[n - 1][n - 1];
-                    for (int k = 0; k < i - 1; k++)
-                        U[n - 1][n - 1] -= L[i][k] * U[k][j];
+                    U[dimension][j] = A[dimension][j];
+                    for (int i = 0; i < dimension; i++)
+                        U[dimension][j] -= L[dimension][i] * U[i][j];
+
                 }
 
-            //3 формула
-            for (int i = 0; i < n; i++)
-                for (int j = 0; j < i; j++)
+                //Теперь пробегаем каждую строку,
+                //таким образом задавая весь столбец
+                //от U[dimension+1][dimension] до U[n-1][dimension]
+                for (int j = dimension + 1; j < n; j++)
                 {
-                    L[i][j] = MatrixCopy[i][j];
-                    for (int k = 0; k < j - 1; k++)
-                        L[i][j] -= L[i][k] * U[k][j];
-                    L[i][j] /= U[j][j];
+                    L[j][dimension] = A[j][dimension];
+                    for (int i = 0; i < dimension; i++)
+                        L[j][dimension] -= L[j][i] * U[i][dimension];
+                    L[j][dimension] /= U[dimension][dimension];
                 }
+            }
 
             Console.WriteLine($"L:\n{L}\n\nU:\n{U}");
             return null;

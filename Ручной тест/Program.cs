@@ -49,7 +49,7 @@ namespace Ручной_тест
         public static void task2()
         {
 
-            LinearEquations.LUMethod3(TestArray);
+            LinearEquations.LUMethod(TestArray);
         }
 
         public static void task1()
