@@ -34,7 +34,7 @@ namespace KMZILib
                 int Length = Values.First().Length;
                 if (Values.Any(Doubles => Doubles.Length != Length))
                     return -1;
-                return HasFreeCoefficient? Length-1: Length;
+                return HasFreeCoefficient ? Length - 1 : Length;
             }
         }
 
@@ -42,6 +42,14 @@ namespace KMZILib
         /// Обозначает, имеет ли матрица столбец свободных членов.
         /// </summary>
         public bool HasFreeCoefficient;
+
+        public Matrix WithoutFreeCoefficients
+        {
+            get
+            {
+                return !HasFreeCoefficient ? Copy() : new Matrix(Values.Select(row => row.Take(row.Length - 1).ToArray()).ToArray());
+            }
+        }
 
         /// <summary>
         /// Обозначает, является ли матрица квадратной. Зависит от стобца свободных членов <see cref="HasFreeCoefficient"/>.
@@ -151,7 +159,7 @@ namespace KMZILib
                 //Прямой ход
                 if (!MatrixCopy.IsSquare)
                     throw new InvalidOperationException(
-                        "Нахождение определителя возможно только для квардратной матрицы.");
+                        "Нахождение определителя возможно только для квадратной матрицы.");
                 double Result = 1;
                 for (int i = 0; i < MatrixCopy.LengthY; i++)
                 {

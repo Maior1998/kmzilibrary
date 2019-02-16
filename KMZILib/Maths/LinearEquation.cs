@@ -181,17 +181,48 @@ namespace KMZILib
 
         public static double[] LUMethod(double[][] MatrixArray)
         {
+            //https://habr.com/ru/sandbox/35982/
+            int n = MatrixArray.Length;
+            Matrix MatrixCopy = new Matrix(MatrixArray) {HasFreeCoefficient = true}.WithoutFreeCoefficients;
+            Matrix L = new Matrix(new double[MatrixCopy.LengthX][].Select(row => new double[MatrixCopy.LengthX]).ToArray());
+            Matrix U = new Matrix(MatrixCopy);
+
+            for (int i = 0; i < n; i++)
+                for (int j = i; j < n; j++)
+                    L[j][i] = U[j][i] / U[i][i];
+
+            for (int k = 1; k < n; k++)
+            {
+                for (int i = k - 1; i < n; i++)
+                    for (int j = i; j < n; j++)
+                        L[j][i] = U[j][i] / U[i][i];
+
+                for (int i = k; i < n; i++)
+                    for (int j = k - 1; j < n; j++)
+                        U[i][j] = U[i][j] - L[i][k - 1] * U[k - 1][j];
+            }
+
+            Console.WriteLine($"L:\n{L}\n\nU:\n{U}");
+            return null;
+        }
+
+        private static double[] LUMethod2(double[][] MatrixArray)
+        {
+            /*
+             * Возможно стоит попробовать алгоритм
+             * http://ru.math.wikia.com/wiki/LU-%D1%80%D0%B0%D0%B7%D0%BB%D0%BE%D0%B6%D0%B5%D0%BD%D0%B8%D0%B5
+             */
             int n = MatrixArray.Length;
             Matrix MatrixCopy = new Matrix(MatrixArray) { HasFreeCoefficient = true };
-            Matrix L = new Matrix(new double[MatrixCopy.LengthX][].Select(row => row = new double[MatrixCopy.LengthX]).ToArray());
+            Matrix L = new Matrix(new double[MatrixCopy.LengthX][].Select(row => new double[MatrixCopy.LengthX]).ToArray());
             for (int i = 0; i < n; i++)
                 L[i][i] = 1;
-            Matrix U = new Matrix(new double[MatrixCopy.LengthX][].Select(row => row = new double[MatrixCopy.LengthX]).ToArray());
+            Matrix U = new Matrix(new double[MatrixCopy.LengthX][].Select(row => new double[MatrixCopy.LengthX]).ToArray());
 
             //1 формула
             U[n - 1][n - 1] = MatrixCopy[n - 1][n - 1];
             for (int k = 0; k < n - 1; k++)
-                U[n - 1][n - 1] -= L[n-1][k] * U[k][n-1];
+                U[n - 1][n - 1] -= L[n - 1][k] * U[k][n - 1];
             //2 формула
             for (int j = 0; j < n; j++)
                 for (int i = 0; i <= j; i++)
