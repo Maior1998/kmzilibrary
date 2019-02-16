@@ -206,6 +206,43 @@ namespace KMZILib
             return null;
         }
 
+        public static double[] LUMethod3(double[][] MatrixArray)
+        {
+            int n = MatrixArray.Length;
+            Matrix MatrixCopy = new Matrix(MatrixArray) { HasFreeCoefficient = true }.WithoutFreeCoefficients;
+            Matrix L = new Matrix(new double[MatrixCopy.LengthX][].Select(row => new double[MatrixCopy.LengthX]).ToArray());
+            Matrix U = new Matrix(MatrixCopy);
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    U[0, i] = MatrixCopy[0, i];
+                    L[i, 0] = MatrixCopy[i, 0] / U[0, 0];
+                    double sum = 0;
+                    for (int k = 0; k < i; k++)
+                    {
+                        sum += L[i, k] * U[k, j];
+                    }
+                    U[i, j] = MatrixCopy[i, j] - sum;
+                    if (i > j)
+                    {
+                        L[j, i] = 0;
+                    }
+                    else
+                    {
+                        sum = 0;
+                        for (int k = 0; k < i; k++)
+                        {
+                            sum += L[j, k] * U[k, i];
+                        }
+                        L[j, i] = (MatrixCopy[j, i] - sum) / U[i, i];
+                    }
+                }
+            }
+            Console.WriteLine($"L:\n{L}\n\nU:\n{U}");
+            return null;
+        }
+
         private static double[] LUMethod2(double[][] MatrixArray)
         {
             /*

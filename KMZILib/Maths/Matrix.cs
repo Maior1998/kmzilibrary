@@ -76,6 +76,7 @@ namespace KMZILib
         /// <param name="Source"></param>
         public Matrix(Matrix Source) : this(Source.Values)
         {
+            HasFreeCoefficient = Source.HasFreeCoefficient;
         }
 
         /// <summary>
