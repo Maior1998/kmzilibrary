@@ -96,15 +96,9 @@ namespace KMZILib
             }
         }
 
-        
-
-        private static void SwapDict(Dictionary<int, int> Source, int i, int j)
-        {
-            int buffer = Source[i];
-            Source[i] = Source[j];
-            Source[j] = buffer;
-        }
-
+        /// <summary>
+        /// Метод Гаусса решения систем линейных уравнений
+        /// </summary>
         public static class GaussMethod
         {
 
@@ -145,16 +139,35 @@ namespace KMZILib
 
             }
 
+            /// <summary>
+            /// Обратный ход алгоритма Гаусса решения систем линейных уравнений.
+            /// </summary>
+            /// <param name="MatrixCopy"></param>
+            /// <param name="offset"></param>
+            /// <returns></returns>
             public static Vector Reverse(Matrix MatrixCopy, Dictionary<int, int> offset)
             {
                 //Обратный ход
                 double[] Result = new double[MatrixCopy.Values.Length];
                 Result[Result.Length - 1] = MatrixCopy.Values[MatrixCopy.Values.Length - 1].Last();
                 for (int i = Result.Length - 2; i >= 0; i--)
-                    Result[i] = MatrixCopy.Values[i].Last() - CalcSum(MatrixCopy, i, Result);
+                {
+                    Result[i] = MatrixCopy.Values[i].Last();
+                    for (int j = i + 1; j < MatrixCopy.LengthY; j++)
+                        Result[i] -= MatrixCopy[i][j] * Result[j];
+                }
+
                 return new Vector(offset.OrderBy(row => row.Value).Select(row => Result[row.Key]).ToArray());
             }
 
+            /// <summary>
+            /// Прямой ход алгоритма Гаусса решения систем линейных уравнений.
+            /// </summary>
+            /// <param name="MatrixArray"></param>
+            /// <param name="offset"></param>
+            /// <param name="style"></param>
+            /// <param name="Debug"></param>
+            /// <returns></returns>
             public static Matrix Straight(double[][] MatrixArray,out Dictionary<int, int> offset, GEModification style = GEModification.Standart,
                 bool Debug = false)
             {
@@ -225,11 +238,24 @@ namespace KMZILib
 
                 return MatrixCopy;
             }
+            private static void SwapDict(Dictionary<int, int> Source, int i, int j)
+            {
+                int buffer = Source[i];
+                Source[i] = Source[j];
+                Source[j] = buffer;
+            }
         }
 
-
+        /// <summary>
+        /// LU-метод решения систем линейных уравнений.
+        /// </summary>
         public static class LUMethod
         {
+            /// <summary>
+            /// Возвращает определитель матрицы, вычисленный с использованием LU-метода.
+            /// </summary>
+            /// <param name="Source"></param>
+            /// <returns></returns>
             public static double GetDefinite(Matrix Source)
             {
                 return GetLU(Source.Values)[1].Definite;
@@ -318,18 +344,6 @@ namespace KMZILib
                 return new []{L,U};
             }
 
-        }
-
-        
-
-        
-
-        private static double CalcSum(Matrix matrix, int index, double[] ResultArray)
-        {
-            double Sum = 0;
-            for (int i = index + 1; i < matrix.LengthY; i++)
-                Sum += matrix[index][i] * ResultArray[i];
-            return Sum;
         }
     }
 }
