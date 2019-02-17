@@ -37,6 +37,7 @@
     <Reference Include="System.Numerics" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MathStatistics\RandomValue.cs" />
     <Compile Include="Maths\AdvancedEuclidsalgorithm.cs" />
     <Compile Include="BinaryFunctions\BinaryFunction.cs" />
     <Compile Include="BinaryFunctions\BinaryRelationMatrix.cs" />

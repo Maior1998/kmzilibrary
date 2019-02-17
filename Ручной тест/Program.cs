@@ -49,15 +49,14 @@ namespace Ручной_тест
         public static void task2()
         {
 
-            LinearEquations.LUMethod(TestArray);
+            LinearEquations.LUMethod.Solve(TestArray);
         }
 
         public static void task1()
         {
-            double[] GaussResult = LinearEquations.GaussianElimination(TestArray,LinearEquations.GEModification.LeadingOnWholeMatrix);
-            Vector GaussResultVector = new Vector(GaussResult);
-            Matrix GaussResultMatrix = new Matrix(new[] { GaussResult });
-            Console.WriteLine($"Результат - {GaussResultVector}");
+            Vector GaussResult = LinearEquations.GaussMethod.Solve(TestArray,LinearEquations.GaussMethod.GEModification.LeadingOnWholeMatrix);
+            Matrix GaussResultMatrix = new Matrix(new[] { GaussResult.Coordinates });
+            Console.WriteLine($"Результат - {GaussResult}");
             Matrix A = new Matrix(TestArray.Select(row => row.Take(row.Length - 1).ToArray()).ToArray());
             Matrix B = new Matrix(TestArray.Select(row => row.Skip(row.Length - 1).ToArray()).ToArray());
             Matrix deltaB = B - A * GaussResultMatrix.TransposedCopy();
