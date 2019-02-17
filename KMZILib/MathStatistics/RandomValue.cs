@@ -6,8 +6,14 @@ using System.Threading.Tasks;
 
 namespace KMZILib
 {
+    /// <summary>
+    /// Класс, представляющий данные и методы для работы со случайными величинами.
+    /// </summary>
     public static class MathStatistics
     {
+        /// <summary>
+        /// Представляет собой случайную величину.
+        /// </summary>
         public class RandomValue
         {
             /// <summary>
@@ -74,6 +80,11 @@ namespace KMZILib
             }
 
             /// <summary>
+            /// Среднее значение последовательности.
+            /// </summary>
+            public double Average=>Statistic.Select(row => row.Key * row.Value).Sum() / Count;
+
+            /// <summary>
             /// Масимальный элемент последовательности.
             /// </summary>
             public double Max => Values.Max();
@@ -107,6 +118,26 @@ namespace KMZILib
             /// Определяет, является ли величина мультимодальной.
             /// </summary>
             public bool IsMultiModal => Statistic.Count(val => val.Value == Statistic.Values.Max()) > 1;
+
+            /// <summary>
+            /// Дисперсия данной величины.
+            /// </summary>
+            public double Dispersion
+            {
+                get
+                {
+                    double Result = 0;
+                    foreach (double probsKey in Statistic.Keys)
+                        Result += Math.Pow(probsKey - Average, 2) * Statistic[probsKey];
+                    return Result / Count;
+                }
+            }
+
+            /// <summary>
+            /// Стандартное отклонение данной величины.
+            /// </summary>
+            public double StandardDeviation => Math.Sqrt(Dispersion);
+
 
         }
 
