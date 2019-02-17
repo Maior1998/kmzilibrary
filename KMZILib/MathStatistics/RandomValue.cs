@@ -73,6 +73,40 @@ namespace KMZILib
                     Statistic.Add(pair.Key, pair.Value);
             }
 
+            /// <summary>
+            /// Масимальный элемент последовательности.
+            /// </summary>
+            public double Max => Values.Max();
+
+            /// <summary>
+            /// Максимальный по модулю элемент последовательности.
+            /// </summary>
+            public double MaxAbs => Values[Values.Select(Math.Abs).ToList().IndexOf(Values.Select(Math.Abs).Max())];
+
+            /// <summary>
+            /// Минимальный элемент последовательности.
+            /// </summary>
+            public double Min => Values.Min();
+
+            /// <summary>
+            /// Минимальный по модулю элемент последовательности.
+            /// </summary>
+            public double MinAbs => Values[Values.Select(Math.Abs).ToList().IndexOf(Values.Select(Math.Abs).Min())];
+
+            /// <summary>
+            /// Возвращает длину интервала. Вычисляется как <see cref="Max"/> - <see cref="Min"/>.
+            /// </summary>
+            public double Interval => Max - Min;
+
+            /// <summary>
+            /// Мода случайной величины. Если есть несколько одинаково-часто-встречающихся величин, вернется первая из них.
+            /// </summary>
+            public double Mean => Statistic.First(val=>val.Value==Statistic.Values.Max()).Key;
+
+            /// <summary>
+            /// Определяет, является ли величина мультимодальной.
+            /// </summary>
+            public bool IsMultiModal => Statistic.Count(val => val.Value == Statistic.Values.Max()) > 1;
 
         }
 
