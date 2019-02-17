@@ -19,12 +19,12 @@ namespace KMZILib
             /// <summary>
             /// Сырой список значений данной случайной величины. По сути, просто числовой ряд.
             /// </summary>
-            public readonly IList<double> Values;
+            public readonly double[] Values;
 
             /// <summary>
-            /// Список вероятностей данной случайной величины.
+            /// Список вероятностей данной случайной величины. Ключи - значения, которые принимала случайная величина. Значения - вероятность того, что величина примет это значение.
             /// </summary>
-            public IList<double> Probs=>Statistic.Values.Select(value=>(double)value/Count).ToList();
+            public readonly Dictionary<double, double> Probs;
 
             /// <summary>
             /// Число всех элементов данной случайной величины. Повторы тоже учитываются.
@@ -32,7 +32,7 @@ namespace KMZILib
             public int Count => Statistic.Values.Sum();
 
             /// <summary>
-            /// Сумма всех значений данной случайной величины.
+            /// Сумма всех значений данной случайной величины. Для вычисления необходима частотная статистика <see cref="Statistic"/>.
             /// </summary>
             public double Sum => Statistic.Select(row => row.Key * row.Value).Sum();
 
@@ -47,24 +47,52 @@ namespace KMZILib
             /// <param name="values"></param>
             public RandomValue(IEnumerable<double> values)
             {
-                Values = new List<double>(values);
-                Statistic=new Dictionary<double, int>();
+                Values = new List<double>(values).ToArray();
+                Statistic = new Dictionary<double, int>();
                 foreach (double key in Values)
                 {
                     if (!Statistic.ContainsKey(key)) Statistic.Add(key, 0);
                     Statistic[key]++;
                 }
+
+                Probs = new Dictionary<double, double>();
+                foreach (KeyValuePair<double, int> row in Statistic)
+                    Probs.Add(row.Key, (double) row.Value / Count);
             }
-            
+
             /// <summary>
             /// Инициализирует новую случайную величину по имеющеейся статистике, но без самого ряда значений.
             /// </summary>
             /// <param name="values"></param>
             public RandomValue(Dictionary<double, int> statistic)
             {
-                Statistic = new Dictionary<double, int>();
-                foreach (KeyValuePair<double, int> pair in statistic)
-                    Statistic.Add(pair.Key, pair.Value);
+                Statistic = new Dictionary<double, int>(statistic);
+                Values = statistic.Keys.ToArray();
+                Probs = new Dictionary<double, double>();
+                foreach (KeyValuePair<double, int> row in Statistic)
+                    Probs.Add(row.Key, (double) row.Value / Count);
+            }
+
+            /// <summary>
+            /// Инициализирует новую случайную величину по имеющемуся набору вероятностей, но без статистических данных.
+            /// </summary>
+            /// <param name="probs"></param>
+            public RandomValue(Dictionary<double, double> probs)
+            {
+                Probs = new Dictionary<double, double>(probs);
+                Values = probs.Keys.ToArray();
+            }
+
+            /// <summary>
+            /// Инициализирует новую случайную величину по имеющемуся набору вероятностей и набору значений.
+            /// </summary>
+            /// <param name="values"></param>
+            /// <param name="probs"></param>
+            public RandomValue(IEnumerable<double> values, Dictionary<double, double> probs)
+            {
+                Values = new List<double>(values).ToArray();
+                Probs = new Dictionary<double, double>(probs);
+                Values = probs.Keys.ToArray();
             }
 
             /// <summary>
@@ -73,16 +101,17 @@ namespace KMZILib
             /// <param name="values"></param>
             public RandomValue(IList<double> values, Dictionary<double, int> statistic)
             {
-                Values = new List<double>(values);
-                Statistic = new Dictionary<double, int>();
-                foreach (KeyValuePair<double, int> pair in statistic)
-                    Statistic.Add(pair.Key, pair.Value);
+                Values = values.ToArray();
+                Statistic = new Dictionary<double, int>(statistic);
+                Probs = new Dictionary<double, double>();
+                foreach (KeyValuePair<double, int> row in Statistic)
+                    Probs.Add(row.Key, (double) row.Value / Count);
             }
 
             /// <summary>
             /// Среднее значение последовательности.
             /// </summary>
-            public double Average=>Statistic.Select(row => row.Key * row.Value).Sum() / Count;
+            public double Average => Statistic.Select(row => row.Key * row.Value).Sum() / Count;
 
             /// <summary>
             /// Масимальный элемент последовательности.
@@ -112,7 +141,7 @@ namespace KMZILib
             /// <summary>
             /// Мода случайной величины. Если есть несколько одинаково-часто-встречающихся величин, вернется первая из них.
             /// </summary>
-            public double Mean => Statistic.First(val=>val.Value==Statistic.Values.Max()).Key;
+            public double Mean => Statistic.First(val => val.Value == Statistic.Values.Max()).Key;
 
             /// <summary>
             /// Определяет, является ли величина мультимодальной.
@@ -138,8 +167,70 @@ namespace KMZILib
             /// </summary>
             public double StandardDeviation => Math.Sqrt(Dispersion);
 
+            /// <summary>
+            /// Математическое ожидание данной случайной величины. Требует наличие списка вероятностей для вычисления.
+            /// </summary>
+            public double MathExeption => Probs.Select(row => row.Key * row.Value).Sum();
+
+            /// <summary>
+            /// Коэффициент эксцесса данной случайной величины.
+            /// </summary>
+            public double Kurtosis => CentralMoment(4) / Math.Pow(Dispersion, 2) - 3;
+
+            /// <summary>
+            /// Возвращает начальный момент данной случайной величины заданного порядка.
+            /// </summary>
+            /// <param name="k"></param>
+            /// <returns></returns>
+            public double StartingMoment(int k)
+            {
+                Dictionary<double,double> buffer = new Dictionary<double, double>();
+                foreach (KeyValuePair<double, double> pair in Probs)
+                    buffer.Add(Math.Pow( pair.Key,k),pair.Value);
+                return new RandomValue(buffer).MathExeption;
+            }
+
+            /// <summary>
+            /// Возвращает абсолютный начальный момент данной случайной величины заданного порядка.
+            /// </summary>
+            /// <param name="k"></param>
+            /// <returns></returns>
+            public double StartingAbsMoment(int k)
+            {
+                Dictionary<double, double> buffer = new Dictionary<double, double>();
+                foreach (KeyValuePair<double, double> pair in Probs)
+                    buffer.Add(Math.Pow(Math.Abs(pair.Key), k), pair.Value);
+                return new RandomValue(buffer).MathExeption;
+            }
+
+            /// <summary>
+            /// Возвращает центральный момент данной случайной величины заданного порядка.
+            /// </summary>
+            /// <param name="k"></param>
+            /// <returns></returns>
+            public double CentralMoment(int k)
+            {
+                double currentexeption = MathExeption;
+                Dictionary<double, double> buffer = new Dictionary<double, double>();
+                foreach (KeyValuePair<double, double> pair in Probs)
+                    buffer.Add(Math.Pow(pair.Key * (1 - currentexeption), k), pair.Value);
+                return new RandomValue(buffer).MathExeption;
+            }
+
+            /// <summary>
+            /// Возвращает абсолютный центральный момент данной случайной величины заданного порядка.
+            /// </summary>
+            /// <param name="k"></param>
+            /// <returns></returns>
+            public double CentralAbsMoment(int k)
+            {
+                double currentexeption = MathExeption;
+                Dictionary<double, double> buffer = new Dictionary<double, double>();
+                foreach (KeyValuePair<double, double> pair in Probs)
+                    buffer.Add(Math.Pow(Math.Abs(pair.Key * (1 - currentexeption)), k), pair.Value);
+                return new RandomValue(buffer).MathExeption;
+            }
 
         }
-
     }
 }

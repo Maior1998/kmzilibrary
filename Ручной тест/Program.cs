@@ -22,7 +22,7 @@ namespace Ручной_тест
             double[] Test = numbs.Select(Convert.ToDouble).ToArray();
 
             MathStatistics.RandomValue value = new MathStatistics.RandomValue(Test);
-            Console.WriteLine(value.DispersionQ);
+            Console.WriteLine(value.Dispersion);
         }
 
         
