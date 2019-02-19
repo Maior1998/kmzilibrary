@@ -172,6 +172,13 @@ namespace KMZILib
             public double StandardDeviation => Math.Sqrt(Dispersion);
 
             /// <summary>
+            /// Стандартная ошибка данной величины.
+            /// </summary>
+            public double StandartError => Dispersion / Math.Sqrt(Count);
+
+            public double StandartErrorGeneral => StandardDeviation / Math.Sqrt(Count);
+
+            /// <summary>
             ///     Математическое ожидание данной случайной величины. Требует наличие списка вероятностей для вычисления.
             /// </summary>
             public double MathExeption => Probs.Select(row => row.Key * row.Value).Sum();
@@ -239,8 +246,14 @@ namespace KMZILib
             {
                 double currentexeption = MathExeption;
                 Dictionary<double, double> buffer = new Dictionary<double, double>();
+                //TODO: в словарь попадают пары с одинковыми ключами. Предположительно из-за того, что четная степень.
                 foreach (KeyValuePair<double, double> pair in Probs)
-                    buffer.Add(Math.Pow(pair.Key * (1 - currentexeption), k), pair.Value);
+                {
+                    double key = Math.Pow(pair.Key * (1 - currentexeption), k);
+                    if (!buffer.ContainsKey(key)) buffer.Add(key, 0);
+                    buffer[key] += pair.Value;
+                }
+
                 return new RandomValue(buffer).MathExeption;
             }
 
