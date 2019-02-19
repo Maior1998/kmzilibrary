@@ -1,34 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace KMZILib
 {
     /// <summary>
-    /// Представляет вектор с вещественными координатами.
+    ///     Представляет вектор с вещественными координатами.
     /// </summary>
     public class Vector
     {
         /// <summary>
-        /// Координаты в виде списка вещественных чисел.
-        /// </summary>
-        public double[] Coordinates { get; private set; }
-
-        /// <summary>
-        /// Число координат вектора.
-        /// </summary>
-        public int CoordinatesLength => Coordinates.Length;
-
-        /// <summary>
-        /// Длина вектора.
-        /// </summary>
-        public double Length => Math.Sqrt(Coordinates.Select(val => Math.Pow(val, 2)).Sum());
-
-        /// <summary>
-        /// Инициализирует новый вектор по заданному набору координат.
+        ///     Инициализирует новый вектор по заданному набору координат.
         /// </summary>
         /// <param name="coords"></param>
         public Vector(double[] coords)
@@ -38,29 +20,7 @@ namespace KMZILib
         }
 
         /// <summary>
-        /// Доступ к координатам вектора по индексам.
-        /// </summary>
-        /// <param name="index"></param>
-        /// <returns></returns>
-        public double this[int index]
-        {
-            get => Coordinates[index];
-            set => Coordinates[index] = value;
-        }
-
-        /// <summary>
-        /// Возвращает координаты вектора в виде массива.
-        /// </summary>
-        /// <returns></returns>
-        public double[] ToArray()
-        {
-            double[] Result = new double[CoordinatesLength];
-            Coordinates.CopyTo(Result, 0);
-            return Result;
-        }
-
-        /// <summary>
-        /// Инициализирует новый вектор по заданной матрице.
+        ///     Инициализирует новый вектор по заданной матрице.
         /// </summary>
         /// <param name="Source"></param>
         public Vector(Matrix Source)
@@ -72,7 +32,44 @@ namespace KMZILib
         }
 
         /// <summary>
-        /// Сложение двух векторов. Длины координат вектором не обязательно должны быть равными.
+        ///     Координаты в виде списка вещественных чисел.
+        /// </summary>
+        public double[] Coordinates { get; }
+
+        /// <summary>
+        ///     Число координат вектора.
+        /// </summary>
+        public int CoordinatesLength => Coordinates.Length;
+
+        /// <summary>
+        ///     Длина вектора.
+        /// </summary>
+        public double Length => Math.Sqrt(Coordinates.Select(val => Math.Pow(val, 2)).Sum());
+
+        /// <summary>
+        ///     Доступ к координатам вектора по индексам.
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public double this[int index]
+        {
+            get => Coordinates[index];
+            set => Coordinates[index] = value;
+        }
+
+        /// <summary>
+        ///     Возвращает координаты вектора в виде массива.
+        /// </summary>
+        /// <returns></returns>
+        public double[] ToArray()
+        {
+            double[] Result = new double[CoordinatesLength];
+            Coordinates.CopyTo(Result, 0);
+            return Result;
+        }
+
+        /// <summary>
+        ///     Сложение двух векторов. Длины координат вектором не обязательно должны быть равными.
         /// </summary>
         /// <param name="First"></param>
         /// <param name="Second"></param>
@@ -95,7 +92,7 @@ namespace KMZILib
         }
 
         /// <summary>
-        /// Разность двух векторов. Длины координат вектором не обязательно должны быть равными.
+        ///     Разность двух векторов. Длины координат вектором не обязательно должны быть равными.
         /// </summary>
         /// <param name="First"></param>
         /// <param name="Second"></param>
@@ -106,7 +103,7 @@ namespace KMZILib
         }
 
         /// <summary>
-        /// Возвращает новый вектор с отрицаниями всех координат.
+        ///     Возвращает новый вектор с отрицаниями всех координат.
         /// </summary>
         /// <param name="First"></param>
         /// <returns></returns>
@@ -116,7 +113,7 @@ namespace KMZILib
         }
 
         /// <summary>
-        /// Возвращает матрицу, заданную по текущему вектору.
+        ///     Возвращает матрицу, заданную по текущему вектору.
         /// </summary>
         /// <returns></returns>
         public Matrix ToMatrix()
@@ -125,12 +122,13 @@ namespace KMZILib
         }
 
         /// <summary>
-        /// Возвращает строковое представление вектора.
+        ///     Возвращает строковое представление вектора.
         /// </summary>
         /// <returns></returns>
         public override string ToString()
         {
-            return $"({string.Join(", ", Coordinates.Select(coord=>Math.Round(coord)==coord?coord.ToString():$"{coord:F3}"))})";
+            return
+                $"({string.Join(", ", Coordinates.Select(coord => Math.Round(coord) == coord ? coord.ToString() : $"{coord:F3}"))})";
         }
     }
 }
