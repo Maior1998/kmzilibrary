@@ -172,10 +172,13 @@ namespace KMZILib
             public double StandardDeviation => Math.Sqrt(Dispersion);
 
             /// <summary>
-            /// Стандартная ошибка данной величины.
+            /// Стандартная ошибка для выборки, когда n != N.
             /// </summary>
             public double StandartError => Dispersion / Math.Sqrt(Count);
 
+            /// <summary>
+            /// Стандартная ошибка для генеральной совокупности, когда n = N.
+            /// </summary>
             public double StandartErrorGeneral => StandardDeviation / Math.Sqrt(Count);
 
             /// <summary>

@@ -110,7 +110,7 @@ namespace KMZILib
                 /// <summary>
                 /// Стандартный алгоритм.
                 /// </summary>
-                Standart,
+                Standard,
                 /// <summary>
                 /// Выбор ведущего элемента в строке.
                 /// </summary>
@@ -132,7 +132,7 @@ namespace KMZILib
             /// <param name="style"></param>
             /// <param name="Debug"></param>
             /// <returns></returns>
-            public static Vector Solve(double[][] MatrixArray, GEModification style = GEModification.Standart, bool Debug = false)
+            public static Vector Solve(double[][] MatrixArray, GEModification style = GEModification.Standard, bool Debug = false)
             {
                 Matrix MatrixCopy = Straight(MatrixArray, out Dictionary<int, int> offset, style, Debug);
                 return Reverse(MatrixCopy, offset);
@@ -168,7 +168,7 @@ namespace KMZILib
             /// <param name="style"></param>
             /// <param name="Debug"></param>
             /// <returns></returns>
-            public static Matrix Straight(double[][] MatrixArray,out Dictionary<int, int> offset, GEModification style = GEModification.Standart,
+            public static Matrix Straight(double[][] MatrixArray,out Dictionary<int, int> offset, GEModification style = GEModification.Standard,
                 bool Debug = false)
             {
                 Matrix MatrixCopy = new Matrix(MatrixArray) { HasFreeCoefficient = true };
