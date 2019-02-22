@@ -252,7 +252,7 @@ namespace KMZILib
                 //TODO: в словарь попадают пары с одинковыми ключами. Предположительно из-за того, что четная степень.
                 foreach (KeyValuePair<double, double> pair in Probs)
                 {
-                    double key = Math.Pow(pair.Key * (1 - currentexeption), k);
+                    double key = Math.Pow(pair.Key - currentexeption, k);
                     if (!buffer.ContainsKey(key)) buffer.Add(key, 0);
                     buffer[key] += pair.Value;
                 }
