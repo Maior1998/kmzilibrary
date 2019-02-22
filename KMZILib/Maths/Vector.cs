@@ -20,6 +20,15 @@ namespace KMZILib
         }
 
         /// <summary>
+        /// Инициализирует новый пустой вектор заданной длины.
+        /// </summary>
+        /// <param name="n"></param>
+        public Vector (int n)
+        {
+            Coordinates = new double[n];
+        }
+
+        /// <summary>
         ///     Инициализирует новый вектор по заданной матрице.
         /// </summary>
         /// <param name="Source"></param>

@@ -12,7 +12,7 @@ namespace Ручной_тест
         
         static void Main(string[] args)
         {
-            Matrix a = new Matrix(new double[][]{new []{7.0,4}, new[] { 5.0, 3 } });
+            Matrix a = new Matrix(new double[][]{new []{3.0,4,-2}, new[] {-2, 1.0, 0 }, new[] { 2, 3.0, 0 } });
             Console.WriteLine(a.Reverse);
 
             return;

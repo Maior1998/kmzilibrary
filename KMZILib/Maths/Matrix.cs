@@ -53,7 +53,7 @@ namespace KMZILib
         /// <param name="m">Число столбцов матрицы.</param>
         public Matrix(int n, int m)
         {
-            Values = new double[n][].Select(row=>new double[m]).ToArray();
+            Values = new double[n][].Select(row => new double[m]).ToArray();
         }
 
         /// <summary>
@@ -193,7 +193,7 @@ namespace KMZILib
         }
 
         /// <summary>
-        ///     Осуществляет транспонирование текущей матрицы
+        ///     Осуществляет транспонирование текущей матрицы.
         /// </summary>
         public Matrix Transpose()
         {
@@ -451,6 +451,9 @@ namespace KMZILib
             return new[] { -1, -1 };
         }
 
+        /// <summary>
+        /// Обратная матрица для данной.
+        /// </summary>
         public Matrix Reverse
         {
 
@@ -459,21 +462,21 @@ namespace KMZILib
                 Matrix Result = GetZeroMatrix(LengthY);
 
 
-                Matrix buffer = new Matrix(new double[LengthY][].Select(row => new double[LengthY + 1]).ToArray());
+                Matrix buffer = new Matrix(LengthY, LengthY + 1);
                 for (int i = 0; i < buffer.LengthY; i++)
                     for (int j = 0; j < buffer.LengthY; j++)
                         buffer[i][j] = Values[i][j];
                 //создали копию матрицы. теперь можно генерить столбцы свободных членов.
                 //Столбцы обратной матрицы - столбцы b в системах линейных уравнений.
-                for (int i = 0; i < Values.Length; i++)
+                for (int i = 0; i < LengthY; i++)
                 {
-                    for (int j = 0; j < Values.Length; j++)
-                        buffer[j][buffer.LengthX - 1] = j == i ? 1 : 0;
-                    Vector BufferResult = LinearEquations.GaussMethod.Solve(buffer.Values);
                     for (int j = 0; j < LengthY; j++)
-                        Result[i][j] = BufferResult[j];
+                        buffer[j][buffer.LengthX - 1] = j == i ? 1 : 0;
+                    Vector BufferResult = LinearEquations.GaussMethod.Solve(buffer);
+                    for (int j = 0; j < LengthY; j++)
+                        Result[j][i] = BufferResult[j];
                 }
-
+                //TODO: на тестовых примерах с интернета работает нормально, но в лабе - нет.
                 return Result;
             }
         }
@@ -490,7 +493,7 @@ namespace KMZILib
         /// <returns></returns>
         public static Matrix GetUnitMatrix(int n)
         {
-            Matrix Result = new Matrix(n,n);
+            Matrix Result = new Matrix(n, n);
             for (int i = 0; i < n; i++)
                 Result[i][i] = 1;
             return Result;
@@ -503,7 +506,7 @@ namespace KMZILib
         /// <returns></returns>
         public static Matrix GetZeroMatrix(int n)
         {
-            return new Matrix(n,n);
+            return new Matrix(n, n);
         }
 
         /// <summary>

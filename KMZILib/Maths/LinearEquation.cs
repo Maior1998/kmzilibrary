@@ -128,7 +128,7 @@ namespace KMZILib
             /// <summary>
             /// Осуществляет решение системы линейных уравнений заданных в виде матрицы методом Гаусса.
             /// </summary>
-            /// <param name="MatrixArray"></param>
+            /// <param name="Source"></param>
             /// <param name="style"></param>
             /// <param name="Debug"></param>
             /// <returns></returns>
@@ -178,7 +178,6 @@ namespace KMZILib
                     offset.Add(i, i);
                 for (int i = 0; i < MatrixCopy.LengthY; i++)
                 {
-                    //TODO: После показа лабораторной можно убрать
                     if (Debug)
                     {
                         Console.WriteLine(MatrixCopy);
@@ -258,25 +257,25 @@ namespace KMZILib
             /// <returns></returns>
             public static double GetDefinite(Matrix Source)
             {
-                return GetLU(Source.Values)[1].Definite;
+                return GetLU(Source)[1].Definite;
             }
 
             /// <summary>
             /// LU метод решения СЛУ.
             /// </summary>
-            /// <param name="MatrixArray"></param>
+            /// <param name="Source"></param>
             /// <param name="Debug"></param>
             /// <returns></returns>
-            public static Vector Solve(double[][] MatrixArray, bool Debug = false)
+            public static Vector Solve(Matrix Source, bool Debug = false)
             {
-                Matrix[] buffer = GetLU(MatrixArray, Debug);
+                Matrix[] buffer = GetLU(Source, Debug);
                 Matrix L = buffer[0];
                 Matrix U = buffer[1];
 
                 if (Debug)
                     Console.WriteLine($"L:\n{L}\n\nU:\n{U}");
 
-                Vector Y = GaussMethod.Solve(new Matrix(L.Values.Select((row, index) => row.Concat(new[] { MatrixArray[index].Last() }).ToArray()).ToArray()));
+                Vector Y = GaussMethod.Solve(new Matrix(L.Values.Select((row, index) => row.Concat(new[] { Source[index].Last() }).ToArray()).ToArray()));
                 if (Debug)
                     Console.WriteLine($"\nY:\n{Y}");
 
@@ -289,13 +288,13 @@ namespace KMZILib
             /// <summary>
             /// Осуществляет разложение заданной матрицы на произвдение матриц L*U.
             /// </summary>
-            /// <param name="MatrixArray"></param>
+            /// <param name="Source"></param>
             /// <param name="Debug"></param>
             /// <returns></returns>
-            public static Matrix[] GetLU(double[][] MatrixArray, bool Debug = false)
+            public static Matrix[] GetLU(Matrix Source, bool Debug = false)
             {
-                int n = MatrixArray.Length;
-                Matrix A = new Matrix(MatrixArray) { HasFreeCoefficient = true }.WithoutFreeCoefficients;
+                int n = Source.LengthY;
+                Matrix A = new Matrix(Source) { HasFreeCoefficient = true }.WithoutFreeCoefficients;
                 Matrix L = new Matrix(new double[n][].Select(row => new double[n]).ToArray());
                 Matrix U = new Matrix(new double[n][].Select(row => new double[n]).ToArray());
 
