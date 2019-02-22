@@ -132,9 +132,9 @@ namespace KMZILib
             /// <param name="style"></param>
             /// <param name="Debug"></param>
             /// <returns></returns>
-            public static Vector Solve(double[][] MatrixArray, GEModification style = GEModification.Standard, bool Debug = false)
+            public static Vector Solve(Matrix Source, GEModification style = GEModification.Standard, bool Debug = false)
             {
-                Matrix MatrixCopy = Straight(MatrixArray, out Dictionary<int, int> offset, style, Debug);
+                Matrix MatrixCopy = Straight(Source, out Dictionary<int, int> offset, style, Debug);
                 return Reverse(MatrixCopy, offset);
 
             }
@@ -142,19 +142,19 @@ namespace KMZILib
             /// <summary>
             /// Обратный ход алгоритма Гаусса решения систем линейных уравнений.
             /// </summary>
-            /// <param name="MatrixCopy"></param>
+            /// <param name="Source"></param>
             /// <param name="offset"></param>
             /// <returns></returns>
-            public static Vector Reverse(Matrix MatrixCopy, Dictionary<int, int> offset)
+            public static Vector Reverse(Matrix Source, Dictionary<int, int> offset)
             {
                 //Обратный ход
-                double[] Result = new double[MatrixCopy.Values.Length];
-                Result[Result.Length - 1] = MatrixCopy.Values[MatrixCopy.Values.Length - 1].Last();
+                double[] Result = new double[Source.Values.Length];
+                Result[Result.Length - 1] = Source.Values[Source.Values.Length - 1].Last();
                 for (int i = Result.Length - 2; i >= 0; i--)
                 {
-                    Result[i] = MatrixCopy.Values[i].Last();
-                    for (int j = i + 1; j < MatrixCopy.LengthY; j++)
-                        Result[i] -= MatrixCopy[i][j] * Result[j];
+                    Result[i] = Source.Values[i].Last();
+                    for (int j = i + 1; j < Source.LengthY; j++)
+                        Result[i] -= Source[i][j] * Result[j];
                 }
 
                 return new Vector(offset.OrderBy(row => row.Value).Select(row => Result[row.Key]).ToArray());
@@ -168,13 +168,13 @@ namespace KMZILib
             /// <param name="style"></param>
             /// <param name="Debug"></param>
             /// <returns></returns>
-            public static Matrix Straight(double[][] MatrixArray,out Dictionary<int, int> offset, GEModification style = GEModification.Standard,
+            public static Matrix Straight(Matrix MatrixArray, out Dictionary<int, int> offset, GEModification style = GEModification.Standard,
                 bool Debug = false)
             {
                 Matrix MatrixCopy = new Matrix(MatrixArray) { HasFreeCoefficient = true };
                 //Прямой ход
                 offset = new Dictionary<int, int>();
-                for (int i = 0; i < MatrixArray.Length; i++)
+                for (int i = 0; i < MatrixArray.LengthY; i++)
                     offset.Add(i, i);
                 for (int i = 0; i < MatrixCopy.LengthY; i++)
                 {
@@ -273,13 +273,16 @@ namespace KMZILib
                 Matrix L = buffer[0];
                 Matrix U = buffer[1];
 
-                Console.WriteLine($"L:\n{L}\n\nU:\n{U}");
+                if (Debug)
+                    Console.WriteLine($"L:\n{L}\n\nU:\n{U}");
 
-                Vector Y = GaussMethod.Solve(L.Values.Select((row, index) => row.Concat(new[] { MatrixArray[index].Last() }).ToArray()).ToArray());
-                Console.WriteLine($"\nY:\n{Y}");
+                Vector Y = GaussMethod.Solve(new Matrix(L.Values.Select((row, index) => row.Concat(new[] { MatrixArray[index].Last() }).ToArray()).ToArray()));
+                if (Debug)
+                    Console.WriteLine($"\nY:\n{Y}");
 
-                Vector X = GaussMethod.Solve(U.Values.Select((row, index) => row.Concat(new[] { Y[index] }).ToArray()).ToArray());
-                Console.WriteLine($"\nX:\n{X}");
+                Vector X = GaussMethod.Solve(new Matrix( U.Values.Select((row, index) => row.Concat(new[] { Y[index] }).ToArray()).ToArray()));
+                if (Debug)
+                    Console.WriteLine($"\nX:\n{X}");
                 return X;
             }
 
@@ -341,7 +344,7 @@ namespace KMZILib
                         L[j][dimension] /= U[dimension][dimension];
                     }
                 }
-                return new []{L,U};
+                return new[] { L, U };
             }
 
         }

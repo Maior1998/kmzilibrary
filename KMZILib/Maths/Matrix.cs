@@ -47,6 +47,25 @@ namespace KMZILib
         }
 
         /// <summary>
+        /// Инициализирует новую пустую матрицу заданной размерности.
+        /// </summary>
+        /// <param name="n">Число строк матрицы.</param>
+        /// <param name="m">Число столбцов матрицы.</param>
+        public Matrix(int n, int m)
+        {
+            Values = new double[n][].Select(row=>new double[m]).ToArray();
+        }
+
+        /// <summary>
+        /// Инициализирует новую пустую квадратную матрицу заданной размерности.
+        /// </summary>
+        /// <param name="n"></param>
+        public Matrix(int n) : this(n, n)
+        {
+
+        }
+
+        /// <summary>
         ///     Массив коэффициентов матрицы в виде вещественных чисел.
         /// </summary>
         public double[][] Values { get; private set; }
@@ -437,7 +456,7 @@ namespace KMZILib
 
             get
             {
-                Matrix Result = new Matrix(new double[LengthY].Select(row => new double[LengthY]).ToArray());
+                Matrix Result = GetZeroMatrix(LengthY);
 
 
                 Matrix buffer = new Matrix(new double[LengthY][].Select(row => new double[LengthY + 1]).ToArray());
@@ -464,12 +483,27 @@ namespace KMZILib
         /// </summary>
         public double norm => Math.Sqrt(!HasFreeCoefficient ? Values.Select(row => row.Select(element => Math.Pow(element, 2)).Sum()).Sum() : Values.Select(row => row.Take(row.Length - 1).Select(element => Math.Pow(element, 2)).Sum()).Sum());
 
+        /// <summary>
+        /// Возвращает единичную матрицу заданной размерности
+        /// </summary>
+        /// <param name="n"></param>
+        /// <returns></returns>
         public static Matrix GetUnitMatrix(int n)
         {
-            Matrix Result = new Matrix(new double[n][].Select(row=>new double[n]).ToArray());
+            Matrix Result = new Matrix(n,n);
             for (int i = 0; i < n; i++)
                 Result[i][i] = 1;
             return Result;
+        }
+
+        /// <summary>
+        /// Возвращает нулевую матрицу заданной размерности
+        /// </summary>
+        /// <param name="n"></param>
+        /// <returns></returns>
+        public static Matrix GetZeroMatrix(int n)
+        {
+            return new Matrix(n,n);
         }
 
         /// <summary>
