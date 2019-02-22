@@ -12,6 +12,10 @@ namespace Ручной_тест
         
         static void Main(string[] args)
         {
+            Matrix a = new Matrix(new double[][]{new []{7.0,4}, new[] { 5.0, 3 } });
+            Console.WriteLine(a.Reverse);
+
+            return;
             string[] numbs = File.ReadAllLines(@"C:\Users\maior\Downloads\numbers.txt", Encoding.Default);
 
             double[] Test = numbs.Select(Convert.ToDouble).ToArray();

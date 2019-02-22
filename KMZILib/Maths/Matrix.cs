@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Sockets;
 
 namespace KMZILib
 {
@@ -41,7 +42,7 @@ namespace KMZILib
         ///     Инициализирует новую матрицу по заданному вектору значений.
         /// </summary>
         /// <param name="Source"></param>
-        public Matrix(Vector Source) : this(new[] {Source.ToArray()})
+        public Matrix(Vector Source) : this(new[] { Source.ToArray() })
         {
         }
 
@@ -161,13 +162,13 @@ namespace KMZILib
             for (int i = 0; i < Result.Length; i++)
                 Result[i] = new double[Second.LengthX];
             for (int ResultRow = 0; ResultRow < Result.Length; ResultRow++)
-            for (int ResultColumn = 0; ResultColumn < Result.First().Length; ResultColumn++)
-            {
-                double Sum = 0;
-                for (int i = 0; i < First.LengthX; i++)
-                    Sum += First.Values[ResultRow][i] * Second.Values[i][ResultColumn];
-                Result[ResultRow][ResultColumn] = Sum;
-            }
+                for (int ResultColumn = 0; ResultColumn < Result.First().Length; ResultColumn++)
+                {
+                    double Sum = 0;
+                    for (int i = 0; i < First.LengthX; i++)
+                        Sum += First.Values[ResultRow][i] * Second.Values[i][ResultColumn];
+                    Result[ResultRow][ResultColumn] = Sum;
+                }
 
             return new Matrix(Result);
         }
@@ -408,10 +409,10 @@ namespace KMZILib
                 List<double> arr = GetRow(i).ToList();
                 int index = arr.IndexOf(Max);
                 if (index != -1)
-                    return new[] {i, index};
+                    return new[] { i, index };
             }
 
-            return new[] {-1, -1};
+            return new[] { -1, -1 };
         }
 
         /// <summary>
@@ -425,10 +426,50 @@ namespace KMZILib
             {
                 int index = GetRow(i).Take(Values[i].Length - 1).Select(Math.Abs).ToList().IndexOf(Max);
                 if (index != -1)
-                    return new[] {i, index};
+                    return new[] { i, index };
             }
 
-            return new[] {-1, -1};
+            return new[] { -1, -1 };
+        }
+
+        public Matrix Reverse
+        {
+
+            get
+            {
+                Matrix Result = new Matrix(new double[LengthY].Select(row => new double[LengthY]).ToArray());
+
+
+                Matrix buffer = new Matrix(new double[LengthY][].Select(row => new double[LengthY + 1]).ToArray());
+                for (int i = 0; i < buffer.LengthY; i++)
+                    for (int j = 0; j < buffer.LengthY; j++)
+                        buffer[i][j] = Values[i][j];
+                //создали копию матрицы. теперь можно генерить столбцы свободных членов.
+                //Столбцы обратной матрицы - столбцы b в системах линейных уравнений.
+                for (int i = 0; i < Values.Length; i++)
+                {
+                    for (int j = 0; j < Values.Length; j++)
+                        buffer[j][buffer.LengthX - 1] = j == i ? 1 : 0;
+                    Vector BufferResult = LinearEquations.GaussMethod.Solve(buffer.Values);
+                    for (int j = 0; j < LengthY; j++)
+                        Result[i][j] = BufferResult[j];
+                }
+
+                return Result;
+            }
+        }
+
+        /// <summary>
+        /// Норма данной матрицы.
+        /// </summary>
+        public double norm => Math.Sqrt(!HasFreeCoefficient ? Values.Select(row => row.Select(element => Math.Pow(element, 2)).Sum()).Sum() : Values.Select(row => row.Take(row.Length - 1).Select(element => Math.Pow(element, 2)).Sum()).Sum());
+
+        public static Matrix GetUnitMatrix(int n)
+        {
+            Matrix Result = new Matrix(new double[n][].Select(row=>new double[n]).ToArray());
+            for (int i = 0; i < n; i++)
+                Result[i][i] = 1;
+            return Result;
         }
 
         /// <summary>

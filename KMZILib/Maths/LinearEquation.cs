@@ -279,7 +279,7 @@ namespace KMZILib
                 Console.WriteLine($"\nY:\n{Y}");
 
                 Vector X = GaussMethod.Solve(U.Values.Select((row, index) => row.Concat(new[] { Y[index] }).ToArray()).ToArray());
-
+                Console.WriteLine($"\nX:\n{X}");
                 return X;
             }
 
