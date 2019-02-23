@@ -10,13 +10,16 @@ namespace KMZILib
     /// </summary>
     public class Matrix
     {
+        #region Поля
         /// <summary>
         ///     Обозначает, имеет ли матрица столбец свободных членов.
         /// </summary>
         public bool HasFreeCoefficient;
+        #endregion
 
+        #region Конструкторы
         /// <summary>
-        ///     Инициализирует новую матрицу с заданным массивом коэффициентов.
+        ///     Инициализирует новую матрицу с заданным массивом вещественных коэффициентов.
         /// </summary>
         /// <param name="Source"></param>
         public Matrix(double[][] Source)
@@ -27,6 +30,15 @@ namespace KMZILib
                 Values[i] = new double[Source[i].Length];
                 Source[i].CopyTo(Values[i], 0);
             }
+        }
+
+        /// <summary>
+        ///     Инициализирует новую матрицу с заданным массивом целочисленных коэффициентов.
+        /// </summary>
+        /// <param name="Source"></param>
+        public Matrix(int[][] Source) : this(Source.Select(row => row.Select(element => (double)element).ToArray())
+            .ToArray())
+        {
         }
 
         /// <summary>
@@ -47,7 +59,7 @@ namespace KMZILib
         }
 
         /// <summary>
-        /// Инициализирует новую пустую матрицу заданной размерности.
+        ///     Инициализирует новую пустую матрицу заданной размерности.
         /// </summary>
         /// <param name="n">Число строк матрицы.</param>
         /// <param name="m">Число столбцов матрицы.</param>
@@ -57,7 +69,7 @@ namespace KMZILib
         }
 
         /// <summary>
-        /// Инициализирует новую пустую квадратную матрицу заданной размерности.
+        ///     Инициализирует новую пустую квадратную матрицу заданной размерности.
         /// </summary>
         /// <param name="n"></param>
         public Matrix(int n) : this(n, n)
@@ -65,6 +77,9 @@ namespace KMZILib
 
         }
 
+        #endregion
+
+        #region Свойства
         /// <summary>
         ///     Массив коэффициентов матрицы в виде вещественных чисел.
         /// </summary>
@@ -145,6 +160,42 @@ namespace KMZILib
         }
 
         /// <summary>
+        ///     Обратная матрица для данной.
+        /// </summary>
+        public Matrix Reverse
+        {
+            get
+            {
+                Matrix Result = GetZeroMatrix(LengthY);
+
+
+                Matrix buffer = new Matrix(LengthY, LengthY + 1);
+                for (int i = 0; i < buffer.LengthY; i++)
+                    for (int j = 0; j < buffer.LengthY; j++)
+                        buffer[i][j] = Values[i][j];
+                //создали копию матрицы. теперь можно генерить столбцы свободных членов.
+                //Столбцы обратной матрицы - столбцы b в системах линейных уравнений.
+                for (int i = 0; i < LengthY; i++)
+                {
+                    for (int j = 0; j < LengthY; j++)
+                        buffer[j][buffer.LengthX - 1] = j == i ? 1 : 0;
+                    Vector BufferResult = LinearEquations.GaussMethod.Solve(buffer);
+                    for (int j = 0; j < LengthY; j++)
+                        Result[j][i] = BufferResult[j];
+                }
+
+                return Result;
+            }
+        }
+
+        /// <summary>
+        ///     Норма данной матрицы.
+        /// </summary>
+        public double Norm => Math.Sqrt(!HasFreeCoefficient
+            ? Values.Select(row => row.Select(element => Math.Pow(element, 2)).Sum()).Sum()
+            : Values.Select(row => row.Take(row.Length - 1).Select(element => Math.Pow(element, 2)).Sum()).Sum());
+
+        /// <summary>
         ///     Доступ к строкам матрицы по заданным индексам.
         /// </summary>
         /// <param name="index"></param>
@@ -167,31 +218,9 @@ namespace KMZILib
             set => Values[index1][index2] = value;
         }
 
-        /// <summary>
-        ///     Осуществляет умножение двух матриц и возвращает результат - новую матрицу.
-        /// </summary>
-        /// <param name="First"></param>
-        /// <param name="Second"></param>
-        /// <returns></returns>
-        public static Matrix operator *(Matrix First, Matrix Second)
-        {
-            if (First.LengthX != Second.LengthY)
-                throw new InvalidOperationException("Число столбцов первой матрицы и число строк второй не совпадают!");
-            double[][] Result = new double[First.LengthY][];
-            for (int i = 0; i < Result.Length; i++)
-                Result[i] = new double[Second.LengthX];
-            for (int ResultRow = 0; ResultRow < Result.Length; ResultRow++)
-                for (int ResultColumn = 0; ResultColumn < Result.First().Length; ResultColumn++)
-                {
-                    double Sum = 0;
-                    for (int i = 0; i < First.LengthX; i++)
-                        Sum += First.Values[ResultRow][i] * Second.Values[i][ResultColumn];
-                    Result[ResultRow][ResultColumn] = Sum;
-                }
+        #endregion
 
-            return new Matrix(Result);
-        }
-
+        #region Методы
         /// <summary>
         ///     Осуществляет транспонирование текущей матрицы.
         /// </summary>
@@ -252,8 +281,11 @@ namespace KMZILib
                 return;
             if (first < 0 || first >= Values.Length ||
                 second < 0 || second >= Values.Length)
+            {
                 throw new InvalidOperationException(
                     $"Один из индексов лежит вне допустимого диапазона! (Min = 0, Max = {Values.Length - 1})");
+            }
+
             double[] bufferrow = Values[first];
             Values[first] = Values[second];
             Values[second] = bufferrow;
@@ -271,8 +303,10 @@ namespace KMZILib
             foreach (double[] row in Values)
                 if (first < 0 || first >= row.Length ||
                     second < 0 || second >= row.Length)
+                {
                     throw new InvalidOperationException(
                         $"Один из индексов лежит вне допустимого диапазона! (Min = 0, Max = {row.Length - 1})");
+                }
 
             foreach (double[] row in Values)
             {
@@ -290,8 +324,10 @@ namespace KMZILib
         public double[] GetRow(int index)
         {
             if (index < 0 || index >= Values.Length)
+            {
                 throw new InvalidOperationException(
                     $"Индекс лежит вне допустимого диапазона! (Min = 0, Max = {Values.Length - 1})");
+            }
 
             return HasFreeCoefficient ? Values[index].Take(Values[index].Length - 1).ToArray() : Values[index];
         }
@@ -305,8 +341,11 @@ namespace KMZILib
         {
             foreach (double[] row in Values)
                 if (index < 0 || index >= row.Length)
+                {
                     throw new InvalidOperationException(
                         $"Один из индексов лежит вне допустимого диапазона! (Min = 0, Max = {row.Length - 1})");
+                }
+
             return Values.Select(row => row[index]).ToArray();
         }
 
@@ -452,42 +491,7 @@ namespace KMZILib
         }
 
         /// <summary>
-        /// Обратная матрица для данной.
-        /// </summary>
-        public Matrix Reverse
-        {
-
-            get
-            {
-                Matrix Result = GetZeroMatrix(LengthY);
-
-
-                Matrix buffer = new Matrix(LengthY, LengthY + 1);
-                for (int i = 0; i < buffer.LengthY; i++)
-                    for (int j = 0; j < buffer.LengthY; j++)
-                        buffer[i][j] = Values[i][j];
-                //создали копию матрицы. теперь можно генерить столбцы свободных членов.
-                //Столбцы обратной матрицы - столбцы b в системах линейных уравнений.
-                for (int i = 0; i < LengthY; i++)
-                {
-                    for (int j = 0; j < LengthY; j++)
-                        buffer[j][buffer.LengthX - 1] = j == i ? 1 : 0;
-                    Vector BufferResult = LinearEquations.GaussMethod.Solve(buffer);
-                    for (int j = 0; j < LengthY; j++)
-                        Result[j][i] = BufferResult[j];
-                }
-                //TODO: на тестовых примерах с интернета работает нормально, но в лабе - нет.
-                return Result;
-            }
-        }
-
-        /// <summary>
-        /// Норма данной матрицы.
-        /// </summary>
-        public double norm => Math.Sqrt(!HasFreeCoefficient ? Values.Select(row => row.Select(element => Math.Pow(element, 2)).Sum()).Sum() : Values.Select(row => row.Take(row.Length - 1).Select(element => Math.Pow(element, 2)).Sum()).Sum());
-
-        /// <summary>
-        /// Возвращает единичную матрицу заданной размерности
+        ///     Возвращает единичную матрицу заданной размерности.
         /// </summary>
         /// <param name="n"></param>
         /// <returns></returns>
@@ -500,7 +504,7 @@ namespace KMZILib
         }
 
         /// <summary>
-        /// Возвращает нулевую матрицу заданной размерности
+        ///     Возвращает нулевую матрицу заданной размерности.
         /// </summary>
         /// <param name="n"></param>
         /// <returns></returns>
@@ -524,6 +528,10 @@ namespace KMZILib
 
             return Result;
         }
+
+        #endregion
+
+        #region Операторы
 
         /// <summary>
         ///     Осуществляет сложение двух матриц и возвращает результат - новую матрицу.
@@ -558,6 +566,34 @@ namespace KMZILib
                 Result[i] = First.Values[i].Select((element, index) => element - Second.Values[i][index]).ToArray();
             return new Matrix(Result);
         }
+
+        /// <summary>
+        ///     Осуществляет умножение двух матриц и возвращает результат - новую матрицу.
+        /// </summary>
+        /// <param name="First"></param>
+        /// <param name="Second"></param>
+        /// <returns></returns>
+        public static Matrix operator *(Matrix First, Matrix Second)
+        {
+            if (First.LengthX != Second.LengthY)
+                throw new InvalidOperationException("Число столбцов первой матрицы и число строк второй не совпадают!");
+            double[][] Result = new double[First.LengthY][];
+            for (int i = 0; i < Result.Length; i++)
+                Result[i] = new double[Second.LengthX];
+            for (int ResultRow = 0; ResultRow < Result.Length; ResultRow++)
+                for (int ResultColumn = 0; ResultColumn < Result.First().Length; ResultColumn++)
+                {
+                    double Sum = 0;
+                    for (int i = 0; i < First.LengthX; i++)
+                        Sum += First.Values[ResultRow][i] * Second.Values[i][ResultColumn];
+                    Result[ResultRow][ResultColumn] = Sum;
+                }
+
+            return new Matrix(Result);
+        }
+
+
+        #endregion
 
         /// <summary>
         ///     Возвращает строковое представление матрицы.

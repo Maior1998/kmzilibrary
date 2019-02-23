@@ -9,37 +9,7 @@ namespace KMZILib
     /// </summary>
     public class Vector
     {
-        /// <summary>
-        ///     Инициализирует новый вектор по заданному набору координат.
-        /// </summary>
-        /// <param name="coords"></param>
-        public Vector(double[] coords)
-        {
-            Coordinates = new double[coords.Length];
-            coords.CopyTo(Coordinates, 0);
-        }
-
-        /// <summary>
-        /// Инициализирует новый пустой вектор заданной длины.
-        /// </summary>
-        /// <param name="n"></param>
-        public Vector (int n)
-        {
-            Coordinates = new double[n];
-        }
-
-        /// <summary>
-        ///     Инициализирует новый вектор по заданной матрице.
-        /// </summary>
-        /// <param name="Source"></param>
-        public Vector(Matrix Source)
-        {
-            List<double> VectorArray = new List<double>();
-            foreach (double[] row in Source.Values)
-                VectorArray.AddRange(row);
-            Coordinates = VectorArray.ToArray();
-        }
-
+        #region Свойства
         /// <summary>
         ///     Координаты в виде списка вещественных чисел.
         /// </summary>
@@ -65,6 +35,44 @@ namespace KMZILib
             get => Coordinates[index];
             set => Coordinates[index] = value;
         }
+        #endregion
+
+        #region Конструкторы
+
+        /// <summary>
+        ///     Инициализирует новый вектор по заданному набору координат.
+        /// </summary>
+        /// <param name="coords"></param>
+        public Vector(double[] coords)
+        {
+            Coordinates = new double[coords.Length];
+            coords.CopyTo(Coordinates, 0);
+        }
+
+        /// <summary>
+        /// Инициализирует новый пустой вектор заданной длины.
+        /// </summary>
+        /// <param name="n"></param>
+        public Vector(int n)
+        {
+            Coordinates = new double[n];
+        }
+
+        /// <summary>
+        ///     Инициализирует новый вектор по заданной матрице.
+        /// </summary>
+        /// <param name="Source"></param>
+        public Vector(Matrix Source)
+        {
+            List<double> VectorArray = new List<double>();
+            foreach (double[] row in Source.Values)
+                VectorArray.AddRange(row);
+            Coordinates = VectorArray.ToArray();
+        }
+
+        #endregion
+
+        #region Методы
 
         /// <summary>
         ///     Возвращает координаты вектора в виде массива.
@@ -76,6 +84,20 @@ namespace KMZILib
             Coordinates.CopyTo(Result, 0);
             return Result;
         }
+
+        /// <summary>
+        ///     Возвращает матрицу, заданную по текущему вектору.
+        /// </summary>
+        /// <returns></returns>
+        public Matrix ToMatrix()
+        {
+            return new Matrix(this);
+        }
+
+
+        #endregion
+
+        #region Операторы
 
         /// <summary>
         ///     Сложение двух векторов. Длины координат вектором не обязательно должны быть равными.
@@ -121,15 +143,8 @@ namespace KMZILib
             return new Vector(First.Coordinates.Select(val => -val).ToArray());
         }
 
-        /// <summary>
-        ///     Возвращает матрицу, заданную по текущему вектору.
-        /// </summary>
-        /// <returns></returns>
-        public Matrix ToMatrix()
-        {
-            return new Matrix(this);
-        }
-
+        #endregion
+        
         /// <summary>
         ///     Возвращает строковое представление вектора.
         /// </summary>
