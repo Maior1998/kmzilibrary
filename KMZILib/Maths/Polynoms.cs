@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Numerics;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using static KMZILib.Comparison;
@@ -77,13 +80,22 @@ namespace KMZILib
                     //заносим в таблицу
                     noms.Add(new Nom(sign, value, degree));
                 }
-                
+
 
 
                 Coefficients = new BigInteger[noms.Max(nom => nom.Degree) + 1];
 
                 foreach (Nom nom in noms)
                     Coefficients[Coefficients.Length - 1 - nom.Degree] = nom.Value * nom.Sign;
+            }
+
+            /// <summary>
+            /// Инициализирует нулевой многочлен заданной степени
+            /// </summary>
+            /// <param name="value"></param>
+            private Polynom(int value)
+            {
+                Coefficients = new BigInteger[value+1];
             }
 
             /// <summary>
@@ -158,7 +170,8 @@ namespace KMZILib
                 {
                     Polynom buffer = new Polynom(rows.Peek());
                     BigInteger[] CurrentRow = buffer.GetValueArray(i, module);
-                    if (CurrentRow.Last() != 0) continue;
+                    if (CurrentRow.Last() != 0)
+                        continue;
 
                     BigInteger[] bufferarray = new BigInteger[CurrentRow.Length - 1];
                     Array.Copy(CurrentRow, bufferarray, bufferarray.Length);
@@ -182,7 +195,8 @@ namespace KMZILib
                 StringBuilder answer = new StringBuilder();
                 for (int i = 0; i < Coefficients.Length; i++)
                 {
-                    if (Coefficients[i] == 0) continue;
+                    if (Coefficients[i] == 0)
+                        continue;
                     if (i <= Coefficients.Length - 2)
                     {
                         answer.Append(
@@ -199,6 +213,135 @@ namespace KMZILib
                 }
 
                 return answer.ToString();
+            }
+
+            /// <summary>
+            /// Возвращает результат сложения двух многочленов.
+            /// </summary>
+            /// <param name="First"></param>
+            /// <param name="Second"></param>
+            /// <returns></returns>
+            public static Polynom operator +(Polynom First, Polynom Second)
+            {
+                BigInteger[] MinArray = First.Coefficients.Length <= Second.Coefficients.Length
+                    ? First.Coefficients
+                    : Second.Coefficients;
+                BigInteger[] MaxArray = First.Coefficients.Length > Second.Coefficients.Length
+                    ? First.Coefficients
+                    : Second.Coefficients;
+                int offset = MaxArray.Length - MinArray.Length;
+                BigInteger[] Result = new BigInteger[MaxArray.Length];
+                for (int i = 0; i < offset; i++)
+                    Result[i] = MaxArray[i];
+                for (int i = offset; i < Result.Length; i++)
+                    Result[i] = MaxArray[i] + MinArray[i - offset];
+                return Result.Any(val => val != 0) ? new Polynom(Result.SkipWhile(num => num == 0).ToArray()) : new Polynom(new[] { (BigInteger)0 });
+            }
+
+            /// <summary>
+            /// Возвращает результат вычитания одного многочлена из другого.
+            /// </summary>
+            /// <param name="First"></param>
+            /// <param name="Second"></param>
+            /// <returns></returns>
+            public static Polynom operator -(Polynom First, Polynom Second)
+            {
+                return First + -Second;
+            }
+
+            /// <summary>
+            /// Возвращает степень коэффициента с заданным индексом.
+            /// </summary>
+            /// <param name="index"></param>
+            /// <returns></returns>
+            private int GetCoefDegree(int index)
+            {
+                return Coefficients.Length - 1 - index;
+            }
+
+            /// <summary>
+            /// Возвращает индекс коэффициента с заданной степенью.
+            /// </summary>
+            /// <param name="index"></param>
+            /// <returns></returns>
+            private int GetCoefIndex(int degree)
+            {
+                return Coefficients.Length - 1 - degree;
+            }
+
+            /// <summary>
+            /// Возвращает результат умножения всех коэффициентов многочлена на заданное число.
+            /// </summary>
+            /// <param name="First"></param>
+            /// <param name="Second"></param>
+            /// <returns></returns>
+            public static Polynom operator *(Polynom First, BigInteger Second)
+            {
+                return new Polynom(First.Coefficients.Select(val => val * Second).ToArray());
+            }
+
+            /// <summary>
+            /// Возвращает результат умножения всех коэффициентов многочлена на заданное число.
+            /// </summary>
+            /// <param name="First"></param>
+            /// <param name="Second"></param>
+            /// <returns></returns>
+            public static Polynom operator *(Polynom First, int Second)
+            {
+                return First * (BigInteger)Second;
+            }
+
+            public static Polynom operator *(Polynom First, Polynom Second)
+            {
+                Polynom[] summaryarray = new Polynom[First.Coefficients.Count(val => val != 0)];
+                for (int i = 0; i < summaryarray.Length; i++)
+                {
+                    int FirstDegree = First.GetCoefDegree(i);
+                    summaryarray[i] = new Polynom(FirstDegree + Second.Degree);
+                    for (int j = 0; j <= Second.Degree; j++)
+                    {
+                        int SecondDegree = Second.GetCoefDegree(j);
+                        //TODO: степень многочлена сбрасывается на нулевую.
+                        summaryarray[i][summaryarray[i].GetCoefIndex(FirstDegree + SecondDegree)] = First[i] * Second[j];
+                    }
+                }
+                Polynom Result = new Polynom(summaryarray.Select(pol=>pol.Degree).Max());
+                Result = summaryarray.Aggregate(Result, (Current, part) => Current + part);
+                return Result;
+            }
+
+            public BigInteger this[int Index]
+            {
+                get => Coefficients[Index];
+                set => Coefficients[Index] = value;
+            }
+
+            /// <summary>
+            /// Приводит число в вид многочлена нулевой степени.
+            /// </summary>
+            /// <param name="Value"></param>
+            public static implicit operator Polynom(int Value)
+            {
+                return new Polynom(new BigInteger[] { Value });
+            }
+
+            /// <summary>
+            /// Приводит число в вид многочлена нулевой степени.
+            /// </summary>
+            /// <param name="Value"></param>
+            public static implicit operator Polynom(BigInteger Value)
+            {
+                return new Polynom(new BigInteger[] { Value });
+            }
+
+            /// <summary>
+            /// Инвертирует значения коэффициентов данного многочлена.
+            /// </summary>
+            /// <param name="Source"></param>
+            /// <returns></returns>
+            public static Polynom operator -(Polynom Source)
+            {
+                return new Polynom(Source.Coefficients.Select(coef => -coef).ToArray());
             }
 
             /// <summary>

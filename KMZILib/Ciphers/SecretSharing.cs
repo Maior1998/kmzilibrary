@@ -5,7 +5,7 @@ using System.Numerics;
 using System.Security.Cryptography.X509Certificates;
 using static KMZILib.Comparison;
 using static KMZILib.Polynoms;
-using static KMZILib.PrimalityTests;
+using static KMZILib.Primes.PrimalityTests;
 
 namespace KMZILib
 {

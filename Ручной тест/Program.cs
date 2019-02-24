@@ -12,8 +12,10 @@ namespace Ручной_тест
         
         static void Main(string[] args)
         {
-            Matrix a = new Matrix(new[] {new[] {3, 4, -2}, new[] {-2, 1, 0}, new[] {2, 3, 0}});
-            Console.WriteLine(a.Reverse);
+            Polynoms.Polynom First = new Polynoms.Polynom(@"2x^2 + x");
+            Polynoms.Polynom Second = new Polynoms.Polynom(@"3x + 2");
+            Polynoms.Polynom Res = First * Second;
+            Console.WriteLine(Res);
 
             return;
             string[] numbs = File.ReadAllLines(@"C:\Users\maior\Downloads\numbers.txt", Encoding.Default);

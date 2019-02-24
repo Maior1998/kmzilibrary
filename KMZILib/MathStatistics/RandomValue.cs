@@ -14,6 +14,7 @@ namespace KMZILib
         /// </summary>
         public class RandomValue
         {
+            #region Поля
             /// <summary>
             ///     Список вероятностей данной случайной величины. Ключи - значения, которые принимала случайная величина. Значения -
             ///     вероятность того, что величина примет это значение.
@@ -30,7 +31,9 @@ namespace KMZILib
             ///     Сырой список значений данной случайной величины. По сути, просто числовой ряд.
             /// </summary>
             public readonly double[] Values;
+            #endregion
 
+            #region Конструкторы
             /// <summary>
             ///     Инициализирует новую случайную величину по имеющемуся набору её значений. Вероятности/Частоты рассчитываются
             ///     автоматически исходя из этого списка.
@@ -100,6 +103,9 @@ namespace KMZILib
                 foreach (KeyValuePair<double, int> row in Statistic)
                     Probs.Add(row.Key, (double)row.Value / Count);
             }
+            #endregion
+
+            #region Свойства
 
             /// <summary>
             ///     Число всех элементов данной случайной величины. Повторы тоже учитываются.
@@ -214,6 +220,10 @@ namespace KMZILib
                 }
             }
 
+
+            #endregion
+
+            #region Методы
             /// <summary>
             ///     Возвращает начальный момент данной случайной величины заданного порядка.
             /// </summary>
@@ -249,11 +259,11 @@ namespace KMZILib
             {
                 double currentexeption = MathExeption;
                 Dictionary<double, double> buffer = new Dictionary<double, double>();
-                //TODO: в словарь попадают пары с одинковыми ключами. Предположительно из-за того, что четная степень.
                 foreach (KeyValuePair<double, double> pair in Probs)
                 {
                     double key = Math.Pow(pair.Key - currentexeption, k);
-                    if (!buffer.ContainsKey(key)) buffer.Add(key, 0);
+                    if (!buffer.ContainsKey(key))
+                        buffer.Add(key, 0);
                     buffer[key] += pair.Value;
                 }
 
@@ -273,6 +283,8 @@ namespace KMZILib
                     buffer.Add(Math.Pow(Math.Abs(pair.Key * (1 - currentexeption)), k), pair.Value);
                 return new RandomValue(buffer).MathExeption;
             }
+
+            #endregion
 
             /// <summary>
             /// Возвращает перечисление всех значений случайной величины.

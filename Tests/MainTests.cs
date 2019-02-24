@@ -238,7 +238,7 @@ namespace Tests
                 {
                     int[] Sources = { 6, 45, 78, 986, 1235, 9875, 19356395 };
                     foreach (int num in Sources)
-                        Assert.AreEqual(PrimalityTests.FPTFull(num), PrimalityTests.PrimalityTestResult.Composite);
+                        Assert.AreEqual(KMZILib.Primes.PrimalityTests.FPTFull(num), KMZILib.Primes.PrimalityTests.PrimalityTestResult.Composite);
                 }
 
                 [TestMethod]
@@ -246,7 +246,7 @@ namespace Tests
                 {
                     int[] Sources = { 7, 641, 2417, 3061, 3607, 15277, 65437 };
                     foreach (int num in Sources)
-                        Assert.AreEqual(PrimalityTests.FPTFull(num), PrimalityTests.PrimalityTestResult.Unknown);
+                        Assert.AreEqual(KMZILib.Primes.PrimalityTests.FPTFull(num), KMZILib.Primes.PrimalityTests.PrimalityTestResult.Unknown);
                 }
             }
 
@@ -258,7 +258,7 @@ namespace Tests
                 {
                     int[] Sources = { 6, 45, 78, 986, 1235, 9875, 19356395 };
                     foreach (int num in Sources)
-                        Assert.AreEqual(PrimalityTests.MRPTFull(num), PrimalityTests.PrimalityTestResult.Composite);
+                        Assert.AreEqual(KMZILib.Primes.PrimalityTests.MRPTFull(num), KMZILib.Primes.PrimalityTests.PrimalityTestResult.Composite);
                 }
 
                 [TestMethod]
@@ -266,7 +266,7 @@ namespace Tests
                 {
                     int[] Sources = { 7, 641, 2417, 3061, 3607, 15277, 65437 };
                     foreach (int num in Sources)
-                        Assert.AreEqual(PrimalityTests.MRPTFull(num), PrimalityTests.PrimalityTestResult.Unknown);
+                        Assert.AreEqual(KMZILib.Primes.PrimalityTests.MRPTFull(num), KMZILib.Primes.PrimalityTests.PrimalityTestResult.Unknown);
                 }
             }
 
@@ -278,7 +278,7 @@ namespace Tests
                 {
                     int[] Sources = { 6, 45, 78, 986, 1235, 9875, 19356395 };
                     foreach (int num in Sources)
-                        Assert.AreEqual(PrimalityTests.SSPTFull(num), PrimalityTests.PrimalityTestResult.Composite);
+                        Assert.AreEqual(KMZILib.Primes.PrimalityTests.SSPTFull(num), KMZILib.Primes.PrimalityTests.PrimalityTestResult.Composite);
                 }
 
                 [TestMethod]
@@ -286,7 +286,7 @@ namespace Tests
                 {
                     int[] Sources = { 7, 641, 2417, 3061, 3607, 15277, 65437 };
                     foreach (int num in Sources)
-                        Assert.AreEqual(PrimalityTests.SSPTFull(num), PrimalityTests.PrimalityTestResult.Unknown);
+                        Assert.AreEqual(KMZILib.Primes.PrimalityTests.SSPTFull(num), KMZILib.Primes.PrimalityTests.PrimalityTestResult.Unknown);
                 }
             }
         }

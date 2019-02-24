@@ -38,7 +38,7 @@ namespace KMZILib
             /// <returns>Шифртекст - результат шифрования</returns>
             public static string Encrypt(string Source, string Key)
             {
-                StringBuilder buffer = new StringBuilder(string.Concat(Regex.Split(Source.ToUpper(), @"\W")));
+                StringBuilder buffer = new StringBuilder(string.Concat(Regex.Split(Source.ToUpper(), @"\W|\d")));
                 for (int i = 0; i < buffer.Length; i++)
                     buffer[i] = GetEncryptedChar(buffer[i], Key[i % Key.Length]);
                 return buffer.ToString();
@@ -52,7 +52,7 @@ namespace KMZILib
             /// <returns>Строка - результат дешифрования</returns>
             public static string Decrypt(string EncryptedText, string Key)
             {
-                StringBuilder buffer = new StringBuilder(string.Concat(Regex.Split(EncryptedText.ToUpper(), @"\W")));
+                StringBuilder buffer = new StringBuilder(string.Concat(Regex.Split(EncryptedText.ToUpper(), @"\W|\d")));
                 for (int i = 0; i < buffer.Length; i++)
                     buffer[i] = GetDecryptedChar(buffer[i], Key[i % Key.Length]);
                 return buffer.ToString();

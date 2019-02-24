@@ -1,9 +1,34 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using static KMZILib.Comparison;
 
 namespace KMZILib
 {
+    /// <summary>
+    /// Статический класс для работы с простыми числами.
+    /// </summary>
+    public static class Primes {
+
+        public static class Factory
+        {
+            private static List<BigInteger> GeneratedNums = new List<BigInteger>();
+
+            public static BigInteger GetNext()
+            {
+                BigInteger[] CurrentSet = new BigInteger[PrimalityTests.PrimeNumbers.Length + GeneratedNums.Count];
+                Array.Copy(PrimalityTests.PrimeNumbers.Select(num => (BigInteger) num).ToArray(), CurrentSet,
+                    PrimalityTests.PrimeNumbers.Length);
+                Array.Copy(GeneratedNums.ToArray(),0, CurrentSet,PrimalityTests.PrimeNumbers.Length, GeneratedNums.Count);
+                while (true)
+                {
+                    BigInteger ElementF = CurrentSet.Aggregate<BigInteger, BigInteger>(1, (Current, KnownPrime) => Current * BigInteger.Pow(KnownPrime, RD.Rand.Next(1, 11)));
+                }
+
+                return 0;
+            }
+        }
     /// <summary>
     ///     Статический класс, осуществляющий алгоритмы тестов простоты
     /// </summary>
@@ -626,5 +651,6 @@ namespace KMZILib
         {
             return MRPT(source, source - 2);
         }
+    }
     }
 }
