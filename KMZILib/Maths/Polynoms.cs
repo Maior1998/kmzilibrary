@@ -293,16 +293,16 @@ namespace KMZILib
 
             public static Polynom operator *(Polynom First, Polynom Second)
             {
-                Polynom[] summaryarray = new Polynom[First.Coefficients.Count(val => val != 0)];
-                for (int i = 0; i < summaryarray.Length; i++)
+                List<Polynom> summaryarray = new List<Polynom>();
+                for (int i = 0; i <= First.Degree; i++)
                 {
                     int FirstDegree = First.GetCoefDegree(i);
-                    summaryarray[i] = new Polynom(FirstDegree + Second.Degree);
+                    if(First[i]==0) continue;
+                    summaryarray.Add(new Polynom(FirstDegree + Second.Degree));
                     for (int j = 0; j <= Second.Degree; j++)
                     {
                         int SecondDegree = Second.GetCoefDegree(j);
-                        //TODO: степень многочлена сбрасывается на нулевую.
-                        summaryarray[i][summaryarray[i].GetCoefIndex(FirstDegree + SecondDegree)] = First[i] * Second[j];
+                        summaryarray[summaryarray.Count-1][summaryarray[summaryarray.Count - 1].GetCoefIndex(FirstDegree + SecondDegree)] = First[i] * Second[j];
                     }
                 }
                 Polynom Result = new Polynom(summaryarray.Select(pol=>pol.Degree).Max());
