@@ -12,10 +12,10 @@ namespace Ручной_тест
         
         static void Main(string[] args)
         {
-            Polynoms.Polynom First = new Polynoms.Polynom(@"2x^2 + x");
-            Polynoms.Polynom Second = new Polynoms.Polynom(@"3x + 2");
+            Polynoms.Polynom First = new Polynoms.Polynom(@"3x^3 +2x^2 +2");
+            Polynoms.Polynom Second = new Polynoms.Polynom(@"x^6 + 1");
             Polynoms.Polynom Res = First * Second;
-            Console.WriteLine(Res);
+            Console.WriteLine($"{First}\n{Second}\n{Res}");
 
             return;
             string[] numbs = File.ReadAllLines(@"C:\Users\maior\Downloads\numbers.txt", Encoding.Default);

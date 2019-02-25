@@ -235,9 +235,7 @@ namespace KMZILib
                     Result[i] = MaxArray[i];
                 for (int i = offset; i < Result.Length; i++)
                     Result[i] = MaxArray[i] + MinArray[i - offset];
-                return Result.Any(val => val != 0) ? 
-                    new Polynom(Result.SkipWhile(num => num == 0).ToArray()) 
-                    : new Polynom(new[] { (BigInteger)0 });
+                return Result.Any(val => val != 0) ? new Polynom(Result.SkipWhile(num => num == 0).ToArray()) : new Polynom(new[] { (BigInteger)0 });
             }
 
             /// <summary>
@@ -264,7 +262,7 @@ namespace KMZILib
             /// <summary>
             /// Возвращает индекс коэффициента с заданной степенью.
             /// </summary>
-            /// <param name="degree"></param>
+            /// <param name="index"></param>
             /// <returns></returns>
             private int GetCoefIndex(int degree)
             {
@@ -295,26 +293,21 @@ namespace KMZILib
 
             public static Polynom operator *(Polynom First, Polynom Second)
             {
-                Polynom[] summaryarray = new Polynom[First.Coefficients.Count(val => val != 0)];
-                for (int i = 0; i < summaryarray.Length; i++)
+                List<Polynom> summaryarray = new List<Polynom>();
+                for (int i = 0; i <= First.Degree; i++)
                 {
                     int FirstDegree = First.GetCoefDegree(i);
-                    summaryarray[i] = new Polynom(FirstDegree + Second.Degree);
+                    if(First[i]==0) continue;
+                    summaryarray.Add(new Polynom(FirstDegree + Second.Degree));
                     for (int j = 0; j <= Second.Degree; j++)
                     {
                         int SecondDegree = Second.GetCoefDegree(j);
-                        summaryarray[i][summaryarray[i].GetCoefIndex(FirstDegree + SecondDegree)] = First[i] * Second[j];
+                        summaryarray[summaryarray.Count-1][summaryarray[summaryarray.Count - 1].GetCoefIndex(FirstDegree + SecondDegree)] = First[i] * Second[j];
                     }
                 }
                 Polynom Result = new Polynom(summaryarray.Select(pol=>pol.Degree).Max());
                 Result = summaryarray.Aggregate(Result, (Current, part) => Current + part);
                 return Result;
-            }
-
-            private Polynom GetNormilized()
-            {
-                BigInteger[] buffer = Coefficients.SkipWhile(val => val == 0).ToArray();
-                return buffer.Length == 0 ? new Polynom(1) : new Polynom(buffer);
             }
 
             public BigInteger this[int Index]
