@@ -235,7 +235,9 @@ namespace KMZILib
                     Result[i] = MaxArray[i];
                 for (int i = offset; i < Result.Length; i++)
                     Result[i] = MaxArray[i] + MinArray[i - offset];
-                return Result.Any(val => val != 0) ? new Polynom(Result.SkipWhile(num => num == 0).ToArray()) : new Polynom(new[] { (BigInteger)0 });
+                return Result.Any(val => val != 0) ? 
+                    new Polynom(Result.SkipWhile(num => num == 0).ToArray()) 
+                    : new Polynom(new[] { (BigInteger)0 });
             }
 
             /// <summary>
@@ -262,7 +264,7 @@ namespace KMZILib
             /// <summary>
             /// Возвращает индекс коэффициента с заданной степенью.
             /// </summary>
-            /// <param name="index"></param>
+            /// <param name="degree"></param>
             /// <returns></returns>
             private int GetCoefIndex(int degree)
             {
@@ -301,13 +303,18 @@ namespace KMZILib
                     for (int j = 0; j <= Second.Degree; j++)
                     {
                         int SecondDegree = Second.GetCoefDegree(j);
-                        //TODO: степень многочлена сбрасывается на нулевую.
                         summaryarray[i][summaryarray[i].GetCoefIndex(FirstDegree + SecondDegree)] = First[i] * Second[j];
                     }
                 }
                 Polynom Result = new Polynom(summaryarray.Select(pol=>pol.Degree).Max());
                 Result = summaryarray.Aggregate(Result, (Current, part) => Current + part);
                 return Result;
+            }
+
+            private Polynom GetNormilized()
+            {
+                BigInteger[] buffer = Coefficients.SkipWhile(val => val == 0).ToArray();
+                return buffer.Length == 0 ? new Polynom(1) : new Polynom(buffer);
             }
 
             public BigInteger this[int Index]
