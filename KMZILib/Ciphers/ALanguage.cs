@@ -94,7 +94,7 @@ namespace KMZILib
                 /// </summary>
                 private RussianLanguage()
                 {
-                    Alphabet = "АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ";
+                    Alphabet = "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ";
                     Frequency = new List<char>
                     {
                         'О',

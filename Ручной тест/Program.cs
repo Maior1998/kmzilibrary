@@ -4,18 +4,42 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Ciphers = KMZILib.Ciphers;
 
 namespace Ручной_тест
 {
     class Program
     {
-        
+
         static void Main(string[] args)
         {
-            Polynoms.Polynom First = new Polynoms.Polynom(@"3x^3 +2x^2 +2");
-            Polynoms.Polynom Second = new Polynoms.Polynom(@"x^6 + 1");
-            Polynoms.Polynom Res = First * Second;
-            Console.WriteLine($"{First}\n{Second}\n{Res}");
+            Ciphers.Languages.CurrentLanguage = Ciphers.Languages.RussianLanguage.GetInstanse();
+
+            for (int i = 0; i < 33; i++)
+            {
+                char f1 = Ciphers.Languages.CurrentLanguage.Alphabet[i];
+                char f2 = Ciphers.CaesarsCipher.Encrypt($"{f1}", 6)[0];
+                char f3 = Ciphers.CaesarsCipher.Encrypt($"{f1}", 15)[0];
+                char f4 = Ciphers.CaesarsCipher.Encrypt($"{f1}", 12)[0];
+                char f5 = Ciphers.CaesarsCipher.Encrypt($"{f1}", 22)[0];
+                Console.WriteLine($"{f1}{f2}{f3}{f4}{f5}");
+            }
+
+            return;
+            for (int i = 0; i < Ciphers.Languages.RussianLanguage.GetInstanse().Alphabet.Length; i++)
+            {
+                Console.WriteLine(Ciphers.CaesarsCipher.Encrypt(Ciphers.Languages.RussianLanguage.GetInstanse().Alphabet, i));
+            }
+
+            Console.WriteLine(LinearEquations.GaussMethod.Solve(new Matrix(new[]
+            {
+                new[] {1.0, 0, 0, -1, 4},new[] {-1, 1, 0, 0.0, 6} , new[] {0.0, 1, -1, 0, 17},new[] {0.0, 0, 1, -1, 18}
+            })));
+
+            Console.WriteLine(Ciphers.Languages.RussianLanguage.GetInstanse().Alphabet.IndexOf("Т"));
+            Console.WriteLine("\n\n");
+            Console.WriteLine(Ciphers.VigenereCipher.Encrypt("АРОЗАУПАЛАНАЛАПУАЗОРААРОЗАУПАЛАНАЛАПУАЗОРААРОЗАУПАЛАНАЛАПУАЗОРААРОЗАУПАЛАНАЛАПУАЗОРА","ГИРЯ"));
+
 
             return;
             string[] numbs = File.ReadAllLines(@"C:\Users\maior\Downloads\numbers.txt", Encoding.Default);

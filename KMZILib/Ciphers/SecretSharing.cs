@@ -59,14 +59,14 @@ namespace KMZILib
                     module = GetBiggerRandomPrime(Key);
 
                     //Вычислили модуль многочлена и знаем порог - пора генерировать многочлен.
-                    BigInteger[] coefs = new BigInteger[Limit];
+                    int[] coefs = new int[Limit];
                     for (int i = 0; i < coefs.Length - 1; i++)
-                        coefs[i] = RD.UniformDistribution(1, module - 1, 1)[0];
-                    coefs[coefs.Length - 1] = Key;
+                        coefs[i] = (int)RD.UniformDistribution(1, module - 1, 1)[0];
+                    coefs[coefs.Length - 1] = (int)Key;
                     Polynom sharepolynom = new Polynom(coefs);
                     KeyValuePair<int, BigInteger>[] Keys = new KeyValuePair<int, BigInteger>[CountOfFragments];
                     for (int i = 1; i <= CountOfFragments; i++)
-                        Keys[i - 1] = new KeyValuePair<int, BigInteger>(i, sharepolynom.GetValue(i, module));
+                        Keys[i - 1] = new KeyValuePair<int, BigInteger>(i, (BigInteger)sharepolynom.GetValue(i, (int)module));
                     return Keys;
                 }
 
