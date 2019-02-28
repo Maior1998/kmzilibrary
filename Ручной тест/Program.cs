@@ -13,6 +13,14 @@ namespace Ручной_тест
 
         static void Main(string[] args)
         {
+            CRS.LFSR test = new CRS.LFSR(@"an+2=an+1 + 2an",new []{0,1});
+            Console.WriteLine(test);
+            for (int i = 0; i < 10; i++)
+            {
+                Console.WriteLine(test.CurrentState);
+                test.GetNext();
+            }
+            return;
             Ciphers.Languages.CurrentLanguage = Ciphers.Languages.RussianLanguage.GetInstanse();
 
             for (int i = 0; i < 33; i++)
@@ -25,7 +33,7 @@ namespace Ручной_тест
                 Console.WriteLine($"{f1}{f2}{f3}{f4}{f5}");
             }
 
-            return;
+            
             for (int i = 0; i < Ciphers.Languages.RussianLanguage.GetInstanse().Alphabet.Length; i++)
             {
                 Console.WriteLine(Ciphers.CaesarsCipher.Encrypt(Ciphers.Languages.RussianLanguage.GetInstanse().Alphabet, i));

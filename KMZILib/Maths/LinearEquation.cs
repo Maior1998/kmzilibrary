@@ -273,15 +273,15 @@ namespace KMZILib
                 Matrix U = buffer[1];
 
                 if (Debug)
-                    Console.WriteLine($"L:\n{L}\n\nU:\n{U}");
+                    Console.WriteLine($"Получена матрица L:\n{L}\n\nПолучена матрица U:\n{U}");
 
                 Vector Y = GaussMethod.Solve(new Matrix(L.Values.Select((row, index) => row.Concat(new[] { Source[index].Last() }).ToArray()).ToArray()));
                 if (Debug)
-                    Console.WriteLine($"\nY:\n{Y}");
+                    Console.WriteLine($"Вектор Y: {Y}");
 
                 Vector X = GaussMethod.Solve(new Matrix( U.Values.Select((row, index) => row.Concat(new[] { Y[index] }).ToArray()).ToArray()));
                 if (Debug)
-                    Console.WriteLine($"\nX:\n{X}");
+                    Console.WriteLine($"Вектор X: {X}");
                 return X;
             }
 
