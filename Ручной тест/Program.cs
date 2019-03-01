@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Ciphers = KMZILib.Ciphers;
+using Polynoms = KMZILib.Polynoms;
 
 namespace Ручной_тест
 {
@@ -13,6 +14,11 @@ namespace Ручной_тест
 
         static void Main(string[] args)
         {
+            Polynoms.Polynom test1 = new Polynoms.Polynom(@"3x^3 + 3x^2 + 1");
+            Polynoms.Polynom test2 = new Polynoms.Polynom(@"2x-2");
+            Console.WriteLine(test1/test2);
+            Console.WriteLine();
+            return;
             string[] numbs = File.ReadAllLines(@"C:\Users\maior\Downloads\numbers.txt", Encoding.Default);
 
             double[] Test = numbs.Select(Convert.ToDouble).ToArray();
@@ -36,3 +42,4 @@ namespace Ручной_тест
 
     }
 }
+

@@ -246,6 +246,51 @@ namespace KMZILib
         }
 
         /// <summary>
+        /// Представлет алгоритма трехточечной скарлярной прогонки. (tridiagonal matrix algorithm)
+        /// </summary>
+        public static class TMA
+        {
+            public static Vector Solve(Matrix Source)
+            {
+                int n = Source.LengthY;
+                Matrix Copy = new Matrix(Source).WithoutFreeCoefficients;
+                Vector d = new Vector(Source.Values.Select(row => row.Last()).ToArray());
+                Vector a = new Vector(n);
+                Vector b = new Vector(n);
+                Vector c = new Vector(n);
+
+                a[0] = 0;
+                b[0] = Copy[0][0];
+                c[0] = Copy[0][1];
+                a[a.CoordinatesLength - 1] = Copy[n - 1][Copy.LengthX - 2];
+                b[b.CoordinatesLength - 1] = Copy[n - 1][Copy.LengthX - 1];
+                c[c.CoordinatesLength - 1] = 0;
+                for (int i = 1; i < n - 1; i++)
+                {
+                    a[i] = Copy[i][i - 1];
+                    b[i] = Copy[i][i];
+                    c[i] = Copy[i][i + 1];
+                }
+                Vector alfa = new Vector(n);
+                Vector beta = new Vector(n);
+                alfa[0] = c[0] / b[0];
+                beta[0] = d[0] / b[0];
+                for (int i = 1; i < n; i++)
+                {
+                    alfa[i] = -c[i] / (a[i] * alfa[i - 1] + b[i]);
+                    beta[i] = (d[i] - a[i] * beta[i - 1]) / (a[i] * alfa[i - 1] + b[i]);
+                }
+
+                Vector Result = new Vector(n);
+                Result[n - 1] =
+                    (d[n - 1] - a[n - 1] * beta[n - 2]) / (a[n - 1] * alfa[n - 2] + b[n - 1]);
+                for (int i = n - 2; i >= 0; i--)
+                    Result[i] = alfa[i] * Result[i + 1] + beta[i];
+                return Result;
+            }
+        }
+
+        /// <summary>
         /// LU-метод решения систем линейных уравнений.
         /// </summary>
         public static class LUMethod
@@ -266,22 +311,13 @@ namespace KMZILib
             /// <param name="Source"></param>
             /// <param name="Debug"></param>
             /// <returns></returns>
-            public static Vector Solve(Matrix Source, bool Debug = false)
+            public static Vector Solve(Matrix Source)
             {
-                Matrix[] buffer = GetLU(Source, Debug);
+                Matrix[] buffer = GetLU(Source);
                 Matrix L = buffer[0];
                 Matrix U = buffer[1];
-
-                if (Debug)
-                    Console.WriteLine($"Получена матрица L:\n{L}\n\nПолучена матрица U:\n{U}");
-
                 Vector Y = GaussMethod.Solve(new Matrix(L.Values.Select((row, index) => row.Concat(new[] { Source[index].Last() }).ToArray()).ToArray()));
-                if (Debug)
-                    Console.WriteLine($"Вектор Y: {Y}");
-
-                Vector X = GaussMethod.Solve(new Matrix( U.Values.Select((row, index) => row.Concat(new[] { Y[index] }).ToArray()).ToArray()));
-                if (Debug)
-                    Console.WriteLine($"Вектор X: {X}");
+                Vector X = GaussMethod.Solve(new Matrix(U.Values.Select((row, index) => row.Concat(new[] { Y[index] }).ToArray()).ToArray()));
                 return X;
             }
 
@@ -289,9 +325,8 @@ namespace KMZILib
             /// Осуществляет разложение заданной матрицы на произвдение матриц L*U.
             /// </summary>
             /// <param name="Source"></param>
-            /// <param name="Debug"></param>
             /// <returns></returns>
-            public static Matrix[] GetLU(Matrix Source, bool Debug = false)
+            public static Matrix[] GetLU(Matrix Source)
             {
                 int n = Source.LengthY;
                 Matrix A = new Matrix(Source) { HasFreeCoefficient = true }.WithoutFreeCoefficients;

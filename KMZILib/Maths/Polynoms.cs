@@ -44,7 +44,17 @@ namespace KMZILib
                 coefficients.CopyTo(Coefficients, 0);
             }
 
-            public Polynom(int[] coefficient) :this(coefficient.Select(val=>(double)val).ToString()){ }
+            /// <summary>
+            /// Инициализирует новый многочлен, который является копией заданного многочлена.
+            /// </summary>
+            /// <param name="Source"></param>
+            public Polynom(Polynom Source)
+            {
+                Coefficients = new double[Source.Coefficients.Length];
+                Source.Coefficients.CopyTo(Coefficients, 0);
+            }
+
+            public Polynom(int[] coefficient) : this(coefficient.Select(val => (double)val).ToString()) { }
 
             /// <summary>
             ///     Инициализация нового многочлена с помощью его строкового представления.
@@ -97,7 +107,7 @@ namespace KMZILib
             /// <param name="value"></param>
             private Polynom(int value)
             {
-                Coefficients = new double[value+1];
+                Coefficients = new double[value + 1];
             }
 
             /// <summary>
@@ -162,11 +172,11 @@ namespace KMZILib
             /// </summary>
             /// <param name="module">Модуль, по которому происходит нахожлдение корней.</param>
             /// <returns>Пары "корень-кратность"</returns>
-            public Dictionary<int,int> SolveResults(int module)
+            public Dictionary<int, int> SolveResults(int module)
             {
-                Dictionary<int,int> Roots = new Dictionary<int,int>();
+                Dictionary<int, int> Roots = new Dictionary<int, int>();
                 Stack<int[]> rows = new Stack<int[]>();
-                rows.Push(Coefficients.Select(coef=>(int)coef).ToArray());
+                rows.Push(Coefficients.Select(coef => (int)coef).ToArray());
                 //поместили изначальный массив коэффициентов 
                 for (int i = 0; i < module; i++)
                 {
@@ -299,15 +309,16 @@ namespace KMZILib
                 for (int i = 0; i <= First.Degree; i++)
                 {
                     int FirstDegree = First.GetCoefDegree(i);
-                    if(First[i]==0) continue;
+                    if (First[i] == 0)
+                        continue;
                     summaryarray.Add(new Polynom(FirstDegree + Second.Degree));
                     for (int j = 0; j <= Second.Degree; j++)
                     {
                         int SecondDegree = Second.GetCoefDegree(j);
-                        summaryarray[summaryarray.Count-1][summaryarray[summaryarray.Count - 1].GetCoefIndex(FirstDegree + SecondDegree)] = First[i] * Second[j];
+                        summaryarray[summaryarray.Count - 1][summaryarray[summaryarray.Count - 1].GetCoefIndex(FirstDegree + SecondDegree)] = First[i] * Second[j];
                     }
                 }
-                Polynom Result = new Polynom(summaryarray.Select(pol=>pol.Degree).Max());
+                Polynom Result = new Polynom(summaryarray.Select(pol => pol.Degree).Max());
                 Result = summaryarray.Aggregate(Result, (Current, part) => Current + part);
                 return Result;
             }
@@ -344,6 +355,50 @@ namespace KMZILib
             public static Polynom operator -(Polynom Source)
             {
                 return new Polynom(Source.Coefficients.Select(coef => -coef).ToArray());
+            }
+
+            public static Polynom operator /(Polynom First, Polynom Second)
+            {
+                //Создали результат - многочлен нужной степени.
+                Polynom Residue = new Polynom(First);
+                int i = 0;
+                Polynom Result = new Polynom(First.Degree - Second.Degree);
+                while (Residue.Degree >= Second.Degree)
+                {
+                    int index = Result.Coefficients.Length - 1 - (Residue.Degree - Second.Degree);
+                    Result[index] = Residue[0] / Second[0];
+
+                    Polynom buffer = new Polynom(Result.Degree);
+                    buffer[index] = Result[index];
+
+                    Residue -= buffer*Second;
+                    //Произвели вычитание текущей степени. Теперь она обнулена.
+                    i++;
+                }
+
+                return Residue;
+            }
+
+            public static Polynom operator %(Polynom First, Polynom Second)
+            {
+                //Создали результат - многочлен нужной степени.
+                Polynom Residue = new Polynom(First);
+                int i = 0;
+                Polynom Result = new Polynom(First.Degree - Second.Degree);
+                while (Residue.Degree >= Second.Degree)
+                {
+                    int index = Result.Coefficients.Length - 1 - (Residue.Degree - Second.Degree);
+                    Result[index] = Residue[0] / Second[0];
+
+                    Polynom buffer = new Polynom(Result.Degree);
+                    buffer[index] = Result[index];
+
+                    Residue -= buffer * Second;
+                    //Произвели вычитание текущей степени. Теперь она обнулена.
+                    i++;
+                }
+
+                return Result;
             }
 
             /// <summary>
