@@ -13,7 +13,7 @@ namespace Ручной_тест
 
         static void Main(string[] args)
         {
-            CRS.LFSR test = new CRS.LFSR(@"an+2=an+1 + 2an",new []{0,1});
+            CRS.MLFSR test = new CRS.MLFSR(@"an+2=an+1 + an", 3,new[] { 1, 1 });
             Console.WriteLine(test);
             for (int i = 0; i < 10; i++)
             {
@@ -33,7 +33,7 @@ namespace Ручной_тест
                 Console.WriteLine($"{f1}{f2}{f3}{f4}{f5}");
             }
 
-            
+
             for (int i = 0; i < Ciphers.Languages.RussianLanguage.GetInstanse().Alphabet.Length; i++)
             {
                 Console.WriteLine(Ciphers.CaesarsCipher.Encrypt(Ciphers.Languages.RussianLanguage.GetInstanse().Alphabet, i));
@@ -46,7 +46,7 @@ namespace Ручной_тест
 
             Console.WriteLine(Ciphers.Languages.RussianLanguage.GetInstanse().Alphabet.IndexOf("Т"));
             Console.WriteLine("\n\n");
-            Console.WriteLine(Ciphers.VigenereCipher.Encrypt("АРОЗАУПАЛАНАЛАПУАЗОРААРОЗАУПАЛАНАЛАПУАЗОРААРОЗАУПАЛАНАЛАПУАЗОРААРОЗАУПАЛАНАЛАПУАЗОРА","ГИРЯ"));
+            Console.WriteLine(Ciphers.VigenereCipher.Encrypt("АРОЗАУПАЛАНАЛАПУАЗОРААРОЗАУПАЛАНАЛАПУАЗОРААРОЗАУПАЛАНАЛАПУАЗОРААРОЗАУПАЛАНАЛАПУАЗОРА", "ГИРЯ"));
 
 
             return;
@@ -70,6 +70,6 @@ namespace Ручной_тест
                               $"Счет : {value.Count}");
         }
 
-        
+
     }
 }

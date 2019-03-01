@@ -50,7 +50,7 @@
     <Compile Include="Ciphers\VigenereCipher.cs" />
     <Compile Include="Ciphers\CodingTheory.cs" />
     <Compile Include="Maths\Comparison.cs" />
-    <Compile Include="Maths\ConstantRecursiveSequence.cs" />
+    <Compile Include="Maths\CRS.cs" />
     <Compile Include="Maths\CRT.cs" />
     <Compile Include="Maths\DiophantineEquation.cs" />
     <Compile Include="Maths\JacobiSymbol.cs" />
