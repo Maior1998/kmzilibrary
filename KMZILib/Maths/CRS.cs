@@ -114,7 +114,7 @@ namespace KMZILib
             private int FirstIndex = 0;
 
             /// <summary>
-            /// Инициализирует новый регистр сдвига по его строковому представлению (например, an+4=an+3 + 5an+2 - 3an).
+            /// Инициализирует новый модульный регистр сдвига по его строковому представлению (например, an+4=an+3 + 5an+2 - 3an).
             /// </summary>
             /// <param name="Source"></param>
             /// <param name="module"></param>

@@ -15,6 +15,19 @@ namespace KMZILib
         /// </summary>
         public static class VigenereCipher
         {
+            /// <summary>
+            /// Возвращает таблицу Виженера для данного языка.
+            /// </summary>
+            /// <param name="Lang"></param>
+            /// <returns></returns>
+            public static string[] GetVigenereTable(Languages.ALanguage Lang)
+            {
+                string[] Result = new string[Lang.Alphabet.Length];
+                for (int i = 0; i < Lang.Alphabet.Length; i++)
+                    Result[i] = CaesarsCipher.Encrypt(Lang.Alphabet, i);
+                return Result;
+            }
+
             private static char GetEncryptedChar(char SourceChar, char KeyChar)
             {
                 int SourceIndex = Languages.CurrentLanguage.Alphabet.IndexOf(SourceChar);
@@ -79,9 +92,9 @@ namespace KMZILib
                                  * Подсчитать НОД для каждой пары таких расстояний
                                  * Выбрать из этого НОДа наиболее встречаемые
                                  */
-                    int CurrentSubstringLength = Math.Min((int) Math.Sqrt(CipherText.Length), 30);
+                    int CurrentSubstringLength = Math.Min((int)Math.Sqrt(CipherText.Length), 30);
                     bool[] ThreadsStatus = new bool[CurrentSubstringLength - 2];
-                    Dictionary<int, int>[] CurSubstrPosKeysArray= new Dictionary<int, int>[CurrentSubstringLength - 2];
+                    Dictionary<int, int>[] CurSubstrPosKeysArray = new Dictionary<int, int>[CurrentSubstringLength - 2];
 
                     //Сначала запускаем кучу потоков для для всех длин от 3 до корня из длины текста
                     for (; CurrentSubstringLength > 2; CurrentSubstringLength--)
@@ -93,28 +106,30 @@ namespace KMZILib
                             //Console.WriteLine($"Выполняю длину подстроки {length}");
                             Dictionary<int, int> CurSubstrPosKeys =
                                 PossibleKeyLengthes(CipherText, length);
-                            CurSubstrPosKeysArray[length-3] = CurSubstrPosKeys;
+                            CurSubstrPosKeysArray[length - 3] = CurSubstrPosKeys;
 
                             ThreadsStatus[length - 3] = true;
                             Console.WriteLine($"Длина {length} закончена.");
-                        }) {IsBackground = true, Name = CurrentSubstringLength.ToString()};
+                        })
+                        { IsBackground = true, Name = CurrentSubstringLength.ToString() };
                         Check.Start();
                     }
 
                     //ждем завершения всех потоков
                     while (ThreadsStatus.Any(status => !status))
                     {
-                        Console.WriteLine($"Длина {ThreadsStatus.ToList().FindIndex(status => !status)+3} все еще не закончена");
+                        Console.WriteLine($"Длина {ThreadsStatus.ToList().FindIndex(status => !status) + 3} все еще не закончена");
                         Thread.Sleep(1000);
                     }
-                    
+
                     //теперь необходимо слить все словари в один.
-                    Dictionary<int,int> Result = new Dictionary<int, int>();
+                    Dictionary<int, int> Result = new Dictionary<int, int>();
                     foreach (Dictionary<int, int> dictionary in CurSubstrPosKeysArray)
                     {
                         foreach (int dictionaryKey in dictionary.Keys)
                         {
-                            if (!Result.ContainsKey(dictionaryKey)) Result.Add(dictionaryKey, 0);
+                            if (!Result.ContainsKey(dictionaryKey))
+                                Result.Add(dictionaryKey, 0);
                             Result[dictionaryKey] += dictionary[dictionaryKey];
                         }
                     }
@@ -131,7 +146,7 @@ namespace KMZILib
 
                 private static Dictionary<int, int> PossibleKeyLengthes(string Source, int SubstringLength)
                 {
-                    Dictionary<int,int> Lengths=new Dictionary<int, int>();
+                    Dictionary<int, int> Lengths = new Dictionary<int, int>();
                     List<string> LastResults = new List<string>();
                     for (int CurrentPosition = 0;
                         CurrentPosition < Source.Length - SubstringLength;
@@ -147,7 +162,8 @@ namespace KMZILib
                             .ToList();
 
                         //Если строка встречается всего один раз то тоже ее пропускаем
-                        if (Textes.Count == 1) continue;
+                        if (Textes.Count == 1)
+                            continue;
 
                         //Теперь необходимо заполнить данные о длине ключевого слова
                         //Получаем список делителей - список потенциальных длин ключа
@@ -169,8 +185,10 @@ namespace KMZILib
                                 .ToList());
                         foreach (int divider in Comparison.GetUniqueNumberDividersF(LengthGCD))
                         {
-                            if(divider<=2) continue;
-                            if (!Lengths.ContainsKey(divider)) Lengths.Add(divider, 0);
+                            if (divider <= 2)
+                                continue;
+                            if (!Lengths.ContainsKey(divider))
+                                Lengths.Add(divider, 0);
                             Lengths[divider]++;
                         }
 
@@ -192,7 +210,8 @@ namespace KMZILib
                 public static string[] GetStringFragmentsFromKeyLength(string Source, int KeyLength)
                 {
                     Source = string.Concat(Regex.Split(Source, @"\W"));
-                    if (KeyLength <= 1) return new[] {Source};
+                    if (KeyLength <= 1)
+                        return new[] { Source };
                     StringBuilder[] Result = new StringBuilder[KeyLength].Select(sb => new StringBuilder()).ToArray();
                     //Проинициализировали все StringBuilder'ы
 
@@ -216,7 +235,7 @@ namespace KMZILib
                         Result.Append(Fragments[i % Fragments.Length][i / Fragments.Length]);
                     return Result.ToString();
                 }
-                }
+            }
         }
     }
 }
