@@ -262,8 +262,8 @@ namespace KMZILib
                 a[0] = 0;
                 b[0] = Copy[0][0];
                 c[0] = Copy[0][1];
-                a[a.CoordinatesLength - 1] = Copy[n - 1][Copy.LengthX - 2];
-                b[b.CoordinatesLength - 1] = Copy[n - 1][Copy.LengthX - 1];
+                a[a.CoordinatesLength - 1] = Copy[n - 1][Copy.LengthX - 3];
+                b[b.CoordinatesLength - 1] = Copy[n - 1][Copy.LengthX - 2];
                 c[c.CoordinatesLength - 1] = 0;
                 for (int i = 1; i < n - 1; i++)
                 {
@@ -273,7 +273,7 @@ namespace KMZILib
                 }
                 Vector alfa = new Vector(n);
                 Vector beta = new Vector(n);
-                alfa[0] = c[0] / b[0];
+                alfa[0] = -c[0] / b[0];
                 beta[0] = d[0] / b[0];
                 for (int i = 1; i < n; i++)
                 {
