@@ -79,7 +79,7 @@ namespace KMZILib
             }
 
             /// <summary>
-            /// Возвращает строковое представление линейного сравнения.
+            /// Возвращает строковое представление линейного уравнения.
             /// </summary>
             /// <returns></returns>
             public override string ToString()
@@ -281,9 +281,10 @@ namespace KMZILib
                     beta[i] = (d[i] - a[i] * beta[i - 1]) / (a[i] * alfa[i - 1] + b[i]);
                 }
 
-                Vector Result = new Vector(n);
-                Result[n - 1] =
-                    (d[n - 1] - a[n - 1] * beta[n - 2]) / (a[n - 1] * alfa[n - 2] + b[n - 1]);
+                Vector Result = new Vector(n)
+                {
+                    [n - 1] = (d[n - 1] - a[n - 1] * beta[n - 2]) / (a[n - 1] * alfa[n - 2] + b[n - 1])
+                };
                 for (int i = n - 2; i >= 0; i--)
                     Result[i] = alfa[i] * Result[i + 1] + beta[i];
                 return Result;
@@ -309,7 +310,6 @@ namespace KMZILib
             /// LU метод решения СЛУ.
             /// </summary>
             /// <param name="Source"></param>
-            /// <param name="Debug"></param>
             /// <returns></returns>
             public static Vector Solve(Matrix Source)
             {

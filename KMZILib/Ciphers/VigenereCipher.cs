@@ -43,6 +43,12 @@ namespace KMZILib
                 return Languages.CurrentLanguage.Alphabet[(int)ResultIndex.A];
             }
 
+            private static string GetOnlyAlphabetCharacters(string Source)
+            {
+                return string.Concat(Regex.Split(Source.ToUpper(), @"[^" + Languages.CurrentLanguage.Alphabet + "]",
+                    RegexOptions.IgnoreCase));
+            }
+
             /// <summary>
             ///     Осуществляет шифрование строки с использованием заданного лозунга
             /// </summary>
@@ -51,7 +57,7 @@ namespace KMZILib
             /// <returns>Шифртекст - результат шифрования</returns>
             public static string Encrypt(string Source, string Key)
             {
-                StringBuilder buffer = new StringBuilder(string.Concat(Regex.Split(Source.ToUpper(), @"\W|\d")));
+                StringBuilder buffer = new StringBuilder(GetOnlyAlphabetCharacters(Source));
                 for (int i = 0; i < buffer.Length; i++)
                     buffer[i] = GetEncryptedChar(buffer[i], Key[i % Key.Length]);
                 return buffer.ToString();
@@ -65,7 +71,7 @@ namespace KMZILib
             /// <returns>Строка - результат дешифрования</returns>
             public static string Decrypt(string EncryptedText, string Key)
             {
-                StringBuilder buffer = new StringBuilder(string.Concat(Regex.Split(EncryptedText.ToUpper(), @"\W|\d")));
+                StringBuilder buffer = new StringBuilder(GetOnlyAlphabetCharacters(EncryptedText));
                 for (int i = 0; i < buffer.Length; i++)
                     buffer[i] = GetDecryptedChar(buffer[i], Key[i % Key.Length]);
                 return buffer.ToString();
@@ -83,122 +89,66 @@ namespace KMZILib
                 /// <returns></returns>
                 public static int[] GetKEHypotheses(string CipherText)
                 {
-                    CipherText = string.Concat(Regex.Split(CipherText, @"\W"));
-                    //На вход дали шифртекст. 
-                    //Необходимо найти все повторяющиеся подстроки и сделать из них KasiskiExaminationResults.
-                    /*
-                                 * TODO: алгоритм:
-                                 * Подсчитать расстояния между всеми совпадающими триграммами в тексте
-                                 * Подсчитать НОД для каждой пары таких расстояний
-                                 * Выбрать из этого НОДа наиболее встречаемые
-                                 */
-                    int CurrentSubstringLength = Math.Min((int)Math.Sqrt(CipherText.Length), 30);
-                    bool[] ThreadsStatus = new bool[CurrentSubstringLength - 2];
-                    Dictionary<int, int>[] CurSubstrPosKeysArray = new Dictionary<int, int>[CurrentSubstringLength - 2];
-
-                    //Сначала запускаем кучу потоков для для всех длин от 3 до корня из длины текста
-                    for (; CurrentSubstringLength > 2; CurrentSubstringLength--)
+                    Dictionary<int, int> PossibleKeyLengthes = new Dictionary<int, int>();
+                    CipherText = GetOnlyAlphabetCharacters(CipherText);
+                    for (int Length = 3; Length < 6; Length++)
                     {
-                        int length = CurrentSubstringLength;
-                        Thread Check = new Thread(() =>
+                        //Length - переменная, которая отвечает за текущую исследуемую длину подстрок.
+                        for (int SubstringIndex = 0; SubstringIndex <= CipherText.Length - Length; SubstringIndex++)
                         {
+                            //Теперь мы выбираем подстроки длины Length начиная с индекса SubstringIndex.
+                            string CurrentSubstring = CipherText.Substring(SubstringIndex, Length);
+                            //Если такая подстрока уже была
+                            //(то есть индекс первого ее вхождения меньше чем SubstringIndex)
+                            //То пропускаем ее
+                            if (CipherText.IndexOf(CurrentSubstring) < SubstringIndex)
+                                continue;
 
-                            //Console.WriteLine($"Выполняю длину подстроки {length}");
-                            Dictionary<int, int> CurSubstrPosKeys =
-                                PossibleKeyLengthes(CipherText, length);
-                            CurSubstrPosKeysArray[length - 3] = CurSubstrPosKeys;
+                            //Собрали все индексы таких подстрок.
+                            int[] Indexes = new Regex(CurrentSubstring).Matches(CipherText).Cast<Match>().Select(match => match.Index).ToArray();
 
-                            ThreadsStatus[length - 3] = true;
-                            Console.WriteLine($"Длина {length} закончена.");
-                        })
-                        { IsBackground = true, Name = CurrentSubstringLength.ToString() };
-                        Check.Start();
-                    }
-
-                    //ждем завершения всех потоков
-                    while (ThreadsStatus.Any(status => !status))
-                    {
-                        Console.WriteLine($"Длина {ThreadsStatus.ToList().FindIndex(status => !status) + 3} все еще не закончена");
-                        Thread.Sleep(1000);
-                    }
-
-                    //теперь необходимо слить все словари в один.
-                    Dictionary<int, int> Result = new Dictionary<int, int>();
-                    foreach (Dictionary<int, int> dictionary in CurSubstrPosKeysArray)
-                    {
-                        foreach (int dictionaryKey in dictionary.Keys)
-                        {
-                            if (!Result.ContainsKey(dictionaryKey))
-                                Result.Add(dictionaryKey, 0);
-                            Result[dictionaryKey] += dictionary[dictionaryKey];
+                            //Теперь пробегаем по этому массиву и находим разности между каждыми
+                            //Двумя индексами.
+                            for (int i = 0; i < Indexes.Length - 1; i++)
+                                for (int j = i + 1; j < Indexes.Length; j++)
+                                {
+                                    int CurIndex = Indexes[j] - Indexes[i];
+                                    //Необходимо найти список делителей этого числа.
+                                    int[] dividers = GetUniqueNumberDividersF(CurIndex);
+                                    //Полученный список помещаем в словарь
+                                    foreach (int Divider in dividers)
+                                    {
+                                        if (!PossibleKeyLengthes.ContainsKey(Divider))
+                                            PossibleKeyLengthes.Add(Divider, 0);
+                                        PossibleKeyLengthes[Divider]++;
+                                    }
+                                }
                         }
                     }
-                    //слили все словари в один. Через жопу, но как иначе?
-
-
-                    //словарь НОДов длин заполнен. теперь необходимо выбрать самые частые
-                    return Result.
-                        OrderByDescending(pair => pair.Value).
-                        Select(pair => pair.Key).
-                        Take(10).
-                        ToArray();
+                    return PossibleKeyLengthes
+                        .OrderByDescending(pair=>pair.Value)
+                        .Take(10)
+                        .Select(pair=>pair.Key)
+                        .ToArray();
                 }
 
-                private static Dictionary<int, int> PossibleKeyLengthes(string Source, int SubstringLength)
+                /// <summary>
+                ///     Получает набор уникальных делителей числа при помощи факторизации и возвращает в виде массива.
+                /// </summary>
+                /// <param name="Number" />
+                /// <returns></returns>
+                public static int[] GetUniqueNumberDividersF(int Number)
                 {
-                    Dictionary<int, int> Lengths = new Dictionary<int, int>();
-                    List<string> LastResults = new List<string>();
-                    for (int CurrentPosition = 0;
-                        CurrentPosition < Source.Length - SubstringLength;
-                        CurrentPosition++)
-                    {
-                        //Создаем текущую подстроку
-                        string CurrentSubString = Source.Substring(CurrentPosition, 3);
-                        //Если такая строка уже встречалась, то просто пропускаем ее
-                        if (LastResults.Any(kasres => kasres == CurrentSubString))
-                            continue;
-
-                        List<Match> Textes = new Regex(CurrentSubString).Matches(Source).Cast<Match>()
-                            .ToList();
-
-                        //Если строка встречается всего один раз то тоже ее пропускаем
-                        if (Textes.Count == 1)
-                            continue;
-
-                        //Теперь необходимо заполнить данные о длине ключевого слова
-                        //Получаем список делителей - список потенциальных длин ключа
-
-
-                        //получили индексы всех вхождений нашей подстроки
-                        int[] SubStrIndexes = Textes.Select(match => match.Index).ToArray();
-
-                        //завели список под расстояния между каждой парой подстрок
-                        //TODO: не между каждыми парами, а между каждыми ПОСЛЕДОВАТЕЛЬНЫМИ ПАРАМИ
-                        int[] SubStrLengthes = new int[SubStrIndexes.Length - 1];
-                        for (int i = 0; i < SubStrLengthes.Length; i++)
-                            SubStrLengthes[i] = SubStrIndexes[i + 1] - SubStrIndexes[i] - 3;
-                        //заполнили массив расстояний между двумя последовательными длинами
-                        //теперь необходимо посчитать все НОДы
-                        //"Предполагаемая длина ключевого слова кратна наибольшему общему делителю всех расстояний."
-                        int LengthGCD = (int)
-                            AdvancedEuclidsalgorithm.GCDResult(SubStrLengthes.Select(num => (BigInteger)num)
-                                .ToList());
-                        foreach (int divider in Comparison.GetUniqueNumberDividersF(LengthGCD))
-                        {
-                            if (divider <= 2)
-                                continue;
-                            if (!Lengths.ContainsKey(divider))
-                                Lengths.Add(divider, 0);
-                            Lengths[divider]++;
-                        }
-
-                        //Записали. теперь добавляем результат в список для того, чтобы еще раз его
-                        //не посчитать и продолжаем
-
-                        LastResults.Add(CurrentSubString);
-                    }
-                    //словарь НОДов длин заполнен. теперь необходимо выбрать самые частые
-                    return Lengths;
+                    if (Number < 0)
+                        Number *= -1;
+                    List<int> dividers = new List<int>();
+                    int i = 1;
+                    int Limit = Number / 2;
+                    while (++i <= Limit)
+                        if (Number % i == 0)
+                            dividers.Add(i);
+                    dividers.Add(Number);
+                    return dividers.ToArray();
                 }
 
                 /// <summary>

@@ -32,9 +32,10 @@ namespace KMZILib
         /// <returns></returns>
         public static int[] GetUniqueNumberDividers(int Number)
         {
-            int Length = (int) Math.Sqrt(Number) + 1;
-            if (Number < 0) Number *= -1;
-            List<int> dividers = new List<int>();
+            if (Number < 0)
+                Number *= -1;
+            int Length = (int)Math.Sqrt(Number) + 1;
+            List<int> dividers = new List<int>() { Number };
             while (Number != 1)
                 for (int i = 2; i <= Length; i++)
                 {
@@ -42,12 +43,14 @@ namespace KMZILib
                     {
                         if (i != Length)
                             continue;
-                        if (!dividers.Contains(Number)) dividers.Add(Number);
+                        if (!dividers.Contains(Number))
+                            dividers.Add(Number);
                         Number /= Number;
                         break;
                     }
 
-                    if (!dividers.Contains(i)) dividers.Add(i);
+                    if (!dividers.Contains(i))
+                        dividers.Add(i);
                     Number /= i;
                     break;
                 }
@@ -62,10 +65,11 @@ namespace KMZILib
         /// <returns></returns>
         public static int[] GetUniqueNumberDividersF(int Number)
         {
-            if (Number < 0) Number *= -1;
+            if (Number < 0)
+                Number *= -1;
             List<int> dividers = new List<int>();
             int i = 1;
-            while (++i < (int) Math.Sqrt(Number))
+            while (++i < (int)Math.Sqrt(Number))
                 if (Number % i == 0)
                     dividers.Add(i);
             dividers.Add(Number);
@@ -79,8 +83,9 @@ namespace KMZILib
         /// <returns></returns>
         public static int[] GetNumberDividers(int Number)
         {
-            int Length = (int) Math.Sqrt(Number) + 1;
-            if (Number < 0) Number *= -1;
+            int Length = (int)Math.Sqrt(Number) + 1;
+            if (Number < 0)
+                Number *= -1;
             List<int> dividers = new List<int>();
             while (Number != 1)
                 for (int i = 2; i <= Length; i++)
@@ -117,13 +122,18 @@ namespace KMZILib
             //ax=b(mod m)
 
             Result = null;
-            if (GCD == null) GCD = AdvancedEuclidsalgorithm.GCD(a, m);
-            if (GCD == null) return false;
-            if (b % GCD[0] != 0) return false;
+            if (GCD == null)
+                GCD = AdvancedEuclidsalgorithm.GCD(a, m);
+            if (GCD == null)
+                return false;
+            if (b % GCD[0] != 0)
+                return false;
             //a*x0=d(mod m)
             BigInteger x_ = GCD[1] * (b / GCD[0]);
-            while (x_ >= m / GCD[0]) x_ -= m / GCD[0];
-            while (x_ < 0) x_ += m / GCD[0];
+            while (x_ >= m / GCD[0])
+                x_ -= m / GCD[0];
+            while (x_ < 0)
+                x_ += m / GCD[0];
             Result = new LinearComparison(x_, m / GCD[0]);
             return true;
         }
@@ -169,9 +179,11 @@ namespace KMZILib
                 get => a;
                 set
                 {
-                    if (M <= 0) throw new InvalidOperationException("Модуль должен быть больше нуля.");
+                    if (M <= 0)
+                        throw new InvalidOperationException("Модуль должен быть больше нуля.");
                     a = value;
-                    while (a < 0) a += M;
+                    while (a < 0)
+                        a += M;
                     a %= M;
                 }
             }
@@ -208,9 +220,11 @@ namespace KMZILib
             /// <returns></returns>
             public override bool Equals(object obj)
             {
-                if (ReferenceEquals(null, obj)) return false;
-                if (ReferenceEquals(this, obj)) return true;
-                return obj.GetType() == GetType() && Equals((LinearComparison) obj);
+                if (ReferenceEquals(null, obj))
+                    return false;
+                if (ReferenceEquals(this, obj))
+                    return true;
+                return obj.GetType() == GetType() && Equals((LinearComparison)obj);
             }
 
             /// <summary>
@@ -219,7 +233,7 @@ namespace KMZILib
             /// <returns></returns>
             public override int GetHashCode()
             {
-                return (int) (a * 397) ^ (int) M;
+                return (int)(a * 397) ^ (int)M;
             }
 
             /// <summary>
@@ -268,8 +282,10 @@ namespace KMZILib
                 BigInteger[] GCD = null)
             {
                 Result = null;
-                if (GCD == null) GCD = AdvancedEuclidsalgorithm.GCD(a, m);
-                if (GCD == null || GCD[0] != 1) return false;
+                if (GCD == null)
+                    GCD = AdvancedEuclidsalgorithm.GCD(a, m);
+                if (GCD == null || GCD[0] != 1)
+                    return false;
                 Result = new LinearComparison(GCD[1], m);
                 return true;
             }
@@ -304,9 +320,11 @@ namespace KMZILib
             /// <returns></returns>
             private static bool IsPrimeNumber(int a)
             {
-                if (a < 0) a *= -1;
-                if (a <= 1) return false;
-                for (int i = 2; i < (int) Math.Sqrt(a) + 1; i++)
+                if (a < 0)
+                    a *= -1;
+                if (a <= 1)
+                    return false;
+                for (int i = 2; i < (int)Math.Sqrt(a) + 1; i++)
                     if (a % i == 0)
                         return false;
                 return true;
@@ -324,12 +342,14 @@ namespace KMZILib
                 BigInteger[] GCD = null)
             {
                 Result = null;
-                if (AdvancedEuclidsalgorithm.GCDResult(a, m) != 1) return false;
+                if (AdvancedEuclidsalgorithm.GCDResult(a, m) != 1)
+                    return false;
                 Result = new LinearComparison(a, m);
-                int degree = EulersFunction((int) m) - 1;
-                BitArray sma = new BitArray(new[] {degree});
+                int degree = EulersFunction((int)m) - 1;
+                BitArray sma = new BitArray(new[] { degree });
                 int i = sma.Length - 1;
-                while (!sma[i]) i--;
+                while (!sma[i])
+                    i--;
                 for (i--; i >= 0; i--)
                     if (sma[i])
                     {

@@ -88,12 +88,10 @@ namespace KMZILib
                         : polynommatch.Value.Contains('x')
                             ? 1
                             : 0;
-                    //опеределили знак. степень и значние 
-                    //заносим в таблицу
+                    //опеределили знак, степень и значние 
+                    //заносим в список
                     noms.Add(new Nom(sign, value, degree));
                 }
-
-
 
                 Coefficients = new double[noms.Max(nom => nom.Degree) + 1];
 
@@ -107,6 +105,7 @@ namespace KMZILib
             /// <param name="value"></param>
             private Polynom(int value)
             {
+                if (value < 0) value = 0;
                 Coefficients = new double[value + 1];
             }
 
@@ -204,6 +203,7 @@ namespace KMZILib
             /// <returns></returns>
             public override string ToString()
             {
+                if (Coefficients.Length == 1) return Coefficients.First().ToString();
                 StringBuilder answer = new StringBuilder();
                 for (int i = 0; i < Coefficients.Length; i++)
                 {
@@ -274,7 +274,7 @@ namespace KMZILib
             /// <summary>
             /// Возвращает индекс коэффициента с заданной степенью.
             /// </summary>
-            /// <param name="index"></param>
+            /// <param name="degree"></param>
             /// <returns></returns>
             private int GetCoefIndex(int degree)
             {
@@ -376,7 +376,7 @@ namespace KMZILib
                     i++;
                 }
 
-                return Residue;
+                return Result;
             }
 
             public static Polynom operator %(Polynom First, Polynom Second)
@@ -398,7 +398,7 @@ namespace KMZILib
                     i++;
                 }
 
-                return Result;
+                return Residue;
             }
 
             /// <summary>
