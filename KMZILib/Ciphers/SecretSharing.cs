@@ -10,7 +10,7 @@ using static KMZILib.Primes.PrimalityTests;
 namespace KMZILib
 {
     /// <summary>
-    ///     Класс, предоставляющий методы для работы с криптографическими задачами
+    ///     Класс, предоставляющий методы для работы с криптографическими задачами. Перед использованием шифров необходимо заполнить поле <see cref="Languages.CurrentLanguage"/>.
     /// </summary>
     public static partial class Ciphers
     {

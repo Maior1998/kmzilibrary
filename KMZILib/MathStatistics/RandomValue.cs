@@ -107,57 +107,70 @@ namespace KMZILib
 
             #region Свойства
 
+            private int count = -1;
+
             /// <summary>
             ///     Число всех элементов данной случайной величины. Повторы тоже учитываются.
             /// </summary>
-            public int Count => Statistic.Values.Sum();
+            public int Count => count == -1 ? count = Statistic.Values.Sum() : count;
 
+
+            private double sum = -1;
             /// <summary>
             ///     Сумма всех значений данной случайной величины. Для вычисления необходима частотная статистика
             ///     <see cref="Statistic" />.
             /// </summary>
-            public double Sum => Statistic.Select(row => row.Key * row.Value).Sum();
+            public double Sum => sum == -1 ? sum = Statistic.Select(row => row.Key * row.Value).Sum() : sum;
 
+            private double average = double.NaN;
             /// <summary>
             ///     Среднее значение последовательности.
             /// </summary>
-            public double Average => Statistic.Select(row => row.Key * row.Value).Sum() / Count;
+            public double Average => double.IsNaN(average) ? average = Statistic.Select(row => row.Key * row.Value).Sum() / Count : average;
 
+            private double max = double.NaN;
             /// <summary>
             ///     Масимальный элемент последовательности.
             /// </summary>
-            public double Max => Values.Max();
+            public double Max => double.IsNaN(max) ? max = Values.Max() : max;
 
+            private double maxabs = double.NaN;
             /// <summary>
             ///     Максимальный по модулю элемент последовательности.
             /// </summary>
-            public double MaxAbs => Values[Values.Select(Math.Abs).ToList().IndexOf(Values.Select(Math.Abs).Max())];
+            public double MaxAbs => double.IsNaN(maxabs) ? maxabs = Values[Values.Select(Math.Abs).ToList().IndexOf(Values.Select(Math.Abs).Max())] : maxabs;
 
+
+            private double min = double.NaN;
             /// <summary>
             ///     Минимальный элемент последовательности.
             /// </summary>
-            public double Min => Values.Min();
+            public double Min => double.IsNaN(min) ? min = Values.Min() : min;
 
+            private double minabs = double.NaN;
             /// <summary>
             ///     Минимальный по модулю элемент последовательности.
             /// </summary>
-            public double MinAbs => Values[Values.Select(Math.Abs).ToList().IndexOf(Values.Select(Math.Abs).Min())];
+            public double MinAbs => double.IsNaN(minabs) ? minabs = Values[Values.Select(Math.Abs).ToList().IndexOf(Values.Select(Math.Abs).Min())] : minabs;
 
+            private double interval = double.NaN;
             /// <summary>
             ///     Возвращает длину интервала. Вычисляется как <see cref="Max" /> - <see cref="Min" />.
             /// </summary>
-            public double Interval => Max - Min;
+            public double Interval => double.IsNaN(interval)?interval= Max - Min:interval;
 
+            private double mean = double.NaN;
             /// <summary>
             ///     Мода случайной величины. Если есть несколько одинаково-часто-встречающихся величин, вернется первая из них.
             /// </summary>
-            public double Mean => Statistic.First(val => val.Value == Statistic.Values.Max()).Key;
+            public double Mean => double.IsNaN(mean)?mean= Statistic.First(val => val.Value == Statistic.Values.Max()).Key:mean;
 
             /// <summary>
             ///     Определяет, является ли величина мультимодальной.
             /// </summary>
             public bool IsMultiModal => Statistic.Count(val => val.Value == Statistic.Values.Max()) > 1;
 
+            private double dispersion = double.NaN;
             /// <summary>
             ///     Дисперсия данной величины.
             /// </summary>
@@ -165,43 +178,68 @@ namespace KMZILib
             {
                 get
                 {
+                    if (!double.IsNaN(dispersion)) return dispersion;
                     double Result = 0;
                     foreach (double probsKey in Statistic.Keys)
                         Result += Math.Pow(probsKey - Average, 2) * Statistic[probsKey];
-                    return Result / Count;
+                    dispersion = Result / Count;
+                    return dispersion;
                 }
             }
 
+            public string DescriptiveStatistics =>
+                $"Среднее : {Average}\n" +
+                $"Стандартная ошибка : {StandartErrorGeneral}\n" +
+                $"Медиана : {Median}\n" +
+                $"Мода : {Mean}\n" +
+                $"Стандартное отклонение : {StandardDeviation}\n" +
+                $"Дисперсия выборки : {Dispersion}\n" +
+                $"Эксцесс : {Kurtosis}\n" +
+                $"Ассиметричность : {Skewness}\n" +
+                $"Интервал : {Interval}\n" +
+                $"Минимум : {Min}\n" +
+                $"Максимум : {Max}\n" +
+                $"Сумма : {Sum}\n" +
+                $"Счет : {Count}";
+
+
+            private double standarddeviation = double.NaN;
             /// <summary>
             ///     Стандартное отклонение данной величины.
             /// </summary>
-            public double StandardDeviation => Math.Sqrt(Dispersion);
+            public double StandardDeviation => double.IsNaN(standarddeviation)?standarddeviation= Math.Sqrt(Dispersion):standarddeviation;
 
+            private double standarderror = double.NaN;
             /// <summary>
             /// Стандартная ошибка для выборки, когда n != N.
             /// </summary>
-            public double StandartError => Dispersion / Math.Sqrt(Count);
+            public double StandardError => double.IsNaN(standarderror)?standarderror= Dispersion / Math.Sqrt(Count):standarderror;
 
+            private double standarderrorgeneral = double.NaN;
             /// <summary>
             /// Стандартная ошибка для генеральной совокупности, когда n = N.
             /// </summary>
-            public double StandartErrorGeneral => StandardDeviation / Math.Sqrt(Count);
+            public double StandartErrorGeneral => double.IsNaN(standarderrorgeneral)?standarderrorgeneral= StandardDeviation / Math.Sqrt(Count):standarderrorgeneral;
 
+            private double mathexeption = double.NaN;
             /// <summary>
             ///     Математическое ожидание данной случайной величины. Требует наличие списка вероятностей для вычисления.
             /// </summary>
-            public double MathExeption => Probs.Select(row => row.Key * row.Value).Sum();
+            public double MathExeption => double.IsNaN(mathexeption)?mathexeption= Probs.Select(row => row.Key * row.Value).Sum():mathexeption;
 
+            private double kurtosis = double.NaN;
             /// <summary>
             ///     Коэффициент эксцесса данной случайной величины.
             /// </summary>
-            public double Kurtosis => CentralMoment(4) / Math.Pow(Dispersion, 2) - 3;
+            public double Kurtosis => double.IsNaN(kurtosis)?kurtosis= CentralMoment(4) / Math.Pow(Dispersion, 2) - 3:kurtosis;
 
+            private double skewness = double.NaN;
             /// <summary>
             /// Коэффициент ассимметрии данной случайной величины.
             /// </summary>
-            public double Skewness => CentralMoment(3) / Math.Pow(StandardDeviation, 3);
+            public double Skewness => double.IsNaN(skewness)?skewness= CentralMoment(3) / Math.Pow(StandardDeviation, 3):skewness;
 
+            private double median = double.NaN;
             /// <summary>
             /// Медиана данной случайной величины.
             /// </summary>
@@ -209,14 +247,15 @@ namespace KMZILib
             {
                 get
                 {
+                    if (!double.IsNaN(median)) return median;
                     double[] Sorted = new double[Values.Length];
                     Values.CopyTo(Sorted, 0);
 
                     Array.Sort(Sorted);
-
-                    return Sorted.Length % 2 == 0 ?
-                      (Sorted[Sorted.Length / 2] + Sorted[Sorted.Length / 2 - 1]) / 2.0
-                    : Sorted[Sorted.Length / 2];
+                    median = Sorted.Length % 2 == 0
+                        ? (Sorted[Sorted.Length / 2] + Sorted[Sorted.Length / 2 - 1]) / 2.0
+                        : Sorted[Sorted.Length / 2];
+                    return median;
                 }
             }
 
