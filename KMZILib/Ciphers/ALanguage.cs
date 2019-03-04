@@ -39,9 +39,9 @@ namespace KMZILib
                 private static ALanguage instance;
 
                 /// <summary>
-                /// Строковое представление алфавита языка в верхнем регистре.
+                /// Строковое представление алфавита языка в верхнем регистре. Менять на свой страх и риск.
                 /// </summary>
-                public string Alphabet { get; protected set; }
+                public string Alphabet { get; set; }
                 /// <summary>
                 /// Представляет упорядоченный по частоте встречи список букв алфавита.
                 /// </summary>

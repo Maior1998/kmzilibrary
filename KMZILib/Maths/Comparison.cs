@@ -236,6 +236,38 @@ namespace KMZILib
                 return (int)(a * 397) ^ (int)M;
             }
 
+            public static LinearComparison operator -(LinearComparison Source)
+            {
+                return new LinearComparison(-Source.A,Source.M);
+            }
+
+            public static LinearComparison operator +(LinearComparison First, LinearComparison Second)
+            {
+                if(First.M!=Second.M) throw new InvalidOperationException("Модули сравнений должны быть равны.");
+                return new LinearComparison(First.LeastModulo+Second.LeastModulo,First.M);
+            }
+
+            public static LinearComparison operator -(LinearComparison First, LinearComparison Second)
+            {
+                if (First.M != Second.M)
+                    throw new InvalidOperationException("Модули сравнений должны быть равны.");
+                return new LinearComparison(First.LeastModulo - Second.LeastModulo, First.M);
+            }
+
+            public static LinearComparison operator *(LinearComparison First, LinearComparison Second)
+            {
+                if (First.M != Second.M)
+                    throw new InvalidOperationException("Модули сравнений должны быть равны.");
+                return new LinearComparison(First.LeastModulo * Second.LeastModulo, First.M);
+            }
+
+            public static LinearComparison operator /(LinearComparison First, LinearComparison Second)
+            {
+                if (First.M != Second.M)
+                    throw new InvalidOperationException("Модули сравнений должны быть равны.");
+                return new LinearComparison(First.LeastModulo / Second.LeastModulo, First.M);
+            }
+
             /// <summary>
             ///     Сравнивает остаток и модуль двух линейных сравнений
             /// </summary>
