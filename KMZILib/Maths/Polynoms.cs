@@ -140,64 +140,6 @@ namespace KMZILib
             }
 
             /// <summary>
-            ///     Вычисление значения многочлена при заданном x в поле Zn. Используется схема Горнера.
-            /// </summary>
-            /// <param name="x">Точка, в которой нужно вычислить многочлен</param>
-            /// <param name="module">Модуль, по которому происходит вычисление</param>
-            /// <returns></returns>
-            public double GetValue(int x, int module)
-            {
-                return GetValueArray(x, module).Last();
-            }
-
-            /// <summary>
-            ///     Вычисление значения многочлена при заданном x в поле Zn. Возвращается вся получившаяся строка значений.
-            ///     Используется схема Горнера.
-            /// </summary>
-            /// <param name="x"></param>
-            /// <param name="module"></param>
-            /// <returns></returns>
-            public int[] GetValueArray(int x, int module)
-            {
-                LinearComparison[] ResultArray = new LinearComparison[Coefficients.Length];
-                ResultArray[0] = new LinearComparison((int)Coefficients[0], module);
-                for (int i = 1; i < Coefficients.Length; i++)
-                    ResultArray[i] = new LinearComparison((int)(ResultArray[i - 1].A * x + (int)Coefficients[i]), module);
-                return ResultArray.Select(comparison => (int)comparison.A).ToArray();
-            }
-
-            /// <summary>
-            ///     Вычисление корней данного многочлена по заданному модулю.
-            /// </summary>
-            /// <param name="module">Модуль, по которому происходит нахожлдение корней.</param>
-            /// <returns>Пары "корень-кратность"</returns>
-            public Dictionary<int, int> SolveResults(int module)
-            {
-                Dictionary<int, int> Roots = new Dictionary<int, int>();
-                Stack<int[]> rows = new Stack<int[]>();
-                rows.Push(Coefficients.Select(coef => (int)coef).ToArray());
-                //поместили изначальный массив коэффициентов 
-                for (int i = 0; i < module; i++)
-                {
-                    Polynom buffer = new Polynom(rows.Peek());
-                    int[] CurrentRow = buffer.GetValueArray(i, module);
-                    if (CurrentRow.Last() != 0)
-                        continue;
-
-                    int[] bufferarray = new int[CurrentRow.Length - 1];
-                    Array.Copy(CurrentRow, bufferarray, bufferarray.Length);
-                    rows.Push(bufferarray);
-                    if (Roots.ContainsKey(i))
-                        Roots[i]++;
-                    else
-                        Roots.Add(i, 1);
-                    i--;
-                }
-
-                return Roots;
-            }
-
-            /// <summary>
             ///     Метод, осуществляющий перевод многочлена в строковый вид
             /// </summary>
             /// <returns></returns>
