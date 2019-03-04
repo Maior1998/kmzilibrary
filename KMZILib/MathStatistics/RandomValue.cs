@@ -277,6 +277,15 @@ namespace KMZILib
             }
 
             /// <summary>
+            /// Возвращает нормлизованную случайную величину, полученную из данной.
+            /// </summary>
+            /// <returns></returns>
+            public RandomValue GetNormalizedValue()
+            {
+                return new RandomValue(Values.Select(val=>val/Interval));
+            }
+
+            /// <summary>
             ///     Возвращает абсолютный начальный момент данной случайной величины заданного порядка.
             /// </summary>
             /// <param name="k"></param>
