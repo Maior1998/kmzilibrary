@@ -236,17 +236,34 @@ namespace KMZILib
                 return (int)(a * 397) ^ (int)M;
             }
 
+            /// <summary>
+            /// Возвращает новое сравнение, в котором остаток умножен на -1.
+            /// </summary>
+            /// <param name="Source"></param>
+            /// <returns></returns>
             public static LinearComparison operator -(LinearComparison Source)
             {
                 return new LinearComparison(-Source.A,Source.M);
             }
 
+            /// <summary>
+            /// Возвращает результат сложения двух сравнений с одинаковыми модулями.
+            /// </summary>
+            /// <param name="First"></param>
+            /// <param name="Second"></param>
+            /// <returns></returns>
             public static LinearComparison operator +(LinearComparison First, LinearComparison Second)
             {
                 if(First.M!=Second.M) throw new InvalidOperationException("Модули сравнений должны быть равны.");
                 return new LinearComparison(First.LeastModulo+Second.LeastModulo,First.M);
             }
 
+            /// <summary>
+            /// Возвращает результат разности двух линейных сравнений с одинаковыми модулями.
+            /// </summary>
+            /// <param name="First"></param>
+            /// <param name="Second"></param>
+            /// <returns></returns>
             public static LinearComparison operator -(LinearComparison First, LinearComparison Second)
             {
                 if (First.M != Second.M)
@@ -254,6 +271,12 @@ namespace KMZILib
                 return new LinearComparison(First.LeastModulo - Second.LeastModulo, First.M);
             }
 
+            /// <summary>
+            /// Возвращает результат умножения остатков двух линейных сравнений с одинаковыми модулями.
+            /// </summary>
+            /// <param name="First"></param>
+            /// <param name="Second"></param>
+            /// <returns></returns>
             public static LinearComparison operator *(LinearComparison First, LinearComparison Second)
             {
                 if (First.M != Second.M)
@@ -261,6 +284,12 @@ namespace KMZILib
                 return new LinearComparison(First.LeastModulo * Second.LeastModulo, First.M);
             }
 
+            /// <summary>
+            /// Возвращает результат деления остатков сравнений с одинаковыми модулями.
+            /// </summary>
+            /// <param name="First"></param>
+            /// <param name="Second"></param>
+            /// <returns></returns>
             public static LinearComparison operator /(LinearComparison First, LinearComparison Second)
             {
                 if (First.M != Second.M)

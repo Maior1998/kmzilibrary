@@ -109,25 +109,40 @@ namespace KMZILib
             /// </summary>
             public Queue<int> Values;
 
+            /// <summary>
+            /// Зранит в себе историю всех значений, начиная с вектора инициализации.
+            /// </summary>
+            public Queue<int> History;
+
+            /// <summary>
+            /// Модуль, на котором работает данный линейный регистр.
+            /// </summary>
             public int Module;
 
             private int FirstIndex = 0;
+
+            /// <summary>
+            /// Вектор инициализации данного регистра и ЛРП.
+            /// </summary>
+            public readonly Vector InitializeVector;
 
             /// <summary>
             /// Инициализирует новый модульный регистр сдвига по его строковому представлению (например, an+4=an+3 + 5an+2 - 3an).
             /// </summary>
             /// <param name="Source"></param>
             /// <param name="module"></param>
-            /// <param name="InitializeVector"></param>
-            public MLFSR(string Source,int module, int[] InitializeVector)
+            /// <param name="initializevector"></param>
+            public MLFSR(string Source,int module, int[] initializevector)
             {
+                InitializeVector=new Vector(initializevector.Select(val=>(double)val).ToArray());
+                History = new Queue<int>(initializevector);
                 Module = module;
-                Values = new Queue<int>(InitializeVector);
+                Values = new Queue<int>(initializevector);
                 Regex LFSRPartRegex = new Regex(@"(?<sign>-)?\s*(?<value>\d+)?\s*a\s*n\s*(?:\+\s*(?<index>\d+))?");
                 Match[] LFSRParts = LFSRPartRegex.Matches(Source).Cast<Match>().ToArray();
-                Formula = new Comparison.LinearComparison[Convert.ToInt32(LFSRParts[0].Groups["index"].Value)];
-                if (Formula.Length != InitializeVector.Length)
-                    throw new InvalidOperationException($"Число элементов, участвующих в операциях ({Formula.Length}) не равно размеру начального вектора ({InitializeVector.Length})");
+                Formula = new Comparison.LinearComparison[Convert.ToInt32(LFSRParts[0].Groups["index"].Value)].Select(comp=>new Comparison.LinearComparison(0,Module)).ToArray();
+                if (Formula.Length != initializevector.Length)
+                    throw new InvalidOperationException($"Число элементов, участвующих в операциях ({Formula.Length}) не равно размеру начального вектора ({initializevector.Length})");
                 for (int i = 1; i < LFSRParts.Length; i++)
                 {
                     //Считали индекс, в который необходимо поместить коэффициент
@@ -137,7 +152,7 @@ namespace KMZILib
                         : Convert.ToInt32(LFSRParts[i].Groups["value"].Value);
                     if (LFSRParts[i].Groups["sign"].Value != "")
                         value *= -1;
-                    Formula[index] = new Comparison.LinearComparison(value,module);
+                    Formula[index].A=value;
                 }
             }
 
@@ -147,6 +162,28 @@ namespace KMZILib
             public string CurrentState
             {
                 get { return string.Join("; ", Values.Select((val, ind) => $"a[{ind + FirstIndex}]={val}")); }
+            }
+
+            /// <summary>
+            /// Сбрасывает данный линейный регистр.
+            /// </summary>
+            public void Reset()
+            {
+                Values=new Queue<int>(InitializeVector.Coordinates.Select(val=>(int)val));
+                History = new Queue<int>(InitializeVector.Coordinates.Select(val => (int)val));
+            }
+
+            /// <summary>
+            /// Период данной ЛРП. Сбрасывает регистр.
+            /// </summary>
+            public int Period
+            {
+                get
+                {
+                    throw new NotImplementedException();
+                    Console.WriteLine($"T <= {Math.Pow(Module,Formula.Length)-1}");
+                    return 0;
+                }
             }
 
             /// <summary>
@@ -164,6 +201,7 @@ namespace KMZILib
                 }
                 Values.Dequeue();
                 Values.Enqueue((int)newvalue.A);
+                History.Enqueue((int)newvalue.A);
                 FirstIndex++;
                 return (int)newvalue.A;
             }
@@ -175,7 +213,7 @@ namespace KMZILib
             public override string ToString()
             {
                 return
-                    $"an+{Formula.Length} = {string.Join(" + ", Formula.Select((element, index) => element.A == 0 ? "" : $"{element}an+{index}").Where(str => str != "").Reverse())}";
+                    $"an+{Formula.Length} = {string.Join(" + ", Formula.Select((element, index) => element.A == 0 ? "" : $"{element.A}an+{index}").Where(str => str != "").Reverse())}";
             }
         }
     }

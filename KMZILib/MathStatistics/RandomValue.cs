@@ -187,6 +187,9 @@ namespace KMZILib
                 }
             }
 
+            /// <summary>
+            /// Описательная статистика данной случайной величины.
+            /// </summary>
             public string DescriptiveStatistics =>
                 $"Среднее : {Average}\n" +
                 $"Стандартная ошибка : {StandartErrorGeneral}\n" +

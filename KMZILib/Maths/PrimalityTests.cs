@@ -10,11 +10,17 @@ namespace KMZILib
     /// Статический класс для работы с простыми числами.
     /// </summary>
     public static class Primes {
-
+        /// <summary>
+        /// Статический класс, предоставляющий методы генерации простых чисел.
+        /// </summary>
         public static class Factory
         {
             private static List<BigInteger> GeneratedNums = new List<BigInteger>();
 
+            /// <summary>
+            /// Возвращает следующее простое число.
+            /// </summary>
+            /// <returns></returns>
             public static BigInteger GetNext()
             {
                 BigInteger[] CurrentSet = new BigInteger[PrimalityTests.PrimeNumbers.Length + GeneratedNums.Count];

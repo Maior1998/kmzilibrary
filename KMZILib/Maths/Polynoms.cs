@@ -54,6 +54,10 @@ namespace KMZILib
                 Source.Coefficients.CopyTo(Coefficients, 0);
             }
 
+            /// <summary>
+            /// Инициализирует новый многочлен с заднными целочисленными коэффициентами.
+            /// </summary>
+            /// <param name="coefficient"></param>
             public Polynom(int[] coefficient) : this(coefficient.Select(val => (double)val).ToString()) { }
 
             /// <summary>
@@ -245,6 +249,12 @@ namespace KMZILib
                 return First * (double)Second;
             }
 
+            /// <summary>
+            /// Возвращает результат умножения многочленов.
+            /// </summary>
+            /// <param name="First"></param>
+            /// <param name="Second"></param>
+            /// <returns></returns>
             public static Polynom operator *(Polynom First, Polynom Second)
             {
                 List<Polynom> summaryarray = new List<Polynom>();
@@ -265,6 +275,11 @@ namespace KMZILib
                 return Result;
             }
 
+            /// <summary>
+            /// Получает доступ к коэффициенту текущего многочлена с заданным индексом.
+            /// </summary>
+            /// <param name="Index"></param>
+            /// <returns></returns>
             public double this[int Index]
             {
                 get => Coefficients[Index];
@@ -299,6 +314,12 @@ namespace KMZILib
                 return new Polynom(Source.Coefficients.Select(coef => -coef).ToArray());
             }
 
+            /// <summary>
+            /// Возвращает неполное частное деления многочленов.
+            /// </summary>
+            /// <param name="First"></param>
+            /// <param name="Second"></param>
+            /// <returns></returns>
             public static Polynom operator /(Polynom First, Polynom Second)
             {
                 //Создали результат - многочлен нужной степени.
@@ -321,6 +342,12 @@ namespace KMZILib
                 return Result;
             }
 
+            /// <summary>
+            /// Возвращает остаток деления многочленов.
+            /// </summary>
+            /// <param name="First"></param>
+            /// <param name="Second"></param>
+            /// <returns></returns>
             public static Polynom operator %(Polynom First, Polynom Second)
             {
                 //Создали результат - многочлен нужной степени.
@@ -416,6 +443,7 @@ namespace KMZILib
             ///     Инициализация нового многочлена с помощью его строкового представления.
             /// </summary>
             /// <param name="ModularPolynom"></param>
+            /// <param name="module"></param>
             public ModularPolynom(string ModularPolynom,int module)
             {
                 Module = module;
@@ -460,6 +488,7 @@ namespace KMZILib
             /// Инициализирует нулевой многочлен заданной степени
             /// </summary>
             /// <param name="value"></param>
+            /// <param name="module"></param>
             private ModularPolynom(int value,int module)
             {
                 Module = module;
@@ -477,7 +506,6 @@ namespace KMZILib
             ///     Вычисление значения многочлена при заданном x в поле Zn. Используется схема Горнера.
             /// </summary>
             /// <param name="x">Точка, в которой нужно вычислить многочлен</param>
-            /// <param name="module">Модуль, по которому происходит вычисление</param>
             /// <returns></returns>
             public double GetValue(int x)
             {
@@ -489,7 +517,6 @@ namespace KMZILib
             ///     Используется схема Горнера.
             /// </summary>
             /// <param name="x"></param>
-            /// <param name="module"></param>
             /// <returns></returns>
             public int[] GetValueArray(int x)
             {
@@ -503,7 +530,6 @@ namespace KMZILib
             /// <summary>
             ///     Вычисление корней данного многочлена по заданному модулю.
             /// </summary>
-            /// <param name="module">Модуль, по которому происходит нахожлдение корней.</param>
             /// <returns>Пары "корень-кратность"</returns>
             public Dictionary<int, int> SolveResults()
             {
@@ -629,7 +655,12 @@ namespace KMZILib
             {
                 return new ModularPolynom(First.Coefficients.Select(val => (int)val.A * Second).ToArray(),First.Module);
             }
-
+            /// <summary>
+            /// Возвращает результат умножения многочленов по модулю.
+            /// </summary>
+            /// <param name="First"></param>
+            /// <param name="Second"></param>
+            /// <returns></returns>
             public static ModularPolynom operator *(ModularPolynom First, ModularPolynom Second)
             {
                 if (First.Module != Second.Module)
@@ -652,6 +683,11 @@ namespace KMZILib
                 return Result;
             }
 
+            /// <summary>
+            /// Получает доступ к коэффициентам текущего модулярного многочлена с заданным индексом.
+            /// </summary>
+            /// <param name="Index"></param>
+            /// <returns></returns>
             public int this[int Index]
             {
                 get => (int)Coefficients[Index].A;
@@ -668,6 +704,12 @@ namespace KMZILib
                 return new ModularPolynom(Source.Coefficients.Select(coef => -(int)coef.A).ToArray(),Source.Module);
             }
 
+            /// <summary>
+            /// Возвращает неполное частное от деления многочленов по модулю.
+            /// </summary>
+            /// <param name="First"></param>
+            /// <param name="Second"></param>
+            /// <returns></returns>
             public static ModularPolynom operator /(ModularPolynom First, ModularPolynom Second)
             {
                 if (First.Module != Second.Module)
@@ -692,6 +734,12 @@ namespace KMZILib
                 return Result;
             }
 
+            /// <summary>
+            /// Возвращает остаток от деления многочленов по модулю.
+            /// </summary>
+            /// <param name="First"></param>
+            /// <param name="Second"></param>
+            /// <returns></returns>
             public static ModularPolynom operator %(ModularPolynom First, ModularPolynom Second)
             {
                 if (First.Module != Second.Module)

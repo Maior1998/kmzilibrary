@@ -63,10 +63,10 @@ namespace KMZILib
                     for (int i = 0; i < coefs.Length - 1; i++)
                         coefs[i] = (int)RD.UniformDistribution(1, module - 1, 1)[0];
                     coefs[coefs.Length - 1] = (int)Key;
-                    Polynom sharepolynom = new Polynom(coefs);
+                    ModularPolynom sharepolynom = new ModularPolynom(coefs,(int)module);
                     KeyValuePair<int, BigInteger>[] Keys = new KeyValuePair<int, BigInteger>[CountOfFragments];
                     for (int i = 1; i <= CountOfFragments; i++)
-                        Keys[i - 1] = new KeyValuePair<int, BigInteger>(i, (BigInteger)sharepolynom.GetValue(i, (int)module));
+                        Keys[i - 1] = new KeyValuePair<int, BigInteger>(i, (BigInteger)sharepolynom.GetValue(i));
                     return Keys;
                 }
 

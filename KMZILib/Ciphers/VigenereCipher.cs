@@ -35,7 +35,13 @@ namespace KMZILib
                 return Languages.CurrentLanguage.Alphabet[(SourceIndex + KeyIndex) % Languages.CurrentLanguage.Alphabet.Length];
             }
 
-            private static char GetDecryptedChar(char EncryptedShar, char KeyChar)
+            /// <summary>
+            /// Возвращает символ, полученный в результате дешифрования символа текста символом ключа.
+            /// </summary>
+            /// <param name="EncryptedShar"></param>
+            /// <param name="KeyChar"></param>
+            /// <returns></returns>
+            public static char GetDecryptedChar(char EncryptedShar, char KeyChar)
             {
                 int SourceIndex = Languages.CurrentLanguage.Alphabet.IndexOf(EncryptedShar);
                 int KeyIndex = Languages.CurrentLanguage.Alphabet.IndexOf(KeyChar);

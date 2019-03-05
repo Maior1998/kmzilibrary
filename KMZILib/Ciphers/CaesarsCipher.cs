@@ -12,7 +12,13 @@ namespace KMZILib
         /// </summary>
         public static class CaesarsCipher
         {
-            private static char GetShiftedChar(char SourceChar, int Shift)
+            /// <summary>
+            /// Возвращает смещенный на заданное расстояние символ.
+            /// </summary>
+            /// <param name="SourceChar"></param>
+            /// <param name="Shift"></param>
+            /// <returns></returns>
+            public static char GetShiftedChar(char SourceChar, int Shift)
             {
                 return Languages.CurrentLanguage.Alphabet[
                     (int) new LinearComparison(Languages.CurrentLanguage.Alphabet.IndexOf(SourceChar) + Shift,

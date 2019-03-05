@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.ExceptionServices;
 
 namespace KMZILib
 {
@@ -143,8 +144,27 @@ namespace KMZILib
             return new Vector(First.Coordinates.Select(val => -val).ToArray());
         }
 
+        public static bool operator ==(Vector First, Vector Second)
+        {
+            if (First.CoordinatesLength != Second.CoordinatesLength) return false;
+            for(int i=0;i<First.CoordinatesLength;i++)
+                if (First[i] != Second[i])
+                    return false;
+            return true;
+        }
+
+        public static bool operator !=(Vector First, Vector Second)
+        {
+            if (First.CoordinatesLength != Second.CoordinatesLength)
+                return true;
+            for (int i = 0; i < First.CoordinatesLength; i++)
+                if (First[i] != Second[i])
+                    return true;
+            return false;
+        }
+
         #endregion
-        
+
         /// <summary>
         ///     Возвращает строковое представление вектора.
         /// </summary>

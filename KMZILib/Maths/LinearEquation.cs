@@ -250,6 +250,11 @@ namespace KMZILib
         /// </summary>
         public static class TMA
         {
+            /// <summary>
+            /// Осуществляет решение системы линейных уравнений, записанной в виде поточной матрицы.
+            /// </summary>
+            /// <param name="Source"></param>
+            /// <returns></returns>
             public static Vector Solve(Matrix Source)
             {
                 int n = Source.LengthY;
