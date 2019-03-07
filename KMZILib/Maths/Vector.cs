@@ -8,7 +8,7 @@ namespace KMZILib
     /// <summary>
     ///     Представляет вектор с вещественными координатами.
     /// </summary>
-    public class Vector
+    public class Vector: IEquatable<Vector>
     {
         #region Свойства
         /// <summary>
@@ -173,6 +173,22 @@ namespace KMZILib
         {
             return
                 $"({string.Join(", ", Coordinates.Select(coord => Math.Round(coord) == coord ? coord.ToString() : $"{coord:F3}"))})";
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is Vector vector &&
+                   EqualityComparer<double[]>.Default.Equals(Coordinates, vector.Coordinates);
+        }
+
+        public override int GetHashCode()
+        {
+            return -1484672504 + EqualityComparer<double[]>.Default.GetHashCode(Coordinates);
+        }
+
+        public bool Equals(Vector other)
+        {
+            return this == other;
         }
     }
 }
