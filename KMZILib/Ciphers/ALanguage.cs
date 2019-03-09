@@ -47,14 +47,6 @@ namespace KMZILib
                 /// </summary>
                 public List<char> Frequency { get; protected set; }
                 /// <summary>
-                /// Упорядоченный по частоте встречи список слов длины 1.
-                /// </summary>
-                public List<char> FrequencyWb1L { get; protected set; }
-                /// <summary>
-                /// Упорядоченный по частоте встречи список слов длины 2.
-                /// </summary>
-                public List<string> FrequencyWb2L { get; protected set; }
-                /// <summary>
                 /// Упорядоченный по частоте встречи список пар букв, которые встречаются друг за другом.
                 /// </summary>
                 public List<string> FrequencyBigrams { get; protected set; }
@@ -62,6 +54,14 @@ namespace KMZILib
                 /// Упорядоченный по частоте встречи список троек букв, которые встречаются друг за другом.
                 /// </summary>
                 public List<string> FrequencyThreegrams { get; protected set; }
+                /// <summary>
+                /// Упорядоченный по частоте встречи список слов длины 1.
+                /// </summary>
+                public List<char> FrequencyWb1L { get; protected set; }
+                /// <summary>
+                /// Упорядоченный по частоте встречи список слов длины 2.
+                /// </summary>
+                public List<string> FrequencyWb2L { get; protected set; }
                 /// <summary>
                 /// Алфавит языка, представленный в виде массива символов в верхнем регистре.
                 /// </summary>

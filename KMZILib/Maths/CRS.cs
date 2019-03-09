@@ -128,6 +128,26 @@ namespace KMZILib
             /// </summary>
             public readonly Vector InitializeVector;
 
+
+            /// <summary>
+            /// Инициализирует новый модульный регистр сдвига по его строковому представлению (например, an+4=an+3 + 5an+2 - 3an).
+            /// </summary>
+            /// <param name="Source"></param>
+            /// <param name="module"></param>
+            /// <param name="initializevector"></param>
+            public MLFSR(int[] Source, int module, int[] initializevector)
+            {
+                InitializeVector = new Vector(initializevector.Select(val => (double)val).ToArray());
+                ValuesHistory = new Queue<int>(initializevector);
+                StatesHistory = new Queue<Vector>();
+                Module = module;
+                Formula = Source.Reverse().Select(val => new Comparison.LinearComparison(val, Module)).ToArray();
+                Values = new Queue<int>(initializevector);
+                StatesHistory.Enqueue(new Vector(Values.Select(val => (double)val).ToArray()));
+                if (Formula.Length != initializevector.Length)
+                    throw new InvalidOperationException($"Число элементов, участвующих в операциях ({Formula.Length}) не равно размеру начального вектора ({initializevector.Length})");
+                }
+
             /// <summary>
             /// Инициализирует новый модульный регистр сдвига по его строковому представлению (например, an+4=an+3 + 5an+2 - 3an).
             /// </summary>
@@ -185,7 +205,7 @@ namespace KMZILib
                 //В этот список будем записывать индексы вертикальных черт 
                 List<int> VerticalsIndexes = new List<int>();
                 //это массив ненулевых коэффициентов формулы
-                int[] NonZeroValue = Formula.Select(comp => (int)comp.A).Where(val => val != 0).ToArray();
+                int[] NonZeroValues = Formula.Select(comp => (int)comp.A).Where(val => val != 0).ToArray();
 
                 //Сначала заполняем последнюю строку.
                 StringBuilder buffer=new StringBuilder();
@@ -205,7 +225,7 @@ namespace KMZILib
                 buffer.Append(string.Join("", new char[Length].Select(ch => ' ')));
                 buffer[buffer.Length - 1] = '│';
                 for(int i=0;i<VerticalsIndexes.Count;i++)
-                    buffer[VerticalsIndexes[i]] = Formula[i].A == 1? '│' : '╤';
+                    buffer[VerticalsIndexes[i]] = NonZeroValues[i] == 1? '│' : '╤';
                 Result[4] = buffer.ToString();
                 buffer.Clear();
                 //заполнили предпоследнюю строку
@@ -214,7 +234,7 @@ namespace KMZILib
                 buffer.Append(string.Join("", new char[Length].Select(ch => ' ')));
                 buffer[buffer.Length - 1] = '│';
                 for (int VertIndex = 0; VertIndex < VerticalsIndexes.Count; VertIndex++)
-                    buffer[VerticalsIndexes[VertIndex]] = NonZeroValue[VertIndex] == 1 ? '│' : NonZeroValue[VertIndex].ToString()[0];
+                    buffer[VerticalsIndexes[VertIndex]] = NonZeroValues[VertIndex] == 1 ? '│' : NonZeroValues[VertIndex].ToString()[0];
                 Result[3] = buffer.ToString();
                 buffer.Clear();
 
@@ -222,7 +242,7 @@ namespace KMZILib
                 buffer.Append(string.Join("", new char[Length].Select(ch => ' ')));
                 buffer[buffer.Length - 1] = '│';
                 for (int i = 0; i < VerticalsIndexes.Count; i++)
-                    buffer[VerticalsIndexes[i]] = NonZeroValue[i] == 1 ? '│' : '╧';
+                    buffer[VerticalsIndexes[i]] = NonZeroValues[i] == 1 ? '│' : '╧';
                 Result[2] = buffer.ToString();
                 buffer.Clear();
 
@@ -266,7 +286,8 @@ namespace KMZILib
             public void Reset()
             {
                 Values=new Queue<int>(InitializeVector.Coordinates.Select(val=>(int)val));
-                ValuesHistory = new Queue<int>(InitializeVector.Coordinates.Select(val => (int)val));
+                ValuesHistory = new Queue<int>(Values);
+                StatesHistory= new Queue<Vector>(new []{new Vector(Values.Select(val => (double)val).ToArray())});
                 FirstIndex = 0;
             }
 

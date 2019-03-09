@@ -26,6 +26,7 @@ namespace Ручной_тест
             Vector init = new Vector(new[] { 1.0, 0, 1, 0, 1 });
             CRS.MLFSR test = new CRS.MLFSR("an+5=2an+4+2an+1",3,new[]{1,0,1,0,1});
             Console.WriteLine(test.InitializeVector);
+            return;
             for (int i = 0; i < 255; i++)
             {
                 Console.WriteLine(test.CurrentState);
