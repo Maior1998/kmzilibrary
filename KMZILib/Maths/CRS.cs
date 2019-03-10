@@ -110,10 +110,13 @@ namespace KMZILib
             public Queue<int> Values;
 
             /// <summary>
-            /// Зранит в себе историю всех значений, начиная с вектора инициализации.
+            /// Хранит в себе историю всех значений, начиная с вектора инициализации.
             /// </summary>
             public Queue<int> ValuesHistory;
 
+            /// <summary>
+            /// Хранит в себе историю всех значений в виде вектором-состояний, начиная с вектора инициализации.
+            /// </summary>
             public Queue<Vector> StatesHistory;
 
             /// <summary>
@@ -127,7 +130,6 @@ namespace KMZILib
             /// Вектор инициализации данного регистра и ЛРП.
             /// </summary>
             public readonly Vector InitializeVector;
-
 
             /// <summary>
             /// Инициализирует новый модульный регистр сдвига по его строковому представлению (например, an+4=an+3 + 5an+2 - 3an).
@@ -188,6 +190,10 @@ namespace KMZILib
                 get { return string.Join("; ", Values.Select((val, ind) => $"a[{ind + FirstIndex}]={val}")); }
             }
 
+            /// <summary>
+            /// Возвращает графическое ASCII представление регистра. Для отображения лучше использовать монотонный шрифты. Например, Consolas или Liquida Console.
+            /// </summary>
+            /// <returns></returns>
             public string Draw()
             {
 
@@ -298,9 +304,19 @@ namespace KMZILib
             {
                 get
                 {
-                    throw new NotImplementedException();
-                    Console.WriteLine($"T <= {Math.Pow(Module,Formula.Length)-1}");
-                    return 0;
+                    Reset();
+                    for (int i = 0; i < (int)Math.Pow(Module, Formula.Length) - 1; i++)
+                    {
+                        ValuesHistory.Enqueue(GetNext(false));
+                        Vector current = StateVector;
+                        if (StatesHistory.Contains(current))
+                        {
+                            Reset();
+                            return i + 1;
+                        }
+                        StatesHistory.Enqueue(current);
+                    }
+                    return -1;
                 }
             }
 

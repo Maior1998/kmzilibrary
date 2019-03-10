@@ -11,6 +11,17 @@ namespace KMZILib
     public static partial class Ciphers
     {
         /// <summary>
+        /// Возвращает текст, из которого удаляются все неалфавитные символы.
+        /// </summary>
+        /// <param name="Source"></param>
+        /// <returns></returns>
+        public static string GetOnlyAlphabetCharacters(string Source)
+        {
+            return string.Concat(Regex.Split(Source.ToUpper(), @"[^" + Languages.CurrentLanguage.Alphabet + "]",
+                RegexOptions.IgnoreCase));
+        }
+
+        /// <summary>
         ///     Шифр Виженера
         /// </summary>
         public static class VigenereCipher
@@ -49,11 +60,7 @@ namespace KMZILib
                 return Languages.CurrentLanguage.Alphabet[(int)ResultIndex.A];
             }
 
-            private static string GetOnlyAlphabetCharacters(string Source)
-            {
-                return string.Concat(Regex.Split(Source.ToUpper(), @"[^" + Languages.CurrentLanguage.Alphabet + "]",
-                    RegexOptions.IgnoreCase));
-            }
+            
 
             /// <summary>
             ///     Осуществляет шифрование строки с использованием заданного лозунга

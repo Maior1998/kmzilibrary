@@ -182,7 +182,7 @@ namespace KMZILib
                     double Result = 0;
                     foreach (double probsKey in Statistic.Keys)
                         Result += Math.Pow(probsKey - Average, 2) * Statistic[probsKey];
-                    dispersion = Result / Count;
+                    dispersion = Result / (Count-1);
                     return dispersion;
                 }
             }
@@ -234,13 +234,32 @@ namespace KMZILib
             /// <summary>
             ///     Коэффициент эксцесса данной случайной величины.
             /// </summary>
-            public double Kurtosis => double.IsNaN(kurtosis)?kurtosis= CentralMoment(4) / Math.Pow(Dispersion, 2) - 3:kurtosis;
+            public double Kurtosis {
+                get
+                {
+                    double n = Count;
+                    if (!double.IsNaN(kurtosis)) return kurtosis;
+                    double fdel = (n * (n + 1)) / ((n - 1) * (n - 2) * (n - 3));
+                    double sum = Values.Select(val => Math.Pow((val - Average) / StandardDeviation, 4)).Sum();
+                    double sdel = (3 * Math.Pow(n - 1, 2)) / ((n - 2) * (n - 3));
+                    return fdel * sum - sdel;
+                }
+            }
 
             private double skewness = double.NaN;
             /// <summary>
             /// Коэффициент ассимметрии данной случайной величины.
             /// </summary>
-            public double Skewness => double.IsNaN(skewness)?skewness= CentralMoment(3) / Math.Pow(StandardDeviation, 3):skewness;
+            public double Skewness {
+                get
+                {
+                    if (!double.IsNaN(skewness)) return skewness;
+                    double n = Count;
+                    double fdel = n / ((n - 1) * (n - 2));
+                    double sum = Values.Select(val => Math.Pow((val - Average) / StandardDeviation, 3)).Sum();
+                    return fdel * sum;
+                }
+            } 
 
             private double median = double.NaN;
             /// <summary>
@@ -320,6 +339,17 @@ namespace KMZILib
 
                 return new RandomValue(buffer).MathExeption;
             }
+
+            /// <summary>
+            ///     Возвращает центральный момент данной случайной величины заданного порядка.
+            /// </summary>
+            /// <param name="k"></param>
+            /// <returns></returns>
+            public double CentralMomentTEST(int k)
+            {
+                return new RandomValue(Values.Select(val=> Math.Pow(val*(1 - MathExeption), k))).MathExeption;
+            }
+
 
             /// <summary>
             ///     Возвращает абсолютный центральный момент данной случайной величины заданного порядка.

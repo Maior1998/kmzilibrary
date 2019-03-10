@@ -63,7 +63,7 @@ namespace KMZILib
 
                 List<string> answer = new List<string>(Languages.CurrentLanguage.Alphabet.Length);
                 for (int i = 1; i <= Languages.CurrentLanguage.Alphabet.Length; i++)
-                    answer.Add($"(k = {i}) {Encrypt(Source, -i)}");
+                    answer.Add($"(k = {i} ({Languages.CurrentLanguage.Alphabet[i-1]})) {Encrypt(Source, -i)}");
                 return answer.ToArray();
             }
         }
