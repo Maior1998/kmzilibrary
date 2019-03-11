@@ -492,7 +492,7 @@ namespace KMZILib
             /// </summary>
             /// <param name="value"></param>
             /// <param name="module"></param>
-            private ModularPolynom(int value,int module)
+            public ModularPolynom(int value,int module)
             {
                 Module = module;
                 if (value < 0)
