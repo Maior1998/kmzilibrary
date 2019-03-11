@@ -157,13 +157,13 @@ namespace KMZILib
             /// <summary>
             ///     Возвращает длину интервала. Вычисляется как <see cref="Max" /> - <see cref="Min" />.
             /// </summary>
-            public double Interval => double.IsNaN(interval)?interval= Max - Min:interval;
+            public double Interval => double.IsNaN(interval) ? interval = Max - Min : interval;
 
             private double mean = double.NaN;
             /// <summary>
             ///     Мода случайной величины. Если есть несколько одинаково-часто-встречающихся величин, вернется первая из них.
             /// </summary>
-            public double Mean => double.IsNaN(mean)?mean= Statistic.First(val => val.Value == Statistic.Values.Max()).Key:mean;
+            public double Mean => double.IsNaN(mean) ? mean = Statistic.First(val => val.Value == Statistic.Values.Max()).Key : mean;
 
             /// <summary>
             ///     Определяет, является ли величина мультимодальной.
@@ -178,11 +178,12 @@ namespace KMZILib
             {
                 get
                 {
-                    if (!double.IsNaN(dispersion)) return dispersion;
+                    if (!double.IsNaN(dispersion))
+                        return dispersion;
                     double Result = 0;
                     foreach (double probsKey in Statistic.Keys)
                         Result += Math.Pow(probsKey - Average, 2) * Statistic[probsKey];
-                    dispersion = Result / (Count-1);
+                    dispersion = Result / (Count - 1);
                     return dispersion;
                 }
             }
@@ -210,39 +211,41 @@ namespace KMZILib
             /// <summary>
             ///     Стандартное отклонение данной величины.
             /// </summary>
-            public double StandardDeviation => double.IsNaN(standarddeviation)?standarddeviation= Math.Sqrt(Dispersion):standarddeviation;
+            public double StandardDeviation => double.IsNaN(standarddeviation) ? standarddeviation = Math.Sqrt(Dispersion) : standarddeviation;
 
             private double standarderror = double.NaN;
             /// <summary>
             /// Стандартная ошибка для выборки, когда n != N.
             /// </summary>
-            public double StandardError => double.IsNaN(standarderror)?standarderror= Dispersion / Math.Sqrt(Count):standarderror;
+            public double StandardError => double.IsNaN(standarderror) ? standarderror = Dispersion / Math.Sqrt(Count) : standarderror;
 
             private double standarderrorgeneral = double.NaN;
             /// <summary>
             /// Стандартная ошибка для генеральной совокупности, когда n = N.
             /// </summary>
-            public double StandartErrorGeneral => double.IsNaN(standarderrorgeneral)?standarderrorgeneral= StandardDeviation / Math.Sqrt(Count):standarderrorgeneral;
+            public double StandartErrorGeneral => double.IsNaN(standarderrorgeneral) ? standarderrorgeneral = StandardDeviation / Math.Sqrt(Count) : standarderrorgeneral;
 
             private double mathexeption = double.NaN;
             /// <summary>
             ///     Математическое ожидание данной случайной величины. Требует наличие списка вероятностей для вычисления.
             /// </summary>
-            public double MathExeption => double.IsNaN(mathexeption)?mathexeption= Probs.Select(row => row.Key * row.Value).Sum():mathexeption;
+            public double MathExeption => double.IsNaN(mathexeption) ? mathexeption = Probs.Select(row => row.Key * row.Value).Sum() : mathexeption;
 
             private double kurtosis = double.NaN;
             /// <summary>
             ///     Коэффициент эксцесса данной случайной величины.
             /// </summary>
-            public double Kurtosis {
+            public double Kurtosis
+            {
                 get
                 {
+                    if (!double.IsNaN(kurtosis))
+                        return kurtosis;
                     double n = Count;
-                    if (!double.IsNaN(kurtosis)) return kurtosis;
                     double fdel = (n * (n + 1)) / ((n - 1) * (n - 2) * (n - 3));
                     double sum = Values.Select(val => Math.Pow((val - Average) / StandardDeviation, 4)).Sum();
                     double sdel = (3 * Math.Pow(n - 1, 2)) / ((n - 2) * (n - 3));
-                    return fdel * sum - sdel;
+                    return kurtosis = fdel * sum - sdel;
                 }
             }
 
@@ -250,16 +253,18 @@ namespace KMZILib
             /// <summary>
             /// Коэффициент ассимметрии данной случайной величины.
             /// </summary>
-            public double Skewness {
+            public double Skewness
+            {
                 get
                 {
-                    if (!double.IsNaN(skewness)) return skewness;
+                    if (!double.IsNaN(skewness))
+                        return skewness;
                     double n = Count;
                     double fdel = n / ((n - 1) * (n - 2));
                     double sum = Values.Select(val => Math.Pow((val - Average) / StandardDeviation, 3)).Sum();
-                    return fdel * sum;
+                    return skewness = fdel * sum;
                 }
-            } 
+            }
 
             private double median = double.NaN;
             /// <summary>
@@ -269,7 +274,8 @@ namespace KMZILib
             {
                 get
                 {
-                    if (!double.IsNaN(median)) return median;
+                    if (!double.IsNaN(median))
+                        return median;
                     double[] Sorted = new double[Values.Length];
                     Values.CopyTo(Sorted, 0);
 
@@ -304,7 +310,7 @@ namespace KMZILib
             /// <returns></returns>
             public RandomValue GetNormalizedValue()
             {
-                return new RandomValue(Values.Select(val=>val/Interval));
+                return new RandomValue(Values.Select(val => val / Interval));
             }
 
             /// <summary>
@@ -347,7 +353,7 @@ namespace KMZILib
             /// <returns></returns>
             public double CentralMomentTEST(int k)
             {
-                return new RandomValue(Values.Select(val=> Math.Pow(val*(1 - MathExeption), k))).MathExeption;
+                return new RandomValue(Values.Select(val => Math.Pow(val * (1 - MathExeption), k))).MathExeption;
             }
 
 
