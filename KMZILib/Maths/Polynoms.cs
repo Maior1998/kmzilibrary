@@ -113,6 +113,8 @@ namespace KMZILib
                 Coefficients = new double[value + 1];
             }
 
+            
+
             /// <summary>
             ///     Степень данного многочлена.
             /// </summary>
@@ -410,6 +412,7 @@ namespace KMZILib
         /// </summary>
         public class ModularPolynom
         {
+            //TODO: унаследовать от простого многочлена?
             /// <summary>
             ///     Массив коэффициентов многочлена. От старших степеней к младшим. Длинными числами могут быть только коэффициенты.
             /// </summary>
@@ -495,6 +498,19 @@ namespace KMZILib
                 if (value < 0)
                     value = 0;
                 Coefficients = new LinearComparison[value + 1].Select(comp=>new LinearComparison(0,Module)).ToArray();
+            }
+
+            /// <summary>
+            /// Порядок данного многочлена. Подразумевается, что многочлен неприводим.
+            /// </summary>
+            public int Exponent
+            {
+                get
+                {
+                    return 0;
+                    int MAX = (int) Math.Pow(Module, Degree)-1;
+
+                }
             }
 
             /// <summary>

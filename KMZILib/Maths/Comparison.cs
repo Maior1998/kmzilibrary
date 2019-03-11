@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Runtime.Remoting.Channels;
 
 namespace KMZILib
 {
@@ -74,6 +75,43 @@ namespace KMZILib
                     dividers.Add(i);
             dividers.Add(Number);
             return dividers.ToArray();
+        }
+
+        /// <summary>
+        /// Факторизация числа. Метод пробных делений. ОЧЕНЬ не эффективен и не рекомендуется к использованию.
+        /// </summary>
+        /// <param name="n"></param>
+        /// <returns></returns>
+        public static Dictionary<int, int> Factor(int n)
+        {
+            Dictionary<int,int> Result = new Dictionary<int, int>();
+            while (n > Primes.PrimalityTests.PrimeNumbers.Last() ||
+                   !Primes.PrimalityTests.PrimeNumbers.Contains((ushort) n))
+            {
+                bool DividerFound = false;
+                foreach (ushort PrimeNumber in Primes.PrimalityTests.PrimeNumbers)
+                {
+                    if (n % PrimeNumber == 0)
+                    {
+                        n /= PrimeNumber;
+                        if(!Result.ContainsKey(PrimeNumber)) Result.Add(PrimeNumber,0);
+                        Result[PrimeNumber]++;
+                        DividerFound = true;
+                        break;
+                    }
+                }
+                if (!DividerFound)
+                    break;
+            }
+
+            if (n != 1)
+            {
+                if (!Result.ContainsKey(n))
+                    Result.Add(n, 0);
+                Result[n]++;
+            }
+
+            return Result;
         }
 
         /// <summary>

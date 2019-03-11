@@ -193,7 +193,7 @@ namespace KMZILib
             /// </summary>
             public string DescriptiveStatistics =>
                 $"Среднее : {Average}\n" +
-                $"Стандартная ошибка : {StandartErrorGeneral}\n" +
+                $"Стандартная ошибка : {StandardErrorGeneral}\n" +
                 $"Медиана : {Median}\n" +
                 $"Мода : {Mean}\n" +
                 $"Стандартное отклонение : {StandardDeviation}\n" +
@@ -223,7 +223,7 @@ namespace KMZILib
             /// <summary>
             /// Стандартная ошибка для генеральной совокупности, когда n = N.
             /// </summary>
-            public double StandartErrorGeneral => double.IsNaN(standarderrorgeneral) ? standarderrorgeneral = StandardDeviation / Math.Sqrt(Count) : standarderrorgeneral;
+            public double StandardErrorGeneral => double.IsNaN(standarderrorgeneral) ? standarderrorgeneral = StandardDeviation / Math.Sqrt(Count) : standarderrorgeneral;
 
             private double mathexeption = double.NaN;
             /// <summary>

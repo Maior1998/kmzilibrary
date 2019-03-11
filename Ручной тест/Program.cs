@@ -21,27 +21,12 @@ namespace Ручной_тест
         public static string Es = "ЭСКАДРА";
         static void Main(string[] args)
         {
-
-
-            Vector init = new Vector(new[] { 1.0, 0, 1, 0, 1 });
-            CRS.MLFSR test = new CRS.MLFSR("an+5=2an+4+2an+1",3,new[]{1,0,1,0,1});
-            Console.WriteLine(test.InitializeVector);
-            return;
-            for (int i = 0; i < 255; i++)
+            Dictionary<int, int> a = Comparison.Factor(24);
+            foreach (KeyValuePair<int, int> KeyValuePair in a)
             {
-                Console.WriteLine(test.CurrentState);
-                test.GetNext(false);
-                Vector current = test.StateVector;
-                if (test.StatesHistory.Contains(current))
-                {
-                    Console.WriteLine($"Период найден на {i+1} шаге");
-                    Console.WriteLine(test.CurrentState);
-                    Console.WriteLine($"({string.Join(", ", test.Values)})");
-                    Console.WriteLine($"Общая последовательность:\n{string.Join(" ",test.ValuesHistory)}");
-                    break;
-                }
-                test.StatesHistory.Enqueue(current);
+                Console.WriteLine($"{KeyValuePair.Key}^{KeyValuePair.Value}");
             }
+
             return;
             Languages.CurrentLanguage = Languages.RussianLanguage.GetInstanse();
             Languages.CurrentLanguage.Alphabet = "АБВГДЕЖЗИКЛМНОПРСТУФХЦЧШЩЬЫЭЮЯ";
