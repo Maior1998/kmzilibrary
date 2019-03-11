@@ -21,11 +21,9 @@ namespace Ручной_тест
         public static string Es = "ЭСКАДРА";
         static void Main(string[] args)
         {
-            Dictionary<int, int> a = Comparison.Factor(24);
-            foreach (KeyValuePair<int, int> KeyValuePair in a)
-            {
-                Console.WriteLine($"{KeyValuePair.Key}^{KeyValuePair.Value}");
-            }
+            //Polynoms.ModularPolynom test = new Polynoms.ModularPolynom("x^2+x+2",5);
+            Polynoms.ModularPolynom test = new Polynoms.ModularPolynom("x^4+x+1", 2);
+            Console.WriteLine(test.Exponent);
 
             return;
             Languages.CurrentLanguage = Languages.RussianLanguage.GetInstanse();

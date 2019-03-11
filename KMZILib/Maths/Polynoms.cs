@@ -507,8 +507,27 @@ namespace KMZILib
             {
                 get
                 {
-                    return 0;
-                    int MAX = (int) Math.Pow(Module, Degree)-1;
+                    //список в который будут помещаться числа, на которые должен делиться порядок.
+                    List<int> NOKArray=new List<int>();
+                    int MAX = (int)Math.Pow(Module, Degree) - 1;
+                    Dictionary<int, int> Dividers = Comparison.Factor(MAX);
+                    foreach (int PrimeDivider in Dividers.Keys)
+                    {
+                        for (int primedegree =1; primedegree <= Dividers[PrimeDivider]; primedegree++)
+                        {
+                            int degree = MAX / (int) Math.Pow(PrimeDivider, primedegree);
+                            ModularPolynom buffer = new ModularPolynom(degree, Module) {[0] = 1};
+                            buffer %= this;
+                            if (buffer.Degree!=0||( buffer[0] != 1 && buffer[0] != 1 - Module))
+                            {
+                                NOKArray.Add((int)Math.Pow(PrimeDivider, Dividers[PrimeDivider]+1-primedegree));
+                                break;
+                            }
+                        }
+                    }
+                    
+
+                    return (int)AdvancedEuclidsalgorithm.LCM(NOKArray.Select(val=>(BigInteger)val).ToArray());
 
                 }
             }

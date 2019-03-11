@@ -134,15 +134,45 @@ namespace KMZILib
         }
 
         /// <summary>
+        /// Вычисляет НОД массива чисел.
+        /// </summary>
+        /// <param name="Source"></param>
+        /// <returns></returns>
+        public static BigInteger GCDResult(BigInteger[] Source)
+        {
+            BigInteger Result = GCDResult(Source[0], Source[1]);
+            for (int i = 2; i < Source.Length; i++)
+                Result = GCDResult(Result, Source[i]);
+            return Result;
+        }
+
+        /// <summary>
+        /// Вычисляет НОК массива чисел.
+        /// </summary>
+        /// <param name="Source"></param>
+        /// <returns></returns>
+        public static BigInteger LCM(BigInteger[] Source)
+        {
+            BigInteger Result = LCM(Source[0], Source[1]);
+            for (int i = 2; i < Source.Length; i++)
+                Result = LCM(Result, Source[i]);
+            return Result;
+        }
+
+        /// <summary>
         ///     Подсчет наибольшего общего делителя для списка чисел.
         /// </summary>
         /// <param name="Array"></param>
         /// <returns></returns>
         public static BigInteger GCDResult(IList<BigInteger> Array)
         {
+            if (Array.Count == 0) return 0;
+            if (Array.Count == 1)
+                return Array[0];
             while (true)
             {
-                if (Array.Count == 1) return Array[0];
+                if (Array.Count == 1)
+                    return Array[0];
                 Array[1] = GCDResult(Array[0], Array[1]);
                 Array = Array.Skip(1).ToList();
             }
