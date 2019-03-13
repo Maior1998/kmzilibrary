@@ -140,6 +140,10 @@ namespace KMZILib
         /// <returns></returns>
         public static BigInteger GCDResult(BigInteger[] Source)
         {
+            if (Source.Length == 0)
+                return 0;
+            if (Source.Length == 1)
+                return Source[0];
             BigInteger Result = GCDResult(Source[0], Source[1]);
             for (int i = 2; i < Source.Length; i++)
                 Result = GCDResult(Result, Source[i]);
@@ -153,6 +157,8 @@ namespace KMZILib
         /// <returns></returns>
         public static BigInteger LCM(BigInteger[] Source)
         {
+            if (Source.Length == 0) return 0;
+            if (Source.Length == 1) return Source[0];
             BigInteger Result = LCM(Source[0], Source[1]);
             for (int i = 2; i < Source.Length; i++)
                 Result = LCM(Result, Source[i]);
