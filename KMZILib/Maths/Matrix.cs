@@ -173,7 +173,7 @@ namespace KMZILib
                 for (int i = 0; i < buffer.LengthY; i++)
                     for (int j = 0; j < buffer.LengthY; j++)
                         buffer[i][j] = Values[i][j];
-                //создали копию матрицы. теперь можно генерить столбцы свободных членов.
+                //Создали копию матрицы. теперь можно генерить столбцы свободных членов.
                 //Столбцы обратной матрицы - столбцы b в системах линейных уравнений.
                 for (int i = 0; i < LengthY; i++)
                 {
@@ -194,6 +194,22 @@ namespace KMZILib
         public double Norm => Math.Sqrt(!HasFreeCoefficient
             ? Values.Select(row => row.Select(element => Math.Pow(element, 2)).Sum()).Sum()
             : Values.Select(row => row.Take(row.Length - 1).Select(element => Math.Pow(element, 2)).Sum()).Sum());
+
+        /// <summary>
+        /// Определеяет, имеет ли данная матрица диагональное преобладание.
+        /// </summary>
+        public bool IsDiagonallyDominant
+        {
+            get
+            {
+                for (int i = 0; i < LengthY; i++)
+                {
+                    double Sum = Values[i].Where((element, index) => index != i).Select(Math.Abs).Sum();
+                    if (Math.Abs(Values[i][i]) < Sum) return false;
+                }
+                return true;
+            }
+        }
 
         /// <summary>
         ///     Доступ к строкам матрицы по заданным индексам.
