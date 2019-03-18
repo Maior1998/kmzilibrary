@@ -125,10 +125,9 @@ namespace KMZILib
         private static Polynoms.ModularPolynom[] gcd(Polynoms.ModularPolynom First, Polynoms.ModularPolynom Second, Polynoms.ModularPolynom x, Polynoms.ModularPolynom y,
             Polynoms.ModularPolynom oldx, Polynoms.ModularPolynom oldy)
         {
-            Console.WriteLine($"{Second}\t\t\t{x}\t\t\t{y}\t\t\t{First/Second}");
             if (Second.Degree == 0)
-                return new[] { Second, x, y };
-            
+                return new[] { Second[0]==0?First: Second, x, y };
+            Console.WriteLine($"{Second}\t\t\t{x}\t\t\t{y}\t\t\t{First/Second}");
             Polynoms.ModularPolynom q = First / Second;
             return gcd(Second, First % Second, oldx - x * q, oldy - y * q, x, y);
         }

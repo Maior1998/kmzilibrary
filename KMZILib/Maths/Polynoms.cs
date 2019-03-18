@@ -757,6 +757,11 @@ namespace KMZILib
                 return new ModularPolynom(Source.Coefficients.Select(coef => -(int)coef.A).ToArray(),Source.Module);
             }
 
+            public ModularPolynom GetNormalized()
+            {
+                return this * (int) MultiplicativeInverse.Solve(this[0], Module);
+            }
+
             /// <summary>
             /// Возвращает неполное частное от деления многочленов по модулю.
             /// </summary>
