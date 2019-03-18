@@ -21,7 +21,11 @@ namespace Ручной_тест
         public static string Es = "ЭСКАДРА";
         static void Main(string[] args)
         {
-           
+
+            Polynoms.ModularPolynom test1 = new Polynoms.ModularPolynom("x^2 + 4x + 6", 7);
+            Console.WriteLine(test1.Exponent);
+            return;
+
             Languages.CurrentLanguage = Languages.RussianLanguage.GetInstanse();
             Languages.CurrentLanguage.Alphabet = "АБВГДЕЖЗИКЛМНОПРСТУФХЦЧШЩЬЫЭЮЯ";
             Console.WriteLine(Ciphers.VigenereCipher.Decrypt(Cipher1, "ЧИЖИКПЫЖИКГДЕТЫБЫЛ"));
