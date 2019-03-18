@@ -16,25 +16,18 @@ namespace Ручной_тест
     class Program
     {
 
-
+        public static double[] Mp = {2.0, 12, 34, 40, 10, 2};
+        public static double[] Mt = {1.83, 12.99, 35.08, 35.08, 12.99, 1.861};
 
         static void Main(string[] args)
         {
-            //Polynoms.ModularPolynom test1=new Polynoms.ModularPolynom("x^4 + x^3 + x^2 + 3",7);
-            //Polynoms.ModularPolynom test2 = new Polynoms.ModularPolynom("x^2 + x + 3", 7);
-
-            Console.WriteLine(new ModularPolynom("6x^2 + 2x + 6",11)/new ModularPolynom("9x",11));
-            Console.WriteLine(new ModularPolynom("6x^2 + 2x + 6", 11) % new ModularPolynom("9x", 11));
-            
-
-            Polynoms.ModularPolynom test1 = new Polynoms.ModularPolynom("7x^5 + 4x^3 + 2x + 1", 11);
-            Polynoms.ModularPolynom test2 = new Polynoms.ModularPolynom("5x^3 + 2", 11);
-            Polynoms.ModularPolynom test3 = new Polynoms.ModularPolynom("-3x", 7);
-            Polynoms.ModularPolynom a =AdvancedEuclidsalgorithm.GCDResult(test1,test2);
+            Console.WriteLine($"Распределение {(MathStatistics.IsNormal(Mp,Mt)?"":"не")} подчиняется нормальному закану распределения");
 
 
 
         }
+
+        
 
 
         public static string Cipher1 = "БЦКНКВСФНТХБЦЫЫЕМЛ";
