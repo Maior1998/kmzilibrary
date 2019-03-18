@@ -598,8 +598,8 @@ namespace KMZILib
             /// <returns></returns>
             public override string ToString()
             {
-                if (Coefficients.Length == 1||Coefficients.All(coef=>coef.LeastModulo==0))
-                    return $"{Coefficients.First().LeastModulo} (mod {Module})";
+                if (Coefficients.Length == 1||Coefficients.All(coef=>coef.A==0))
+                    return $"{Coefficients.First().A} (mod {Module})";
                 StringBuilder answer = new StringBuilder();
                 for (int i = 0; i < Coefficients.Length; i++)
                 {
@@ -607,16 +607,20 @@ namespace KMZILib
                         continue;
                     if (i <= Coefficients.Length - 2)
                     {
+                        /*
                         answer.Append(
                             $"{(Coefficients[i].LeastModulo > 0 ? Coefficients[i].LeastModulo == 1 ? i == 0 ? "" : " + " : $"{(i == 0 ? "" : " + ") + Coefficients[i].LeastModulo}" : $"{(i == 0 ? "-" : " - ")}{(BigInteger.Abs(Coefficients[i].LeastModulo) == 1 ? "" : BigInteger.Abs(Coefficients[i].LeastModulo).ToString())}")}x");
+                            */
+                        answer.Append(
+                            $"{(Coefficients[i].A == 1 ? i == 0 ? "" : " + " : $"{(i == 0 ? "" : " + ") + Coefficients[i].A}")}x");
+
+
                         if (i < Coefficients.Length - 2)
                             answer.Append($"^{Coefficients.Length - i - 1}");
                     }
                     else
                     {
-                        answer.Append(Coefficients[i].LeastModulo > 0
-                            ? $"{(i == 0 ? "" : " + ") + Coefficients[i].LeastModulo}"
-                            : $" - {BigInteger.Abs(Coefficients[i].LeastModulo)}");
+                        answer.Append($"{(i == 0 ? "" : " + ") + Coefficients[i].A}");
                     }
                 }
 
@@ -680,6 +684,15 @@ namespace KMZILib
                 return Coefficients.Length - 1 - degree;
             }
 
+            public static ModularPolynom GetNormalized(ModularPolynom Source)
+            {
+                return Source.Coefficients.Any(val => val.A != 0)
+                    ? new ModularPolynom(
+                        Source.Coefficients.SkipWhile(num => num.A == 0).Select(val => (int) val.A).ToArray(),
+                        Source.Module)
+                    : new ModularPolynom(new[] {0}, Source.Module);
+            }
+
             /// <summary>
             /// Возвращает результат умножения всех коэффициентов многочлена на заданное число.
             /// </summary>
@@ -698,8 +711,13 @@ namespace KMZILib
             /// <returns></returns>
             public static ModularPolynom operator *(ModularPolynom First, ModularPolynom Second)
             {
+                First = GetNormalized(First);
+                Second = GetNormalized(Second);
                 if (First.Module != Second.Module)
                     throw new InvalidOperationException("Модули многочленов должны совпадать.");
+                if (First.Degree == 0) return Second * First[0];
+                if (Second.Degree == 0)
+                    return First * Second[0];
                 List<ModularPolynom> summaryarray = new List<ModularPolynom>();
                 for (int i = 0; i <= First.Degree; i++)
                 {
@@ -751,12 +769,15 @@ namespace KMZILib
                     throw new InvalidOperationException("Модули многочленов должны совпадать.");
                 //Создали результат - многочлен нужной степени.
                 ModularPolynom Residue = new ModularPolynom(First);
+
                 int i = 0;
+                int multiplier =(int)MultiplicativeInverse.Solve(Second[0], Second.Module);
+                Second *= multiplier;
                 ModularPolynom Result = new ModularPolynom(First.Degree - Second.Degree,First.Module);
-                while (Residue.Degree >= Second.Degree)
+                while (Residue.Degree >= Second.Degree&&Residue.Degree>=1)
                 {
                     int index = Result.Coefficients.Length - 1 - (Residue.Degree - Second.Degree);
-                    Result[index] = Residue[0] / Second[0];
+                    Result[index] = Residue[0] ;
 
                     ModularPolynom buffer = new ModularPolynom(Result.Degree,First.Module);
                     buffer[index] = Result[index];
@@ -766,6 +787,8 @@ namespace KMZILib
                     i++;
                 }
 
+                Second *= (int) MultiplicativeInverse.Solve(multiplier, Second.Module);
+                Result *= multiplier;
                 return Result;
             }
 
@@ -782,11 +805,13 @@ namespace KMZILib
                 //Создали результат - многочлен нужной степени.
                 ModularPolynom Residue = new ModularPolynom(First);
                 int i = 0;
+                int multiplier = (int)MultiplicativeInverse.Solve(Second[0], Second.Module);
+                Second *= multiplier;
                 ModularPolynom Result = new ModularPolynom(First.Degree - Second.Degree,First.Module);
-                while (Residue.Degree >= Second.Degree)
+                while (Residue.Degree >= Second.Degree && Residue.Degree >= 1)
                 {
                     int index = Result.Coefficients.Length - 1 - (Residue.Degree - Second.Degree);
-                    Result[index] = Residue[0] / Second[0];
+                    Result[index] = Residue[0];
 
                     ModularPolynom buffer = new ModularPolynom(Result.Degree,First.Module);
                     buffer[index] = Result[index];

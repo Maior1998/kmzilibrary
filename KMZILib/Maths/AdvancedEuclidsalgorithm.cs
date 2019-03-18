@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Runtime.InteropServices;
 
 namespace KMZILib
 {
@@ -117,6 +119,29 @@ namespace KMZILib
             if (Second == 0) return new[] {First, olda, oldb};
             BigInteger q = First / Second;
             return gcd(Second, First % Second, olda - a * q, oldb - b * q, a, b);
+        }
+
+
+        private static Polynoms.ModularPolynom[] gcd(Polynoms.ModularPolynom First, Polynoms.ModularPolynom Second, Polynoms.ModularPolynom x, Polynoms.ModularPolynom y,
+            Polynoms.ModularPolynom oldx, Polynoms.ModularPolynom oldy)
+        {
+            Console.WriteLine($"{Second}\t\t\t{x}\t\t\t{y}\t\t\t{First/Second}");
+            if (Second.Degree == 0)
+                return new[] { Second, x, y };
+            
+            Polynoms.ModularPolynom q = First / Second;
+            return gcd(Second, First % Second, oldx - x * q, oldy - y * q, x, y);
+        }
+
+        public static Polynoms.ModularPolynom GCDResult(Polynoms.ModularPolynom First, Polynoms.ModularPolynom Second)
+        {
+            Console.WriteLine($"{First}\t\t\t{new Polynoms.ModularPolynom(new[] { 1 }, First.Module)}\t\t\t{new Polynoms.ModularPolynom(0, First.Module)}\t\t\t-");
+            return gcd(First, Second,new Polynoms.ModularPolynom(0, First.Module) , new Polynoms.ModularPolynom(new[] { 1 }, First.Module), new Polynoms.ModularPolynom(new[] { 1 }, First.Module), new Polynoms.ModularPolynom(0, First.Module))[0];
+        }
+
+        public static Polynoms.ModularPolynom[] GCD(Polynoms.ModularPolynom First, Polynoms.ModularPolynom Second)
+        {
+            return gcd(First, Second,new Polynoms.ModularPolynom(new[] { 1 }, First.Module) , new Polynoms.ModularPolynom(0, First.Module), new Polynoms.ModularPolynom(0, First.Module), new Polynoms.ModularPolynom(new[] { 1 }, First.Module));
         }
 
         /// <summary>
