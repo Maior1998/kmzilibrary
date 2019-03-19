@@ -398,10 +398,17 @@ namespace KMZILib
             {
                 Result = 0.5;
             }
+            else if (LaplasTable.ContainsKey(Source))
+                Result = LaplasTable[Source];
             else
             {
-                double x = LaplasTable.Keys.First(key => LaplasTable.Keys.Select(val => Math.Abs(val - Source)).Min() == Math.Abs(key - Source));
-                Result = LaplasTable[x];
+                //TODO: необходимо добежать до первого ключа, который больше чем текущий x
+                //а потом по пропорциям выдать соответствующее значение функции лапласа
+                double Lower = LaplasTable.Keys.First(val => val <= Source);
+                double Higher = Lower + 0.1;
+                Result = LaplasTable[Lower] +
+                         (LaplasTable[Higher] - LaplasTable[Lower]) * ((Source - Lower) / (Higher - Lower))
+                    ;
             }
 
             return Result * sign;
