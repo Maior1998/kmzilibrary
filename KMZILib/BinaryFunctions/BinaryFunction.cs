@@ -432,7 +432,7 @@ namespace KMZILib
         }
 
         /// <summary>
-        ///     Метод, возвращающий значение целого числа в виде массива двоичных значений в указанном количество от его начала
+        ///     Возвращает значение целого числа в виде массива двоичных значений в указанном количество от его начала
         ///     (младших бит)
         /// </summary>
         /// <param name="Number">Число, которое необходимо перевести в двоичную систему счисления</param>
@@ -451,7 +451,7 @@ namespace KMZILib
         }
 
         /// <summary>
-        ///     Метод, возвращающий значение целого числа в виде массива двоичных значений
+        ///     Возвращает значение целого числа в виде массива двоичных значений
         /// </summary>
         /// <param name="Number">Число, которое необходимо перевести в двоичную систему счисления</param>
         /// <returns>Массив двоичных значение - двоичное представление числа</returns>
@@ -468,6 +468,28 @@ namespace KMZILib
             for (int k = 0; i >= 0; i--, k++)
                 Result[k] = number[i];
             return Result;
+        }
+
+        /// <summary>
+        ///     Возвращает бинарное представление целого числа.
+        ///     (младших бит)
+        /// </summary>
+        /// <param name="Number">Число, которое необходимо перевести в двоичную систему счисления</param>
+        /// <returns>Строка - двоичное представление числа</returns>
+        public static string GetBinaryString(BigInteger Number)
+        {
+            return string.Concat(GetBinaryArray(Number).Select(val => val ? '1' : '0'));
+        }
+        /// <summary>
+        ///     Возвращает бинарное представление целого числа с заданным числом разрядов.
+        ///     (младших бит)
+        /// </summary>
+        /// <param name="Number">Число, которое необходимо перевести в двоичную систему счисления</param>
+        /// <param name="Count">Число разрядов. Отсчет ведется от младших к старщим</param>
+        /// <returns>Строка - двоичное представление числа</returns>
+        public static string GetBinaryString(BigInteger Number, int Count)
+        {
+            return string.Concat(GetBinaryArray(Number,Count).Select(val => val ? '1' : '0'));
         }
 
         /// <summary>
