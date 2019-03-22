@@ -87,6 +87,38 @@ namespace KMZILib
         }
 
         /// <summary>
+        /// Возвращает нормализованную версию данного вектора.
+        /// </summary>
+        /// <returns></returns>
+        public Vector GetNormalized()
+        {
+            return new Vector(Coordinates.Select(val=>val/Length).ToArray());
+        }
+
+        /// <summary>
+        /// Вычисляет скалярное произведение заданного вектора с текущим.
+        /// </summary>
+        /// <param name="Second"></param>
+        /// <returns></returns>
+        public double ScalarProduct(Vector Second)
+        {
+            return ScalarProduct(this, Second);
+        }
+
+        /// <summary>
+        /// Вычисляет скалярное произведение двух векторов.
+        /// </summary>
+        /// <param name="First"></param>
+        /// <param name="Second"></param>
+        /// <returns></returns>
+        public static double ScalarProduct(Vector First, Vector Second)
+        {
+            if (First.CoordinatesLength!=Second.CoordinatesLength)
+                throw new InvalidOperationException("Длины перемножаемых векторов не равны.");
+            return First.Coordinates.Select((val,ind)=>val*Second[ind]).Sum();
+        }
+
+        /// <summary>
         ///     Возвращает матрицу, заданную по текущему вектору.
         /// </summary>
         /// <returns></returns>
