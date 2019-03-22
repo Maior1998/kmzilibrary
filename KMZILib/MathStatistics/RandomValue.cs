@@ -477,9 +477,9 @@ namespace KMZILib
         public static bool IsNormal(RandomValue Source)
         {
             int CountOfIntervals;
-            if (Source.Count < 15) CountOfIntervals = 1;
-            else if (Source.Count < 225)
-                CountOfIntervals = 3;
+            
+            if (Source.Count < 225)
+                CountOfIntervals = 4;
             else if (Source.Count < 1250)
                 CountOfIntervals = (int)Math.Ceiling(Source.Count / (double)50);
             else
