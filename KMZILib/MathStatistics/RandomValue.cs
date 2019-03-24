@@ -402,10 +402,11 @@ namespace KMZILib
                 Result = LaplasTable[Source];
             else
             {
-                //TODO: необходимо добежать до первого ключа, который больше чем текущий x
+                double[] Keys = LaplasTable.Keys.OrderBy(val => val).ToArray();
+                //необходимо добежать до первого ключа, который больше чем текущий x
                 //а потом по пропорциям выдать соответствующее значение функции лапласа
-                double Lower = LaplasTable.Keys.First(val => val <= Source);
-                double Higher = Lower + 0.1;
+                double Higher = Keys.First(val => val > Source);
+                double Lower = Keys[Keys.ToList().IndexOf(Higher)-1];
                 Result = LaplasTable[Lower] +
                          (LaplasTable[Higher] - LaplasTable[Lower]) * ((Source - Lower) / (Higher - Lower))
                     ;
@@ -420,7 +421,7 @@ namespace KMZILib
         /// <param name="Source">Случайная величина, для которой необходимо рассчитать критерий</param>
         /// <param name="CountOfIntervals">Число интервалов разбиения.</param>
         /// <returns></returns>
-        public static double ChiSquaredTest(RandomValue Source, int CountOfIntervals)
+        public static double ChiSquaredTest(RandomValue Source, int CountOfIntervals,bool PrintM=false)
         {
             //Начало - откуда начнем рассматривать интервалы
             double Start = Source.Min;
@@ -434,20 +435,20 @@ namespace KMZILib
             //Стандартное отклонение величины
             double StandardDeviation = Source.StandardDeviation;
 
-            //Среднее значение величины
+            //Среднее значение выборки
             double Average = Source.Average;
 
             //Массив теоретических частот
-            double[] MTheoral = new double[CountOfIntervals].Select(val => (double) Source.Count).ToArray();
+            double[] MTheoral = new double[CountOfIntervals];
 
             //Массив практических частот
-            double[] MPract = new double[CountOfIntervals];
+            int[] MPract = new int[CountOfIntervals];
 
             //Массив хи квадратов для каждого интервала
             double[] HiQua = new double[CountOfIntervals];
 
             int i = 0;
-            for (double j = Start; j + Step <= End; j += Step, i++)
+            for (double j = Start; i<CountOfIntervals; j += Step, i++)
             {
                 //Начало текущего интервала
                 double CurrentStart = j;
@@ -456,14 +457,27 @@ namespace KMZILib
                 double CurrentEnd = j + Step;
 
                 //Вычисляем теоретическую частоту
-                MTheoral[i] *= Math.Abs(LaplasFunc(Math.Abs(CurrentEnd - Average) / StandardDeviation) -
+                MTheoral[i] = Source.Count*Math.Abs(LaplasFunc(Math.Abs(CurrentEnd - Average) / StandardDeviation) -
                                         LaplasFunc(Math.Abs(CurrentStart - Average) / StandardDeviation));
 
                 //Получаем число величин, попавших в интервал. Это практическая частота.
                 MPract[i] = Source.Values.Count(val => val >= CurrentStart && val < CurrentEnd);
                 //Вычисляем критерий хи квадрат для данного интервала
-                HiQua[i] = Math.Pow(MPract[i] - MTheoral[i], 2) / MTheoral[i];
+                if (MPract[i] == (int)Math.Round(MTheoral[i]))
+                    HiQua[i] = 0;
+                if (Math.Abs(MTheoral[i]) < 0.5)
+                    HiQua[i] = Math.Pow(MPract[i], 2);
+                else
+                    HiQua[i] = Math.Pow(MPract[i] - (int)Math.Round(MTheoral[i]), 2) / MTheoral[i];
             }
+
+            if (PrintM)
+            {
+                Console.WriteLine($"MPract = {string.Join(", ", MPract)}" );
+                Console.WriteLine($"MTheoral = {string.Join(", ", MTheoral.Select(Convert.ToInt32))}");
+                Console.WriteLine();
+            }
+
             //Результат сумма критериев со всех интервалов
             double HiQuaResult = HiQua.Sum();
             return HiQuaResult;
@@ -474,7 +488,7 @@ namespace KMZILib
         /// </summary>
         /// <param name="Source"></param>
         /// <returns></returns>
-        public static bool IsNormal(RandomValue Source)
+        public static bool IsNormal(RandomValue Source,bool PrintM=false)
         {
             int CountOfIntervals;
             
@@ -484,7 +498,7 @@ namespace KMZILib
                 CountOfIntervals = (int)Math.Ceiling(Source.Count / (double)50);
             else
                 CountOfIntervals = 25;
-            double SourceChiSquared = ChiSquaredTest(Source, CountOfIntervals);
+            double SourceChiSquared = ChiSquaredTest(Source, CountOfIntervals,PrintM);
             int FreeDegree = CountOfIntervals - 3;
             double CriticalChiSquared = GetChiSquaredCritical(FreeDegree);
             return CriticalChiSquared >= SourceChiSquared;

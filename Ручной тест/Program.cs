@@ -21,8 +21,8 @@ namespace Ручной_тест
 
         static void Main(string[] args)
         {
-            Console.WriteLine($"Распределение {(MathStatistics.IsNormal(Mp,Mt)?"":"не")} подчиняется нормальному закану распределения");
-
+            Polynoms.Polynom test = new Polynoms.Polynom(new []{2.0,0.1});
+            Console.WriteLine(test);
 
 
         }
