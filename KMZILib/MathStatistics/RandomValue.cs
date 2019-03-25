@@ -421,8 +421,20 @@ namespace KMZILib
         /// <param name="Source">Случайная величина, для которой необходимо рассчитать критерий</param>
         /// <param name="CountOfIntervals">Число интервалов разбиения.</param>
         /// <returns></returns>
-        public static double ChiSquaredTest(RandomValue Source, int CountOfIntervals,bool PrintM=false)
+        public static double ChiSquaredTest(RandomValue Source, int CountOfIntervals=0,bool PrintM=false)
         {
+            if (CountOfIntervals == 0)
+            {
+                if (Source.Count < 15)
+                    CountOfIntervals = 1;
+                else if (Source.Count < 225)
+                    CountOfIntervals = 3;
+                else if (Source.Count < 1250)
+                    CountOfIntervals = (int)Math.Ceiling(Source.Count / (double)50);
+                else
+                    CountOfIntervals = 25;
+            }
+
             //Начало - откуда начнем рассматривать интервалы
             double Start = Source.Min;
 
