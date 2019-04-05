@@ -18,7 +18,12 @@ namespace Ручной_тест
 
         static void Main(string[] args)
         {
-
+            Polynoms.Polynom test = new Polynoms.Polynom("x^3 -0.1x^2 +0.3x-0.6");
+            Console.WriteLine(test);
+            Console.WriteLine(test.Derivative());
+            Console.WriteLine(test.Derivative().Derivative());
+            Console.WriteLine(test.Derivative().Derivative().Derivative());
+            Console.WriteLine(test.Derivative().Derivative().Derivative().Derivative());
 
         }
 
