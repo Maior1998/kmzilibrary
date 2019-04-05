@@ -79,7 +79,7 @@ namespace KMZILib
 
                 Regex PolynomRegex =
                     new Regex(
-                        @"(\s*(?<sign>[+-])?\s*(?<value>\s*[0-9]+(?:\.[0-9]+)?)?\s*x\s*(\^\s*(?<degree>[1-9][0-9]*))?)|((?<sign>-?)\s*(?<value>[1-9][0-9]*))");
+                        @"(\s*(?<sign>[+-])?\s*(?<value>\s*[0-9]+(?:\.[0-9]+)?)?\s*x\s*(\^\s*(?<degree>[1-9][0-9]*))?)|((?<sign>-?)\s*(?<value>[0-9]+(?:\.[0-9]+)?))");
                 List<Nom> noms = new List<Nom>();
                 foreach (Match polynommatch in PolynomRegex.Matches(polynom))
                 {
