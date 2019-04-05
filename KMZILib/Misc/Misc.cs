@@ -11,9 +11,9 @@ namespace KMZILib
     /// </summary>
     public static partial class Misc
     {
-        public static string GetSignedValue(double Source)
+        public static string GetSignedValue(double Source, int CountOfDigits=-1)
         {
-            return $"{(Source >= 0 ? "+" : "-")} {Math.Abs(Source)}";
+            return $"{(Source >= 0 ? "+" : "-")} {(CountOfDigits==-1? Math.Abs(Source): Math.Abs(Math.Round(Source,CountOfDigits)))}";
         }
 
         public static string GetSignedValue(int Source)
