@@ -114,14 +114,22 @@ namespace KMZILib
             ///     Число всех элементов данной случайной величины. Повторы тоже учитываются.
             /// </summary>
             public int Count => count == -1 ? count = Statistic.Values.Sum() : count;
+            
+            private double squaredsum = Double.NaN;
+            /// <summary>
+            ///     Сумма квадратов значений данной случайной величины. Для вычисления необходима частотная статистика
+            ///     <see cref="Statistic" />.
+            /// </summary>
+            public double SquaredSum => Double.IsNaN(squaredsum)
+                ? squaredsum = Values.Select(val => Math.Pow(val, 2)).Sum()
+                : squaredsum;
 
-
-            private double sum = -1;
+            private double sum = Double.NaN;
             /// <summary>
             ///     Сумма всех значений данной случайной величины. Для вычисления необходима частотная статистика
             ///     <see cref="Statistic" />.
             /// </summary>
-            public double Sum => sum == -1 ? sum = Statistic.Select(row => row.Key * row.Value).Sum() : sum;
+            public double Sum => Double.IsNaN(sum) ? sum = Statistic.Select(row => row.Key * row.Value).Sum() : sum;
 
             private double average = Double.NaN;
             /// <summary>
@@ -206,8 +214,7 @@ namespace KMZILib
                 $"Максимум : {Max}\n" +
                 $"Сумма : {Sum}\n" +
                 $"Счет : {Count}";
-
-
+            
             private double standarddeviation = Double.NaN;
             /// <summary>
             ///     Стандартное отклонение данной величины.
@@ -382,6 +389,41 @@ namespace KMZILib
             {
                 return String.Join(", ", Values);
             }
+        }
+
+        /// <summary>
+        /// Возвращает значение коэффициента корреляции Пирсона для двух заданных величин.
+        /// </summary>
+        /// <param name="First"></param>
+        /// <param name="Second"></param>
+        /// <returns></returns>
+        public static double GetCorrelationValue(RandomValue First, RandomValue Second)
+        {
+            if (First.Count!=Second.Count)
+                throw new InvalidOperationException("Число элементов в влеичинах должно совпадать.");
+            int n = First.Count;
+            double Numerator = n * First.Values.Select((elem, ind) => elem * Second.Values[ind]).Sum() - First.Sum*Second.Sum;
+            double Denominator =
+                Math.Abs(n * First.SquaredSum - Math.Pow(First.Sum, 2));
+            Denominator *= Math.Abs(n * Second.SquaredSum - Math.Pow(Second.Sum, 2));
+            Denominator = Math.Sqrt(Denominator);
+            return Numerator / Denominator;
+        }
+
+        /// <summary>
+        /// Возвращает таблицу корреляций Пирсона.
+        /// </summary>
+        /// <returns></returns>
+        public static double[][] GetCorrelationTable(RandomValue[] Columns)
+        {
+            double[][] Result = new double[Columns.Length][].Select(row => new double[Columns.Length]).ToArray();
+            for (int i = 0; i < Columns.Length; i++)
+            {
+                for (int j = 0; j < i; j++)
+                    Result[i][j] = Result[j][i] = GetCorrelationValue(Columns[i], Columns[j]);
+                Result[i][i] = 1;
+            }
+            return Result;
         }
 
         /// <summary>
