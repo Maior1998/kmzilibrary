@@ -551,8 +551,17 @@ namespace KMZILib
                 return Source[0][0];
             if (Source.LengthX == 2)
                 return Source[0][0] * Source[1][1] - Source[0][1] * Source[1][0];
-            return Source.Values.First().Select((elem, ind) => Math.Pow(-1, ind) * Source[0][ind] * GetDefinite(GetSubmatrix(Source, 0, ind))).Sum();
+            return Source.Values.First().Select((elem, ind) => Math.Pow(-1, ind) * Source[0][ind] * GetMinor(Source,0,ind)).Sum();
         }
+
+        /// <summary>
+        /// Возвращает дополнительный минор данной матрицы
+        /// </summary>
+        /// <param name="Source"></param>
+        /// <param name="i"></param>
+        /// <param name="j"></param>
+        /// <returns></returns>
+        public static double GetMinor(Matrix Source, int i, int j) => GetDefinite(GetSubmatrix(Source, i, j));
         /// <summary>
         ///     Возвращает матрицу в виде массива коэффициентов.
         /// </summary>
