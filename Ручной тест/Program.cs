@@ -15,15 +15,15 @@ namespace Ручной_тест
 {
     class Program
     {
-
+        public static double[][] Test = new[]
+        {
+            new[] {1.0, 4, 7},
+            new[] {3.0, 0, 5},
+            new[] {-1.0, 9, 11}
+        };
         static void Main(string[] args)
         {
-            Polynoms.Polynom test = new Polynoms.Polynom("x^3 -0.1x^2 +0.3x-0.6");
-            Console.WriteLine(test);
-            Console.WriteLine(test.Derivative());
-            Console.WriteLine(test.Derivative().Derivative());
-            Console.WriteLine(test.Derivative().Derivative().Derivative());
-            Console.WriteLine(test.Derivative().Derivative().Derivative().Derivative());
+            Console.WriteLine(Matrix.GetDefinite(new Matrix( Test)));  
 
         }
 

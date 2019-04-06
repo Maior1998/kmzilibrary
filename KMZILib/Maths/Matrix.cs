@@ -205,7 +205,8 @@ namespace KMZILib
                 for (int i = 0; i < LengthY; i++)
                 {
                     double Sum = Values[i].Where((element, index) => index != i).Select(Math.Abs).Sum();
-                    if (Math.Abs(Values[i][i]) < Sum) return false;
+                    if (Math.Abs(Values[i][i]) < Sum)
+                        return false;
                 }
                 return true;
             }
@@ -529,6 +530,29 @@ namespace KMZILib
             return new Matrix(n, n);
         }
 
+        private static Matrix GetSubmatrix(Matrix Source, int i, int j)
+        {
+            double[][] Result = Source.Values
+                .Select(row => row.Where((elem, ind) => ind != j).ToArray())
+                .Where((row, ind) => ind != i).ToArray();
+            return new Matrix(Result);
+        }
+
+        /// <summary>
+        /// Возвращает определитель заданной матрицы при помощи разложения по строке.
+        /// </summary>
+        /// <param name="Source"></param>
+        /// <returns></returns>
+        public static double GetDefinite(Matrix Source)
+        {
+            if (Source.LengthX != Source.LengthY)
+                throw new InvalidOperationException("Минор существует только для квадратных матриц.");
+            if (Source.LengthX == 1)
+                return Source[0][0];
+            if (Source.LengthX == 2)
+                return Source[0][0] * Source[1][1] - Source[0][1] * Source[1][0];
+            return Source.Values.First().Select((elem, ind) => Math.Pow(-1, ind) * Source[0][ind] * GetDefinite(GetSubmatrix(Source, 0, ind))).Sum();
+        }
         /// <summary>
         ///     Возвращает матрицу в виде массива коэффициентов.
         /// </summary>
@@ -610,6 +634,9 @@ namespace KMZILib
 
 
         #endregion
+
+
+
 
         /// <summary>
         ///     Возвращает строковое представление матрицы.
