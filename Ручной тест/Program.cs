@@ -23,7 +23,7 @@ namespace Ручной_тест
         };
         static void Main(string[] args)
         {
-            Console.WriteLine(Matrix.GetDefinite(new Matrix( Test)));  
+            Console.WriteLine(new Matrix( Test).Definite);  
 
         }
 

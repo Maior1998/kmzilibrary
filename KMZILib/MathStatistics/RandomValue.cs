@@ -559,26 +559,43 @@ namespace KMZILib
         }
 
         /// <summary>
-        /// Возвращает значение множественного коэффициента корреляции.
+        /// Возвращает значение множественного коэффициента корреляции. (MultipleCorrelationValue)
         /// </summary>
         /// <param name="CorrelationTable"></param>
         /// <param name="i"></param>
         /// <returns></returns>
-        public static double GetMultipleCorrelationValue(Matrix CorrelationTable, int i)
+        public static double GetMCV(Matrix CorrelationTable, int i)
         {
-            return Math.Sqrt(1 - Matrix.GetDefinite(CorrelationTable) / Matrix.GetMinor(CorrelationTable, i, i));
+            return Math.Sqrt(1 - CorrelationTable.Definite / Matrix.GetMinor(CorrelationTable, i, i));
         }
 
         /// <summary>
-        /// Возвращает значение частного коэффициента между переменными с индексами i и j.
+        /// Возвращает значение частного коэффициента между переменными с индексами i и j. (PartialCorrelationCoefficientValue)
         /// </summary>
         /// <param name="CorrelationTable"></param>
         /// <returns></returns>
-        public static double GetPartialCorrelationCoefficient(Matrix CorrelationTable, int i, int j)
+        public static double GetPCCV(Matrix CorrelationTable, int i, int j)
         {
             return Matrix.GetAlgebraicAddition(CorrelationTable, i, j) / Math.Sqrt(
                        Matrix.GetAlgebraicAddition(CorrelationTable, i, i) *
                        Matrix.GetAlgebraicAddition(CorrelationTable, j, j));
+        }
+
+        /// <summary>
+        /// Возвращает таблицу частных коэффициентов. (PartialCorrelationCoefficientTable)
+        /// </summary>
+        /// <param name="CorrelationTable"></param>
+        /// <returns></returns>
+        public static double[][] GetPCCT(Matrix CorrelationTable)
+        {
+            double[][] Result = new double[CorrelationTable.LengthY][].Select(row => new double[CorrelationTable.LengthY]).ToArray();
+            for (int i = 0; i < CorrelationTable.LengthY; i++)
+            {
+                for (int j = 0; j < i; j++)
+                    Result[i][j] = Result[j][i] = GetPCCV(CorrelationTable,i,j);
+                Result[i][i] = 1;
+            }
+            return Result;
         }
 
         private static readonly Dictionary<double, double> LaplasTable = new Dictionary<double, double>
