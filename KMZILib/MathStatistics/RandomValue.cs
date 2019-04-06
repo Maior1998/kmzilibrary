@@ -558,6 +558,29 @@ namespace KMZILib
             return CriticalChiSquared >= SourceChiSquared;
         }
 
+        /// <summary>
+        /// Возвращает значение множественного коэффициента корреляции.
+        /// </summary>
+        /// <param name="CorrelationTable"></param>
+        /// <param name="i"></param>
+        /// <returns></returns>
+        public static double GetMultipleCorrelationValue(Matrix CorrelationTable, int i)
+        {
+            return Math.Sqrt(1 - Matrix.GetDefinite(CorrelationTable) / Matrix.GetMinor(CorrelationTable, i, i));
+        }
+
+        /// <summary>
+        /// Возвращает значение частного коэффициента между переменными с индексами i и j.
+        /// </summary>
+        /// <param name="CorrelationTable"></param>
+        /// <returns></returns>
+        public static double GetPartialCorrelationCoefficient(Matrix CorrelationTable, int i, int j)
+        {
+            return Matrix.GetAlgebraicAddition(CorrelationTable, i, j) / Math.Sqrt(
+                       Matrix.GetAlgebraicAddition(CorrelationTable, i, i) *
+                       Matrix.GetAlgebraicAddition(CorrelationTable, j, j));
+        }
+
         private static readonly Dictionary<double, double> LaplasTable = new Dictionary<double, double>
         {
             {0, 0},

@@ -562,6 +562,19 @@ namespace KMZILib
         /// <param name="j"></param>
         /// <returns></returns>
         public static double GetMinor(Matrix Source, int i, int j) => GetDefinite(GetSubmatrix(Source, i, j));
+
+        /// <summary>
+        /// Возвращает алгебраическое дополнение для заданных матрицы и координат.
+        /// </summary>
+        /// <param name="Source"></param>
+        /// <param name="i"></param>
+        /// <param name="j"></param>
+        /// <returns></returns>
+        public static double GetAlgebraicAddition(Matrix Source, int i, int j)
+        {
+            return Math.Pow(-1, i + j) * GetMinor(Source, i, j);
+        }
+
         /// <summary>
         ///     Возвращает матрицу в виде массива коэффициентов.
         /// </summary>
