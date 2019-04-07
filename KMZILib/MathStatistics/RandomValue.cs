@@ -401,9 +401,7 @@ namespace KMZILib
         {
             return Math.Abs(PCCV) * Math.Sqrt((n - 2) / (1 - Math.Pow(PCCV, 2)));
         }
-
         
-
         /// <summary>
         /// Возвращает значение коэффициента корреляции Пирсона для двух заданных величин.
         /// </summary>
@@ -583,7 +581,7 @@ namespace KMZILib
         }
 
         /// <summary>
-        /// Возвращает значение частного коэффициента между переменными с индексами i и j. (PartialCorrelationCoefficientValue)
+        /// Возвращает значение частного коэффициента корреляции между переменными с индексами i и j. (PartialCorrelationCoefficientValue)
         /// </summary>
         /// <param name="CorrelationTable"></param>
         /// <returns></returns>
@@ -595,7 +593,7 @@ namespace KMZILib
         }
 
         /// <summary>
-        /// Возвращает таблицу частных коэффициентов. (PartialCorrelationCoefficientTable)
+        /// Возвращает таблицу частных коэффициентов корреляции. (PartialCorrelationCoefficientTable)
         /// </summary>
         /// <param name="CorrelationTable"></param>
         /// <returns></returns>
