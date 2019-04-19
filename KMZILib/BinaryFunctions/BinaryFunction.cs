@@ -66,12 +66,23 @@ namespace KMZILib
         }
 
         /// <summary>
-        /// Инициализирует новую бинарную функцию при помощи двоичного значения её вектора-столбца
+        /// Инициализирует новую бинарную функцию при помощи двоичного значения её вектора-столбца. Число переменных определяется автоматически.
         /// </summary>
         /// <param name="Source"></param>
         public BinaryFunction(int Source)
         {
-            ValuesArray = GetBinaryArray(Source);
+
+            ValuesArray = GetBinaryArray(Source,(int)Math.Ceiling(Math.Log(Source,2)));
+        }
+
+        /// <summary>
+        /// Инициализирует новую бинарную функцию с заданным числом переменных при помощи двоичного значения её вектора-столбца
+        /// </summary>
+        /// <param name="Source"></param>
+        /// <param name="VariablesCount"></param>
+        public BinaryFunction(int Source,int VariablesCount)
+        {
+            ValuesArray = GetBinaryArray(Source, (int)Math.Pow(2,VariablesCount));
         }
 
         /// <summary>

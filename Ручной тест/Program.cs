@@ -18,8 +18,14 @@ namespace Ручной_тест
         
         static void Main(string[] args)
         {
-              BinaryFunction test = new BinaryFunction(0b1100);
-              Console.WriteLine(string.Join("", test.ValuesArray));
+              BinaryFunction test = new BinaryFunction(0b1001,2);
+              BinaryFunction[] test2 = new[]
+              {
+                  new BinaryFunction(0b0110,2),
+                  new BinaryFunction(0b1101,2),
+                  new BinaryFunction(0b0100,2)
+              };
+              Console.WriteLine(test.Distance(test2));
 
         }
 
