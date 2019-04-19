@@ -44,7 +44,6 @@
     <Compile Include="Maths\AdvancedEuclidsalgorithm.cs" />
     <Compile Include="BinaryFunctions\BinaryFunction.cs" />
     <Compile Include="BinaryFunctions\BinaryRelationMatrix.cs" />
-    <Compile Include="BinaryFunctions\LRPN.cs" />
     <Compile Include="Ciphers\CaesarsCipher.cs" />
     <Compile Include="Ciphers\ALanguage.cs" />
     <Compile Include="Ciphers\SecretSharing.cs" />

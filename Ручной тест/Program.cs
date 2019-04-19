@@ -15,15 +15,11 @@ namespace Ручной_тест
 {
     class Program
     {
-        public static double[][] Test = new[]
-        {
-            new[] {1.0, 4, 7},
-            new[] {3.0, 0, 5},
-            new[] {-1.0, 9, 11}
-        };
+        
         static void Main(string[] args)
         {
-            Console.WriteLine(new Matrix( Test).Definite);  
+              BinaryFunction test = new BinaryFunction(0b1100);
+              Console.WriteLine(string.Join("", test.ValuesArray));
 
         }
 

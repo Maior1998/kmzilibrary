@@ -14,7 +14,7 @@ namespace KMZILib
     {
         private const string VariablesAlphabet = "ABCDXYZKMUWTQS";
 
-        private readonly bool[] ValuesArray;
+        public readonly bool[] ValuesArray;
 
         /// <summary>
         ///     Инициализирует случайную бинарную функцию заданной длины
@@ -45,11 +45,30 @@ namespace KMZILib
         }
 
         /// <summary>
-        ///     Инициализирует новую бинарную функцию при помощи знаков операций + | * | ()
+        /// Инициализирует новую бинарную функцию по имеющемуся столбцу её значений.
         /// </summary>
-        /// <param name="Function"></param>
-        public BinaryFunction(string Function) : this(LRPN.CalcLRPN.GetValues(Function))
+        /// <param name="Source"></param>
+        public BinaryFunction(int[] Source)
         {
+            ValuesArray = Source.Select(val => val == 1).ToArray();
+        }
+
+        /// <summary>
+        ///     Инициализирует новую бинарную функцию при помощи строки, представляющей столбец её значений
+        /// </summary>
+        /// <param name="Source"></param>
+        public BinaryFunction(string Source)
+        {
+            ValuesArray = Source.ToCharArray().Select(val => val == '1').ToArray();
+        }
+
+        /// <summary>
+        /// Инициализирует новую бинарную функцию при помощи двоичного значения её вектора-столбца
+        /// </summary>
+        /// <param name="Source"></param>
+        public BinaryFunction(int Source)
+        {
+            ValuesArray = GetBinaryArray(Source);
         }
 
         /// <summary>
@@ -571,7 +590,7 @@ namespace KMZILib
 
         private class DNF : IEquatable<DNF>
         {
-            public readonly bool?[] Values;
+            private readonly bool?[] Values;
             public bool IsParticiated;
 
             public DNF(bool?[] Source)
@@ -604,12 +623,12 @@ namespace KMZILib
                 }
             }
 
-            public int Length => Values.Length;
+            private int Length => Values.Length;
 
-            public bool? this[int index]
+            private bool? this[int index]
             {
                 get => Values[index];
-                private set => Values[index] = value;
+                set => Values[index] = value;
             }
 
             public bool Equals(DNF other)

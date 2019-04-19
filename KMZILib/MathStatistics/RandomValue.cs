@@ -392,16 +392,19 @@ namespace KMZILib
         }
 
         /// <summary>
-        /// Возвращает значение t значимости коэффициента корреляции Стюдента для заданного выборочного частного коэффициента корреляции и числа параметров.
+        /// Возвращает результат F-критерия или, другими словами, критерия Фишера. 
         /// </summary>
-        /// <param name="PCCV"></param>
-        /// <param name="n"></param>
+        /// <param name="DeterminationCoefficient">Коэффициент детерминации.</param>
+        /// <param name="TableLength">Число наблюдений.</param>
+        /// <param name="ColumnsLength">Число параметров.</param>
         /// <returns></returns>
-        public static double GetCSC(double PCCV, int n)
+        public static double FTest(double DeterminationCoefficient, int TableLength, int ColumnsLength)
         {
-            return Math.Abs(PCCV) * Math.Sqrt((n - 2) / (1 - Math.Pow(PCCV, 2)));
+            double Result = DeterminationCoefficient / (ColumnsLength - 1);
+            Result *= (TableLength - ColumnsLength) / (1 - DeterminationCoefficient);
+            return Result;
         }
-        
+
         /// <summary>
         /// Возвращает значение коэффициента корреляции Пирсона для двух заданных величин.
         /// </summary>
@@ -411,7 +414,7 @@ namespace KMZILib
         public static double GetCorrelationValue(RandomValue First, RandomValue Second)
         {
             if (First.Count!=Second.Count)
-                throw new InvalidOperationException("Число элементов в влеичинах должно совпадать.");
+                throw new InvalidOperationException("Число элементов в величинах должно совпадать.");
             int n = First.Count;
             double Numerator = n * First.Values.Select((elem, ind) => elem * Second.Values[ind]).Sum() - First.Sum*Second.Sum;
             double Denominator =
@@ -609,6 +612,72 @@ namespace KMZILib
             return Result;
         }
 
+        /// <summary>
+        /// Возвращает значение t значимости коэффициента корреляции Стюдента для заданного выборочного частного коэффициента корреляции и числа параметров.
+        /// </summary>
+        /// <param name="PCCV"></param>
+        /// <param name="n"></param>
+        /// <returns></returns>
+        public static double GetCSC(double PCCV, int n)
+        {
+            return Math.Abs(PCCV) * Math.Sqrt((n - 2) / (1 - Math.Pow(PCCV, 2)));
+        }
+
+        /// <summary>
+        /// Возвращает критическое значение для значимости коэффициента корреляции Стюдента при a = 0.95 и заданного числа степеней свободы.
+        /// </summary>
+        /// <param name="FreedomDegree"></param>
+        /// <returns></returns>
+        public static double GetCSCCritical(int FreedomDegree) => CSCCritical[FreedomDegree];
+
+        /// <summary>
+        /// Возвращает критической значение критерия хи-квадрат для a = 0.05 с заданным числом степеней свободы.
+        /// </summary>
+        /// <param name="CountFreeDegree"></param>
+        /// <returns></returns>
+        public static double GetChiSquaredCritical(int CountFreeDegree) => ChiSquaredCriticals[CountFreeDegree - 1];
+        private static readonly double[] ChiSquaredCriticals =
+        {
+            3.84146, 5.99146, 7.81473, 9.48773, 11.0705, 12.59159, 14.06714, 15.50731, 16.91898, 18.30704, 19.67514,
+            21.02607, 22.36203, 23.68479, 24.99579, 26.29623, 27.58711, 28.8693, 30.14353, 31.41043, 32.67057, 33.92444,
+            35.17246, 36.41503, 37.65248, 38.88514, 40.11327, 41.33714, 42.55697, 43.77297
+        };
+        /// <summary>
+        /// Критические значения для значимости коэффициента корреляции Стюдента при a = 0.95.
+        /// </summary>
+        private static readonly Dictionary<int, double> CSCCritical = new Dictionary<int, double>()
+        {
+            {1, 12.706},
+            {2, 4.302},
+            {3, 3.182},
+            {4, 2.776},
+            {5, 2.57},
+            {6, 2.446},
+            {7, 2.3646},
+            {8, 2.306},
+            {9, 2.2622},
+            {10, 2.2281},
+            {11, 2.201},
+            {12, 2.1788},
+            {13, 2.1604},
+            {14, 2.1448},
+            {15, 2.1314},
+            {16, 2.119},
+            {17, 2.1098},
+            {18, 2.1009},
+            {19, 2.093},
+            {20, 2.086},
+            {21, 2.0790},
+            {22, 2.0739},
+            {23, 2.0687},
+            {24, 2.0639},
+            {25, 2.0595},
+            {26, 2.059},
+            {27, 2.0518},
+            {28, 2.0484},
+            {29, 2.0452},
+            {30, 2.0423}
+        };
         private static readonly Dictionary<double, double> LaplasTable = new Dictionary<double, double>
         {
             {0, 0},
@@ -869,62 +938,6 @@ namespace KMZILib
             {4, 0.49996},
             {4.5, 0.49999},
             {5, 0.49999}
-        };
-
-        /// <summary>
-        /// Возвращает критическое значение для значимости коэффициента корреляции Стюдента при a = 0.95 и заданного числа степеней свободы.
-        /// </summary>
-        /// <param name="FreedomDegree"></param>
-        /// <returns></returns>
-        public static double GetCSCCritical(int FreedomDegree) => CSCCritical[FreedomDegree];
-        /// <summary>
-        /// Критические значения для значимости коэффициента корреляции Стюдента при a = 0.95.
-        /// </summary>
-        private static readonly Dictionary<int, double> CSCCritical = new Dictionary<int, double>()
-        {
-            {1, 12.706},
-            {2, 4.302},
-            {3, 3.182},
-            {4, 2.776},
-            {5, 2.57},
-            {6, 2.446},
-            {7, 2.3646},
-            {8, 2.306},
-            {9, 2.2622},
-            {10, 2.2281},
-            {11, 2.201},
-            {12, 2.1788},
-            {13, 2.1604},
-            {14, 2.1448},
-            {15, 2.1314},
-            {16, 2.119},
-            {17, 2.1098},
-            {18, 2.1009},
-            {19, 2.093},
-            {20, 2.086},
-            {21, 2.0790},
-            {22, 2.0739},
-            {23, 2.0687},
-            {24, 2.0639},
-            {25, 2.0595},
-            {26, 2.059},
-            {27, 2.0518},
-            {28, 2.0484},
-            {29, 2.0452},
-            {30, 2.0423}
-        };
-
-        /// <summary>
-        /// Возвращает критической значение критерия хи-квадрат для a = 0.05 с заданным числом степеней свободы.
-        /// </summary>
-        /// <param name="CountFreeDegree"></param>
-        /// <returns></returns>
-        public static double GetChiSquaredCritical(int CountFreeDegree) => ChiSquaredCriticals[CountFreeDegree - 1];
-        private static readonly double[] ChiSquaredCriticals =
-        {
-            3.84146, 5.99146, 7.81473, 9.48773, 11.0705, 12.59159, 14.06714, 15.50731, 16.91898, 18.30704, 19.67514,
-            21.02607, 22.36203, 23.68479, 24.99579, 26.29623, 27.58711, 28.8693, 30.14353, 31.41043, 32.67057, 33.92444,
-            35.17246, 36.41503, 37.65248, 38.88514, 40.11327, 41.33714, 42.55697, 43.77297
         };
     }
 }
