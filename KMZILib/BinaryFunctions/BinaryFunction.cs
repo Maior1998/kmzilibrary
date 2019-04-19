@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Security;
 using System.Text;
 
 namespace KMZILib
@@ -14,19 +15,21 @@ namespace KMZILib
     {
         private const string VariablesAlphabet = "ABCDXYZKMUWTQS";
 
+        /// <summary>
+        /// Столбец значений функции.
+        /// </summary>
         public readonly bool[] ValuesArray;
 
         /// <summary>
         ///     Инициализирует случайную бинарную функцию заданной длины
         /// </summary>
-        /// <param name="Length">Длина столбца-значений функции</param>
+        /// <param name="Length">Число переменных функции</param>
         public BinaryFunction(byte Length)
         {
             ValuesArray = new bool[(int)Math.Pow(2, Length)];
 
-            Random rand = new Random();
             for (int i = 0; i < ValuesArray.Length; i++)
-                ValuesArray[i] = rand.Next(2) == 1;
+                ValuesArray[i] = RD.Rand.Next(2) == 1;
         }
 
         /// <summary>
@@ -77,6 +80,11 @@ namespace KMZILib
         public string Value => string.Join("", ValuesArray.Select(i => i ? 1 : 0));
 
         /// <summary>
+        /// Возвращает вес текущей функции или, другими словами, число единиц в её векторе-значений.
+        /// </summary>
+        public int Weight => ValuesArray.Count(val => val);
+
+        /// <summary>
         ///     Таблица истинности данной булевой функции
         /// </summary>
         public bool[,] TruthTable
@@ -102,8 +110,6 @@ namespace KMZILib
         /// </summary>
         public byte CountOfVariables => (byte)Math.Log(ValuesArray.Length, 2);
 
-
-        //T0 T1 Ts Tm Tl
         /// <summary>
         ///     Свойство функции, показывающее, принадлежит ли она классу функций, сохраняющих нуль
         /// </summary>
@@ -442,6 +448,63 @@ namespace KMZILib
         }
 
         /// <summary>
+        /// Возвращает расстояние между текущей и заданной функциями или, другими словами, число различающихся значений их векторов-столбцов.
+        /// </summary>
+        /// <param name="Other"></param>
+        /// <returns></returns>
+        public int Distance(BinaryFunction Other)
+        {
+            return Distance(this, Other);
+        }
+
+        /// <summary>
+        /// Возвращает расстояние между двумя функциями или, другими словами, число различающихся значений их векторов-столбцов.
+        /// </summary>
+        /// <param name="First"></param>
+        /// <param name="Second"></param>
+        /// <returns></returns>
+        public static int Distance(BinaryFunction First, BinaryFunction Second)
+        {
+            if(First.ValuesArray.Length!=Second.ValuesArray.Length)
+                throw new InvalidOperationException("Длины столбцов-значений функций ддолжны совпадать.");
+
+            return First.ValuesArray.Select((val, ind) => val ^ Second.ValuesArray[ind]).Count(val => val);
+        }
+
+
+        /// <summary>
+        /// Возвращает расстояние от текущей функции до заданного множества функций или, другими словами, минимальное расстояние между всевозможными переборами.
+        /// </summary>
+        /// <param name="Second"></param>
+        /// <returns></returns>
+        public int Distance(BinaryFunction[] Second)
+        {
+            return Distance(this, Second);
+        }
+
+        /// <summary>
+        /// Возвращает расстояние между заданной функцией и множеством функций или, другими словами, минимальное расстояние между всевозможными переборами.
+        /// </summary>
+        /// <param name="First"></param>
+        /// <param name="Second"></param>
+        /// <returns></returns>
+        public static int Distance(BinaryFunction First, BinaryFunction[] Second)
+        {
+            return Distance(new[] {First}, Second);
+        }
+
+        /// <summary>
+        /// Возвращает расстояние между двумя множествами функций или, другими словами, минимальное расстояние между всевозможными переборами.
+        /// </summary>
+        /// <param name="First"></param>
+        /// <param name="Second"></param>
+        /// <returns></returns>
+        public static int Distance(BinaryFunction[] First, BinaryFunction[] Second)
+        {
+            return First.Select(func1 => Second.Select(func2 => func2.Distance(func1)).Min()).Min();
+        }
+
+        /// <summary>
         ///     Строковое представление функции. Возвращается свойство <see cref="Value" />
         /// </summary>
         /// <returns>Строка-представление функции</returns>
@@ -499,6 +562,7 @@ namespace KMZILib
         {
             return string.Concat(GetBinaryArray(Number).Select(val => val ? '1' : '0'));
         }
+
         /// <summary>
         ///     Возвращает бинарное представление целого числа с заданным числом разрядов.
         ///     (младших бит)
