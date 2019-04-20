@@ -72,7 +72,7 @@ namespace KMZILib
         public BinaryFunction(int Source)
         {
 
-            ValuesArray = GetBinaryArray(Source,(int)Math.Ceiling(Math.Log(Source,2)));
+            ValuesArray = GetBinaryArray(Source, (int)Math.Ceiling(Math.Log(Source, 2)));
         }
 
         /// <summary>
@@ -80,9 +80,9 @@ namespace KMZILib
         /// </summary>
         /// <param name="Source"></param>
         /// <param name="VariablesCount"></param>
-        public BinaryFunction(int Source,int VariablesCount)
+        public BinaryFunction(int Source, int VariablesCount)
         {
-            ValuesArray = GetBinaryArray(Source, (int)Math.Pow(2,VariablesCount));
+            ValuesArray = GetBinaryArray(Source, (int)Math.Pow(2, VariablesCount));
         }
 
         /// <summary>
@@ -476,12 +476,63 @@ namespace KMZILib
         /// <returns></returns>
         public static int Distance(BinaryFunction First, BinaryFunction Second)
         {
-            if(First.ValuesArray.Length!=Second.ValuesArray.Length)
+            if (First.ValuesArray.Length != Second.ValuesArray.Length)
                 throw new InvalidOperationException("Длины столбцов-значений функций ддолжны совпадать.");
 
             return First.ValuesArray.Select((val, ind) => val ^ Second.ValuesArray[ind]).Count(val => val);
         }
 
+        /// <summary>
+        /// Возвращает массив-формулу преобразования Фурье для заданной булевой функции
+        /// </summary>
+        /// <param name="Source"></param>
+        /// <returns></returns>
+        public static bool[][] GetFourierTransformFormula(BinaryFunction Source)
+        {
+            List<bool[]> FourierTransformFormula = new List<bool[]>();
+            for (int i = 0; i < Source.ValuesArray.Length; i++)
+            {
+                if (!Source.ValuesArray[i])
+                    continue;
+                FourierTransformFormula.Add(GetBinaryArray(i, Source.CountOfVariables));
+            }
+
+            return FourierTransformFormula.ToArray();
+        }
+
+        /// <summary>
+        /// Возвращает строковое представления формулы преобразования Фурье для заданной функции.
+        /// </summary>
+        /// <param name="Source"></param>
+        /// <returns></returns>
+        public static string GetFourierTransformString(BinaryFunction Source)
+        {
+            bool[][] FourierTransformFormula = GetFourierTransformFormula(Source);
+            StringBuilder Result = new StringBuilder(FourierTransformFormula[0].All(boo => !boo) ? "1" : $"(-1)^{string.Join("⊕", FourierTransformFormula[0].Select((val, ind) => $"u{ind + 1}").Where((val, ind) => FourierTransformFormula[0][ind]))}");
+            for (int i = 1; i < FourierTransformFormula.Length; i++)
+            {
+                Result.Append(
+                    $" + (-1)^{string.Join("⊕", FourierTransformFormula[i].Select((val, ind) => $"u{ind + 1}").Where((val, ind) => FourierTransformFormula[i][ind]))}");
+            }
+
+            return Result.ToString();
+        }
+
+        /// <summary>
+        /// Возвращает спектр Фурье для заданной булевой функции.
+        /// </summary>
+        /// <param name="Source"></param>
+        /// <returns></returns>
+        public static int[] FourierSpectrum(BinaryFunction Source)
+        {
+            bool[][] FourierTransformFormula = GetFourierTransformFormula(Source);
+
+            for (int i = 0; i < Source.ValuesArray.Length; i++)
+            {
+
+            }
+            return null;
+        }
 
         /// <summary>
         /// Возвращает расстояние от текущей функции до заданного множества функций или, другими словами, минимальное расстояние между всевозможными переборами.
@@ -501,7 +552,7 @@ namespace KMZILib
         /// <returns></returns>
         public static int Distance(BinaryFunction First, BinaryFunction[] Second)
         {
-            return Distance(new[] {First}, Second);
+            return Distance(new[] { First }, Second);
         }
 
         /// <summary>
@@ -523,6 +574,7 @@ namespace KMZILib
         {
             return Value;
         }
+
 
         /// <summary>
         ///     Возвращает значение целого числа в виде массива двоичных значений в указанном количество от его начала
@@ -583,7 +635,7 @@ namespace KMZILib
         /// <returns>Строка - двоичное представление числа</returns>
         public static string GetBinaryString(BigInteger Number, int Count)
         {
-            return string.Concat(GetBinaryArray(Number,Count).Select(val => val ? '1' : '0'));
+            return string.Concat(GetBinaryArray(Number, Count).Select(val => val ? '1' : '0'));
         }
 
         /// <summary>
