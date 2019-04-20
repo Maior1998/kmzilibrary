@@ -541,6 +541,62 @@ namespace KMZILib
         }
 
         /// <summary>
+        /// Возвращает массив-формулу преобразования Уолша-Адамара для заданной булевой функции
+        /// </summary>
+        /// <param name="Source"></param>
+        /// <returns></returns>
+        public static (bool[],bool)[] GetWalshHadamardTransformFormula(BinaryFunction Source)
+        {
+            List<(bool[],bool)> FourierTransformFormula = new List<(bool[],bool)>();
+            for (int i = 0; i < Source.ValuesArray.Length; i++)
+            {
+                FourierTransformFormula.Add((GetBinaryArray(i, Source.CountOfVariables),Source.ValuesArray[i]));
+            }
+
+            return FourierTransformFormula.ToArray();
+        }
+
+        /// <summary>
+        /// Возвращает строковое представления формулы преобразования Уолша-Адамара для заданной функции.
+        /// </summary>
+        /// <param name="Source"></param>
+        /// <returns></returns>
+        public static string GetWalshHadamardTransformString(BinaryFunction Source)
+        {
+            (bool[],bool)[] WalshHadamardTransformFormula = GetWalshHadamardTransformFormula(Source);
+            StringBuilder Result = new StringBuilder(WalshHadamardTransformFormula[0].Item1.All(boo => !boo) ? WalshHadamardTransformFormula[0].Item2?"-1":"1" : $"(-1)^{string.Join("⊕", WalshHadamardTransformFormula[0].Item1.Select((val, ind) => $"u{ind + 1}").Where((val, ind) => WalshHadamardTransformFormula[0].Item1[ind]))}");
+            for (int i = 1; i < WalshHadamardTransformFormula.Length; i++)
+            {
+                Result.Append(
+                    $" + (-1)^{string.Join("⊕", WalshHadamardTransformFormula[i].Item1.Select((val, ind) => $"u{ind + 1}").Where((val, ind) => WalshHadamardTransformFormula[i].Item1[ind]))}{(Source.ValuesArray[i]? "⊕1" : "")}");
+            }
+
+            return Result.ToString();
+        }
+
+        /// <summary>
+        /// Возвращает спектр Уолша-Адамара для заданной булевой функции.
+        /// </summary>
+        /// <param name="Source"></param>
+        /// <returns></returns>
+        public static int[] WalshHadamardSpectrum(BinaryFunction Source)
+        {
+            (bool[], bool)[] WalshHadamardTransformFormula = GetWalshHadamardTransformFormula(Source);
+
+            int[] Result = new int[Source.ValuesArray.Length];
+            for (int i = 0; i < Source.ValuesArray.Length; i++)
+            {
+                bool[] CurrentSet = GetBinaryArray(i, Source.CountOfVariables);
+                Result[i] = WalshHadamardTransformFormula[0].Item1.All(boo => !boo) ? WalshHadamardTransformFormula[0].Item2?-1:1 : 0;
+                for (int j = WalshHadamardTransformFormula[0].Item1.All(boo => !boo) ? 1 : 0; j < WalshHadamardTransformFormula.Length; j++)
+                {
+                    Result[i] += (int)Math.Pow(-1, CurrentSet.Where((val, ind) => WalshHadamardTransformFormula[j].Item1[ind]).Aggregate(false, (Current, next) => Current ^ next)^ WalshHadamardTransformFormula[j].Item2 ? 1 : 0);
+                }
+            }
+            return Result;
+        }
+
+        /// <summary>
         /// Возвращает расстояние от текущей функции до заданного множества функций или, другими словами, минимальное расстояние между всевозможными переборами.
         /// </summary>
         /// <param name="Second"></param>

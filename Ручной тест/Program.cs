@@ -18,9 +18,9 @@ namespace Ручной_тест
         
         static void Main(string[] args)
         {
-            BinaryFunction test = new BinaryFunction(0b01011001, 3);
-            Console.WriteLine(BinaryFunction.GetFourierTransformString(test));
-            Console.WriteLine($"{string.Join("\n",BinaryFunction.FourierSpectrum(test))}");
+            BinaryFunction test = new BinaryFunction(0b11011001, 3);
+            Console.WriteLine(BinaryFunction.GetWalshHadamardTransformString(test));
+            Console.WriteLine($"{string.Join("\n",BinaryFunction.WalshHadamardSpectrum(test))}");
 
         }
 
