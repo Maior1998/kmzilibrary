@@ -527,11 +527,17 @@ namespace KMZILib
         {
             bool[][] FourierTransformFormula = GetFourierTransformFormula(Source);
 
+            int[] Result = new int[Source.ValuesArray.Length];
             for (int i = 0; i < Source.ValuesArray.Length; i++)
             {
-
+                bool[] CurrentSet = GetBinaryArray(i, Source.CountOfVariables);
+                Result[i] = FourierTransformFormula[0].All(boo => !boo) ? 1 : 0;
+                for (int j = 1; j < FourierTransformFormula.Length; j++)
+                {
+                    Result[i] += (int) Math.Pow(-1, CurrentSet.Where((val,ind)=>FourierTransformFormula[j][ind]).Aggregate(false,(Current,next)=>Current^next)?1:0);
+                }
             }
-            return null;
+            return Result;
         }
 
         /// <summary>
