@@ -15,10 +15,21 @@ namespace KMZILib
     {
         private const string VariablesAlphabet = "ABCDXYZKMUWTQS";
 
+        private bool[] valuesarray;
+
         /// <summary>
         /// Столбец значений функции.
         /// </summary>
-        public readonly bool[] ValuesArray;
+        public bool[] ValuesArray
+        {
+            get => valuesarray;
+            set
+            {
+                if(value.Length!=(int)Math.Pow(2, new byte[32].Select((val, ind) => ind + 1).First(val => Math.Pow(2, val) >= value.Length)))
+                    throw new InvalidOperationException("Длина столбца значений должна быть степенью 2.");
+                valuesarray = value;
+            }
+        }
 
         /// <summary>
         ///     Инициализирует случайную бинарную функцию заданной длины
@@ -523,7 +534,7 @@ namespace KMZILib
         /// </summary>
         /// <param name="Source"></param>
         /// <returns></returns>
-        public static int[] FourierSpectrum(BinaryFunction Source)
+        public static int[] GetFourierSpectrum(BinaryFunction Source)
         {
             bool[][] FourierTransformFormula = GetFourierTransformFormula(Source);
 
@@ -579,7 +590,7 @@ namespace KMZILib
         /// </summary>
         /// <param name="Source"></param>
         /// <returns></returns>
-        public static int[] WalshHadamardSpectrum(BinaryFunction Source)
+        public static int[] GetWalshHadamardSpectrum(BinaryFunction Source)
         {
             (bool[], bool)[] WalshHadamardTransformFormula = GetWalshHadamardTransformFormula(Source);
 

@@ -18,9 +18,8 @@ namespace Ручной_тест
         
         static void Main(string[] args)
         {
-            BinaryFunction test = new BinaryFunction(0b11011001, 3);
-            Console.WriteLine(BinaryFunction.GetWalshHadamardTransformString(test));
-            Console.WriteLine($"{string.Join("\n",BinaryFunction.WalshHadamardSpectrum(test))}");
+            int length = 6;
+            Console.WriteLine(Math.Pow(2,new int[32].Select((val,ind)=>ind+1).First(val=>Math.Pow(2,val)>=length)));
 
         }
 
