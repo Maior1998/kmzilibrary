@@ -18,7 +18,9 @@ namespace Ручной_тест
         
         static void Main(string[] args)
         {
-            Console.WriteLine($"{string.Join("\n",BinaryFunction.FourierSpectrum(new BinaryFunction(0b11011001, 3)))}");
+            BinaryFunction test = new BinaryFunction(0b01011001, 3);
+            Console.WriteLine(BinaryFunction.GetFourierTransformString(test));
+            Console.WriteLine($"{string.Join("\n",BinaryFunction.FourierSpectrum(test))}");
 
         }
 
