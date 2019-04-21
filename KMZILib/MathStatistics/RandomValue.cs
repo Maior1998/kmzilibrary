@@ -631,6 +631,26 @@ namespace KMZILib
         public static double GetCSCCritical(int FreedomDegree) => CSCCritical[FreedomDegree];
 
         /// <summary>
+        /// Возвращает регрессионное уравнения для заданных столбцов-параметров и результирующего столбца матрицы наблюдений.
+        /// </summary>
+        /// <param name="Parametres"></param>
+        /// <param name="ResultValue"></param>
+        /// <returns></returns>
+        public static double[] GetRegressionEquation(RandomValue[] Parametres, RandomValue ResultValue)
+        {
+            double[][] XArray = new double[Parametres.First().Count][];
+            for (int i = 0; i < XArray.Length; i++)
+            {
+                XArray[i]= new double[Parametres.Length+1];
+                XArray[i][0] = 1;
+                Parametres.Select(param=>param.Values[i]).ToArray().CopyTo(XArray,1);
+            }
+            Matrix X = new Matrix(XArray);
+            Matrix Y = new Matrix(new []{ResultValue.Values}).Transpose();
+            return ((X.TransposedCopy() * X).Reverse * X.TransposedCopy() * Y).TransposedCopy().Values[0];
+        }
+
+        /// <summary>
         /// Возвращает критической значение критерия хи-квадрат для a = 0.05 с заданным числом степеней свободы.
         /// </summary>
         /// <param name="CountFreeDegree"></param>
@@ -643,7 +663,7 @@ namespace KMZILib
             35.17246, 36.41503, 37.65248, 38.88514, 40.11327, 41.33714, 42.55697, 43.77297
         };
         /// <summary>
-        /// Критические значения для значимости коэффициента корреляции Стюдента при a = 0.95.
+        /// Критические значения для значимости коэффициента корреляции Стьюдента при a = 0.95.
         /// </summary>
         private static readonly Dictionary<int, double> CSCCritical = new Dictionary<int, double>()
         {
