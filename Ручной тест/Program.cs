@@ -18,8 +18,9 @@ namespace Ручной_тест
         
         static void Main(string[] args)
         {
-            int length = 6;
-            Console.WriteLine(Math.Pow(2,new int[32].Select((val,ind)=>ind+1).First(val=>Math.Pow(2,val)>=length)));
+            BinaryFunction a = new BinaryFunction(0b11001011, 3);
+            Console.WriteLine(a.ZhegalkinPolynomial);
+            Console.WriteLine(a.Degree);
 
         }
 

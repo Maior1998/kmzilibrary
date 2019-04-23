@@ -233,6 +233,31 @@ namespace KMZILib
         }
 
         /// <summary>
+        /// Степень данной функции в её АНФ.
+        /// </summary>
+        public int Degree
+        {
+            get
+            {
+                bool[][] PascalTriangle = new bool[ValuesArray.Length][];
+                PascalTriangle[0] = ValuesArray;
+                for (int i = 1; i < ValuesArray.Length; i++)
+                {
+                    //i - строка в треугольнике Паскаля
+                    //каждая последующая строка на 1 короче предыдущей
+                    PascalTriangle[i] = new bool[PascalTriangle[i - 1].Length - 1];
+                    for (int j = 0; j < PascalTriangle[i].Length; j++)
+                        PascalTriangle[i][j] = PascalTriangle[i - 1][j] ^ PascalTriangle[i - 1][j + 1];
+                }
+
+                //Треугольник Паскаля заполнен.
+                return new int[PascalTriangle.Length].Select((val, ind) => ind)
+                    .Where(val => PascalTriangle[val][0]).Select(index => GetBinaryArray(index).Count(val => val))
+                    .Max();
+            }
+        }
+
+        /// <summary>
         ///     Строковое представление СДНФ функции
         /// </summary>
         public string PDNF
