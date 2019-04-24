@@ -25,7 +25,7 @@ namespace KMZILib
             get => valuesarray;
             set
             {
-                if(value.Length!=(int)Math.Pow(2, new byte[32].Select((val, ind) => ind + 1).First(val => Math.Pow(2, val) >= value.Length)))
+                if (value.Length != (int)Math.Pow(2, new byte[32].Select((val, ind) => ind + 1).First(val => Math.Pow(2, val) >= value.Length)))
                     throw new InvalidOperationException("Длина столбца значений должна быть степенью 2.");
                 valuesarray = value;
             }
@@ -575,7 +575,7 @@ namespace KMZILib
                 Result[i] = FourierTransformFormula[0].All(boo => !boo) ? 1 : 0;
                 for (int j = FourierTransformFormula[0].All(boo => !boo) ? 1 : 0; j < FourierTransformFormula.Length; j++)
                 {
-                    Result[i] += (int) Math.Pow(-1, CurrentSet.Where((val,ind)=>FourierTransformFormula[j][ind]).Aggregate(false,(Current,next)=>Current^next)?1:0);
+                    Result[i] += (int)Math.Pow(-1, CurrentSet.Where((val, ind) => FourierTransformFormula[j][ind]).Aggregate(false, (Current, next) => Current ^ next) ? 1 : 0);
                 }
             }
             return Result;
@@ -589,25 +589,25 @@ namespace KMZILib
         /// <returns></returns>
         public static bool IsStable(BinaryFunction Source, int m)
         {
-            if(m>=Source.CountOfVariables)
+            if (m >= Source.CountOfVariables)
                 throw new InvalidOperationException("Число m должно быть меньше числа аргументов функции.");
 
             for (int FixedVariablesCount = 1; FixedVariablesCount <= m; FixedVariablesCount++)
             {
                 //Выбираем, какие переменные фиксировать. Задаем наборы, в которых на местах фиксированных переменных будут 1, на месте свободных 0.
                 List<bool[]> States = new List<bool[]>();
-                for (int i = 0; i < (int) Math.Pow(2, Source.CountOfVariables); i++)
+                for (int i = 0; i < (int)Math.Pow(2, Source.CountOfVariables); i++)
                 {
-                    bool[] CurrentSet = GetBinaryArray(i,Source.CountOfVariables);
-                    if(CurrentSet.Count(val=>val)!=FixedVariablesCount)
+                    bool[] CurrentSet = GetBinaryArray(i, Source.CountOfVariables);
+                    if (CurrentSet.Count(val => val) != FixedVariablesCount)
                         continue;
-                    if(States.Any(set=>set.Select((boo,ind)=>boo==CurrentSet[ind]).All(boo=>boo)))
+                    if (States.Any(set => set.Select((boo, ind) => boo == CurrentSet[ind]).All(boo => boo)))
                         continue;
                     States.Add(CurrentSet);
                     //Выбрали, какие переменные зафиксировать.
 
                     //Создаем словарь, где ключи - конкретный зафиксированный набор, а значения - значения столбца функции в таких наборах
-                    Dictionary<bool[],List<bool>> NewFunctions=new Dictionary<bool[], List<bool>>();
+                    Dictionary<bool[], List<bool>> NewFunctions = new Dictionary<bool[], List<bool>>();
                     for (int j = 0; j < Source.ValuesArray.Length; j++)
                     {
                         //Текущая строка таблицы истинности
@@ -623,11 +623,12 @@ namespace KMZILib
                         }
                         else
                         {
-                            NewFunctions.Add(CurrentFuncSet,new List<bool>(new []{FuncValue}));
+                            NewFunctions.Add(CurrentFuncSet, new List<bool>(new[] { FuncValue }));
                         }
                     }
 
-                    if (NewFunctions.Values.Any(val => !new BinaryFunction(val.ToArray()).IsEquilibrium)) return false;
+                    if (NewFunctions.Values.Any(val => !new BinaryFunction(val.ToArray()).IsEquilibrium))
+                        return false;
                 }
             }
 
@@ -636,16 +637,69 @@ namespace KMZILib
         }
 
         /// <summary>
+        /// Определяет, является ли заданная функция m-устойчивой.
+        /// </summary>
+        /// <param name="Source"></param>
+        /// <param name="m"></param>
+        /// <returns></returns>
+        public static int GetMaxStableValue(BinaryFunction Source)
+        {
+            int FixedVariablesCount = 1;
+            for (; FixedVariablesCount <= Source.CountOfVariables; FixedVariablesCount++)
+            {
+                //Выбираем, какие переменные фиксировать. Задаем наборы, в которых на местах фиксированных переменных будут 1, на месте свободных 0.
+                List<bool[]> States = new List<bool[]>();
+                for (int i = 0; i < (int)Math.Pow(2, Source.CountOfVariables); i++)
+                {
+                    bool[] CurrentSet = GetBinaryArray(i, Source.CountOfVariables);
+                    if (CurrentSet.Count(val => val) != FixedVariablesCount)
+                        continue;
+                    if (States.Any(set => set.Select((boo, ind) => boo == CurrentSet[ind]).All(boo => boo)))
+                        continue;
+                    States.Add(CurrentSet);
+                    //Выбрали, какие переменные зафиксировать.
+
+                    //Создаем словарь, где ключи - конкретный зафиксированный набор, а значения - значения столбца функции в таких наборах
+                    Dictionary<bool[], List<bool>> NewFunctions = new Dictionary<bool[], List<bool>>();
+                    for (int j = 0; j < Source.ValuesArray.Length; j++)
+                    {
+                        //Текущая строка таблицы истинности
+                        bool[] CurrentFuncSet = GetBinaryArray(j, Source.CountOfVariables);
+                        bool FuncValue = Source.ValuesArray[j];
+                        if (NewFunctions.Keys.Any(row =>
+                            row.Select((variable, index) => !CurrentSet[index] || variable == CurrentFuncSet[index])
+                                .All(res => res)))
+                        {
+                            NewFunctions[NewFunctions.Keys.First(row =>
+                                row.Select((variable, index) => !CurrentSet[index] || variable == CurrentFuncSet[index])
+                                    .All(res => res))].Add(FuncValue);
+                        }
+                        else
+                        {
+                            NewFunctions.Add(CurrentFuncSet, new List<bool>(new[] { FuncValue }));
+                        }
+                    }
+
+                    if (NewFunctions.Values.Any(val => !new BinaryFunction(val.ToArray()).IsEquilibrium))
+                        return FixedVariablesCount-1;
+                }
+            }
+
+
+            return FixedVariablesCount-1;
+        }
+
+        /// <summary>
         /// Возвращает массив-формулу преобразования Уолша-Адамара для заданной булевой функции
         /// </summary>
         /// <param name="Source"></param>
         /// <returns></returns>
-        public static (bool[],bool)[] GetWalshHadamardTransformFormula(BinaryFunction Source)
+        public static (bool[], bool)[] GetWalshHadamardTransformFormula(BinaryFunction Source)
         {
-            List<(bool[],bool)> FourierTransformFormula = new List<(bool[],bool)>();
+            List<(bool[], bool)> FourierTransformFormula = new List<(bool[], bool)>();
             for (int i = 0; i < Source.ValuesArray.Length; i++)
             {
-                FourierTransformFormula.Add((GetBinaryArray(i, Source.CountOfVariables),Source.ValuesArray[i]));
+                FourierTransformFormula.Add((GetBinaryArray(i, Source.CountOfVariables), Source.ValuesArray[i]));
             }
 
             return FourierTransformFormula.ToArray();
@@ -658,12 +712,12 @@ namespace KMZILib
         /// <returns></returns>
         public static string GetWalshHadamardTransformString(BinaryFunction Source)
         {
-            (bool[],bool)[] WalshHadamardTransformFormula = GetWalshHadamardTransformFormula(Source);
-            StringBuilder Result = new StringBuilder(WalshHadamardTransformFormula[0].Item1.All(boo => !boo) ? WalshHadamardTransformFormula[0].Item2?"-1":"1" : $"(-1)^{string.Join("⊕", WalshHadamardTransformFormula[0].Item1.Select((val, ind) => $"u{ind + 1}").Where((val, ind) => WalshHadamardTransformFormula[0].Item1[ind]))}");
+            (bool[], bool)[] WalshHadamardTransformFormula = GetWalshHadamardTransformFormula(Source);
+            StringBuilder Result = new StringBuilder(WalshHadamardTransformFormula[0].Item1.All(boo => !boo) ? WalshHadamardTransformFormula[0].Item2 ? "-1" : "1" : $"(-1)^{string.Join("⊕", WalshHadamardTransformFormula[0].Item1.Select((val, ind) => $"u{ind + 1}").Where((val, ind) => WalshHadamardTransformFormula[0].Item1[ind]))}");
             for (int i = 1; i < WalshHadamardTransformFormula.Length; i++)
             {
                 Result.Append(
-                    $" + (-1)^{string.Join("⊕", WalshHadamardTransformFormula[i].Item1.Select((val, ind) => $"u{ind + 1}").Where((val, ind) => WalshHadamardTransformFormula[i].Item1[ind]))}{(Source.ValuesArray[i]? "⊕1" : "")}");
+                    $" + (-1)^{string.Join("⊕", WalshHadamardTransformFormula[i].Item1.Select((val, ind) => $"u{ind + 1}").Where((val, ind) => WalshHadamardTransformFormula[i].Item1[ind]))}{(Source.ValuesArray[i] ? "⊕1" : "")}");
             }
 
             return Result.ToString();
@@ -682,10 +736,10 @@ namespace KMZILib
             for (int i = 0; i < Source.ValuesArray.Length; i++)
             {
                 bool[] CurrentSet = GetBinaryArray(i, Source.CountOfVariables);
-                Result[i] = WalshHadamardTransformFormula[0].Item1.All(boo => !boo) ? WalshHadamardTransformFormula[0].Item2?-1:1 : 0;
+                Result[i] = WalshHadamardTransformFormula[0].Item1.All(boo => !boo) ? WalshHadamardTransformFormula[0].Item2 ? -1 : 1 : 0;
                 for (int j = WalshHadamardTransformFormula[0].Item1.All(boo => !boo) ? 1 : 0; j < WalshHadamardTransformFormula.Length; j++)
                 {
-                    Result[i] += (int)Math.Pow(-1, CurrentSet.Where((val, ind) => WalshHadamardTransformFormula[j].Item1[ind]).Aggregate(false, (Current, next) => Current ^ next)^ WalshHadamardTransformFormula[j].Item2 ? 1 : 0);
+                    Result[i] += (int)Math.Pow(-1, CurrentSet.Where((val, ind) => WalshHadamardTransformFormula[j].Item1[ind]).Aggregate(false, (Current, next) => Current ^ next) ^ WalshHadamardTransformFormula[j].Item2 ? 1 : 0);
                 }
             }
             return Result;

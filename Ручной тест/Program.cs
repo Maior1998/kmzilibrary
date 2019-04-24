@@ -18,8 +18,8 @@ namespace Ручной_тест
         
         static void Main(string[] args)
         {
-            BinaryFunction test = new BinaryFunction(0b01011010,3);
-            Console.WriteLine(BinaryFunction.IsStable(test,2));
+            BinaryFunction test = new BinaryFunction(0b01101001,3);
+            Console.WriteLine(BinaryFunction.GetMaxStableValue(test));
         }
 
         
