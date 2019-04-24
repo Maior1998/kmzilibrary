@@ -628,7 +628,12 @@ namespace KMZILib
         /// </summary>
         /// <param name="FreedomDegree"></param>
         /// <returns></returns>
-        public static double GetCSCCritical(int FreedomDegree) => CSCCritical[FreedomDegree];
+        public static double GetCSCCritical(int FreedomDegree)
+        {
+            if (FreedomDegree > CSCCritical.Keys.Max())
+                return 2;
+            return CSCCritical[FreedomDegree];
+        }
 
         /// <summary>
         /// Возвращает регрессионное уравнения для заданных столбцов-параметров и результирующего столбца матрицы наблюдений.
@@ -696,7 +701,8 @@ namespace KMZILib
             {27, 2.0518},
             {28, 2.0484},
             {29, 2.0452},
-            {30, 2.0423}
+            {30, 2.0423},
+
         };
         private static readonly Dictionary<double, double> LaplasTable = new Dictionary<double, double>
         {
