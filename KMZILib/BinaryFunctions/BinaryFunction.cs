@@ -591,45 +591,15 @@ namespace KMZILib
         {
             if (m >= Source.CountOfVariables)
                 throw new InvalidOperationException("Число m должно быть меньше числа аргументов функции.");
-
-            for (int FixedVariablesCount = 1; FixedVariablesCount <= m; FixedVariablesCount++)
+            if (!Source.IsEquilibrium) return false;
+            for (int i = 0; i < Source.ValuesArray.Length; i++)
             {
-                //Выбираем, какие переменные фиксировать. Задаем наборы, в которых на местах фиксированных переменных будут 1, на месте свободных 0.
-                List<bool[]> States = new List<bool[]>();
-                for (int i = 0; i < (int)Math.Pow(2, Source.CountOfVariables); i++)
-                {
-                    bool[] CurrentSet = GetBinaryArray(i, Source.CountOfVariables);
-                    if (CurrentSet.Count(val => val) != FixedVariablesCount)
-                        continue;
-                    if (States.Any(set => set.Select((boo, ind) => boo == CurrentSet[ind]).All(boo => boo)))
-                        continue;
-                    States.Add(CurrentSet);
-                    //Выбрали, какие переменные зафиксировать.
-
-                    //Создаем словарь, где ключи - конкретный зафиксированный набор, а значения - значения столбца функции в таких наборах
-                    Dictionary<bool[], List<bool>> NewFunctions = new Dictionary<bool[], List<bool>>();
-                    for (int j = 0; j < Source.ValuesArray.Length; j++)
-                    {
-                        //Текущая строка таблицы истинности
-                        bool[] CurrentFuncSet = GetBinaryArray(j, Source.CountOfVariables);
-                        bool FuncValue = Source.ValuesArray[j];
-                        if (NewFunctions.Keys.Any(row =>
-                            row.Select((variable, index) => !CurrentSet[index] || variable == CurrentFuncSet[index])
-                                .All(res => res)))
-                        {
-                            NewFunctions[NewFunctions.Keys.First(row =>
-                                row.Select((variable, index) => !CurrentSet[index] || variable == CurrentFuncSet[index])
-                                    .All(res => res))].Add(FuncValue);
-                        }
-                        else
-                        {
-                            NewFunctions.Add(CurrentFuncSet, new List<bool>(new[] { FuncValue }));
-                        }
-                    }
-
-                    if (NewFunctions.Values.Any(val => !new BinaryFunction(val.ToArray()).IsEquilibrium))
-                        return false;
-                }
+                bool[] CurrentSet = GetBinaryArray(i, Source.CountOfVariables);
+                int Weight = CurrentSet.Count(val => val);
+                if (Weight > m || Weight == 0)
+                    continue;
+                if (Source.ValuesArray[i])
+                    return false;
             }
 
 
@@ -681,12 +651,57 @@ namespace KMZILib
                     }
 
                     if (NewFunctions.Values.Any(val => !new BinaryFunction(val.ToArray()).IsEquilibrium))
-                        return FixedVariablesCount-1;
+                        return FixedVariablesCount - 1;
                 }
             }
 
 
-            return FixedVariablesCount-1;
+            return FixedVariablesCount - 1;
+        }
+
+        /// <summary>
+        /// Возвращает максимальный порядок имунности данной функции.
+        /// </summary>
+        /// <param name="Source"></param>
+        /// <returns></returns>
+        public static int GetMaxCorrelationImmunityValue(BinaryFunction Source)
+        {
+            int m = 1;
+            for(;m<Source.CountOfVariables;m++)
+            for (int i = 0; i < Source.ValuesArray.Length; i++)
+            {
+                bool[] CurrentSet = GetBinaryArray(i, Source.CountOfVariables);
+                int Weight = CurrentSet.Count(val => val);
+                if (Weight > m || Weight == 0)
+                    continue;
+                if (Source.ValuesArray[i])
+                    break;
+            }
+
+
+            return m-1;
+        }
+        /// <summary>
+        /// Определеяет, имеет ли функция корреляционную иммунность порядка m.
+        /// </summary>
+        /// <param name="Source"></param>
+        /// <param name="m"></param>
+        /// <returns></returns>
+        public static bool IsCorrelationImmune(BinaryFunction Source, int m)
+        {
+            if (m >= Source.CountOfVariables)
+                throw new InvalidOperationException("Число m должно быть меньше числа аргументов функции.");
+            for (int i = 0; i < Source.ValuesArray.Length; i++)
+            {
+                bool[] CurrentSet = GetBinaryArray(i, Source.CountOfVariables);
+                int Weight = CurrentSet.Count(val => val);
+                if (Weight > m|| Weight==0)
+                    continue;
+                if (Source.ValuesArray[i]) return false;
+            }
+
+
+            return true;
         }
 
         /// <summary>
