@@ -643,7 +643,7 @@ namespace KMZILib
             {
                 XArray[i]= new double[Parametres.Length+1];
                 XArray[i][0] = 1;
-                Parametres.Select(param=>param.Values[i]).ToArray().CopyTo(XArray,1);
+                Parametres.Select(param=>param.Values[i]).ToArray().CopyTo(XArray[i],1);
             }
             Matrix X = new Matrix(XArray);
             Matrix Y = new Matrix(new []{ResultValue.Values}).Transpose();

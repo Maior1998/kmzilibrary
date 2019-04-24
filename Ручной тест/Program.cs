@@ -18,10 +18,8 @@ namespace Ручной_тест
         
         static void Main(string[] args)
         {
-            BinaryFunction a = new BinaryFunction(0b11001011, 3);
-            Console.WriteLine(a.ZhegalkinPolynomial);
-            Console.WriteLine(a.Degree);
-
+            BinaryFunction test = new BinaryFunction(0b01011010,3);
+            Console.WriteLine(BinaryFunction.IsStable(test,2));
         }
 
         

@@ -258,6 +258,11 @@ namespace KMZILib
         }
 
         /// <summary>
+        /// Определяет, является ли функция уравновешенной, т.е. имеет ли она одинаковое число нулей и единиц в своем столбце значений.
+        /// </summary>
+        public bool IsEquilibrium => 2 * ValuesArray.Count(val => val) == ValuesArray.Length;
+
+        /// <summary>
         ///     Строковое представление СДНФ функции
         /// </summary>
         public string PDNF
@@ -574,6 +579,60 @@ namespace KMZILib
                 }
             }
             return Result;
+        }
+
+        /// <summary>
+        /// Определяет, является ли заданная функция m-устойчивой.
+        /// </summary>
+        /// <param name="Source"></param>
+        /// <param name="m"></param>
+        /// <returns></returns>
+        public static bool IsStable(BinaryFunction Source, int m)
+        {
+            if(m>=Source.CountOfVariables)
+                throw new InvalidOperationException("Число m должно быть меньше числа аргументов функции.");
+
+            for (int FixedVariablesCount = 1; FixedVariablesCount <= m; FixedVariablesCount++)
+            {
+                //Выбираем, какие переменные фиксировать. Задаем наборы, в которых на местах фиксированных переменных будут 1, на месте свободных 0.
+                List<bool[]> States = new List<bool[]>();
+                for (int i = 0; i < (int) Math.Pow(2, Source.CountOfVariables); i++)
+                {
+                    bool[] CurrentSet = GetBinaryArray(i,Source.CountOfVariables);
+                    if(CurrentSet.Count(val=>val)!=FixedVariablesCount)
+                        continue;
+                    if(States.Any(set=>set.Select((boo,ind)=>boo==CurrentSet[ind]).All(boo=>boo)))
+                        continue;
+                    States.Add(CurrentSet);
+                    //Выбрали, какие переменные зафиксировать.
+
+                    //Создаем словарь, где ключи - конкретный зафиксированный набор, а значения - значения столбца функции в таких наборах
+                    Dictionary<bool[],List<bool>> NewFunctions=new Dictionary<bool[], List<bool>>();
+                    for (int j = 0; j < Source.ValuesArray.Length; j++)
+                    {
+                        //Текущая строка таблицы истинности
+                        bool[] CurrentFuncSet = GetBinaryArray(j, Source.CountOfVariables);
+                        bool FuncValue = Source.ValuesArray[j];
+                        if (NewFunctions.Keys.Any(row =>
+                            row.Select((variable, index) => !CurrentSet[index] || variable == CurrentFuncSet[index])
+                                .All(res => res)))
+                        {
+                            NewFunctions[NewFunctions.Keys.First(row =>
+                                row.Select((variable, index) => !CurrentSet[index] || variable == CurrentFuncSet[index])
+                                    .All(res => res))].Add(FuncValue);
+                        }
+                        else
+                        {
+                            NewFunctions.Add(CurrentFuncSet,new List<bool>(new []{FuncValue}));
+                        }
+                    }
+
+                    if (NewFunctions.Values.Any(val => !new BinaryFunction(val.ToArray()).IsEquilibrium)) return false;
+                }
+            }
+
+
+            return true;
         }
 
         /// <summary>
