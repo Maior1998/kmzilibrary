@@ -21,14 +21,14 @@ namespace KMZILib
         {
             private static BigInteger GetBiggerRandomPrime(BigInteger current)
             {
-                if (BigInteger.Abs(current) < PrimeNumbers.Last())
+                if (BigInteger.Abs(current) < Misc.Data.PrimeNumbers.Last())
                 {
-                    return PrimeNumbers[
+                    return Misc.Data.PrimeNumbers[
                         RD.Rand.Next(
-                            PrimeNumbers.ToList().IndexOf(
-                                PrimeNumbers.First(
+                            Misc.Data.PrimeNumbers.ToList().IndexOf(
+                                Misc.Data.PrimeNumbers.First(
                                     num => num > BigInteger.Abs(current))),
-                            PrimeNumbers.Length)
+                            Misc.Data.PrimeNumbers.Length)
                     ];
                 }
 

@@ -85,11 +85,11 @@ namespace KMZILib
         public static Dictionary<int, int> Factor(int n)
         {
             Dictionary<int,int> Result = new Dictionary<int, int>();
-            while (n > Primes.PrimalityTests.PrimeNumbers.Last() ||
-                   !Primes.PrimalityTests.PrimeNumbers.Contains((ushort) n))
+            while (n > Misc.Data.PrimeNumbers.Last() ||
+                   !Misc.Data.PrimeNumbers.Contains((ushort) n))
             {
                 bool DividerFound = false;
-                foreach (ushort PrimeNumber in Primes.PrimalityTests.PrimeNumbers)
+                foreach (ushort PrimeNumber in Misc.Data.PrimeNumbers)
                 {
                     if (n % PrimeNumber == 0)
                     {

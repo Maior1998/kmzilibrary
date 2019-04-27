@@ -65,6 +65,7 @@
     <Compile Include="Maths\Polynoms.cs" />
     <Compile Include="Maths\PrimalityTests.cs" />
     <Compile Include="Maths\Vector.cs" />
+    <Compile Include="Misc\Data.cs" />
     <Compile Include="Misc\Misc.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Ciphers\RD.cs" />
