@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Remoting;
-using Data=KMZILib.Misc.Data;
+using Data = KMZILib.Misc.Data;
 
 namespace KMZILib
 {
@@ -214,7 +214,7 @@ namespace KMZILib
                 $"Минимум : {Min}\n" +
                 $"Максимум : {Max}\n" +
                 $"Сумма : {Sum}\n" +
-                $"Счет : {Count}";
+                $"Количество элементов : {Count}";
 
             private double standarddeviation = Double.NaN;
             /// <summary>
@@ -406,12 +406,31 @@ namespace KMZILib
             return Result;
         }
 
+        /// <summary>
+        /// Возвращает критическое значение F критерия для данных чисел степеней свободы.
+        /// </summary>
+        /// <param name="FreedomDegreeFirst"></param>
+        /// <param name="FreedomDegreeSecond"></param>
+        /// <returns></returns>
         public static double GetFCritical(int FreedomDegreeFirst, int FreedomDegreeSecond)
         {
             int RowIndex = Data.FCCritical.Keys.OrderBy(rowindex => Math.Abs(rowindex - FreedomDegreeFirst)).First();
             int ColumnIndex = Data.FCCritical.First().Value.Keys
                 .OrderBy(columnindex => Math.Abs(columnindex - FreedomDegreeSecond)).First();
             return Data.FCCritical[RowIndex][ColumnIndex];
+        }
+
+        /// <summary>
+        /// Возвращает значимость по F критерию.
+        /// </summary>
+        /// <param name="FTestValue"></param>
+        /// <param name="FreedomDegreeFirst"></param>
+        /// <param name="FreedomDegreeSecond"></param>
+        /// <returns></returns>
+        public static bool IsSignificantByFTest(double FTestValue, int FreedomDegreeFirst, int FreedomDegreeSecond)
+        {
+            double Critical = GetFCritical(FreedomDegreeFirst, FreedomDegreeSecond);
+            return FTestValue >= Critical;
         }
 
         /// <summary>
@@ -434,7 +453,7 @@ namespace KMZILib
         }
 
         /// <summary>
-        /// Возвращает таблицу корреляций Пирсона.
+        /// Возвращает таблицу парных корреляций Пирсона.
         /// </summary>
         /// <returns></returns>
         public static double[][] GetCorrelationTable(RandomValue[] Columns)
@@ -456,7 +475,7 @@ namespace KMZILib
         /// <returns></returns>
         public static double LaplasFunc(double Source)
         {
-            int sign = (int) (Source / Math.Abs(Source));
+            int sign = (int)(Source / Math.Abs(Source));
             Source = Math.Abs(Source);
             double Result = 0;
             if (Source >= 5)
