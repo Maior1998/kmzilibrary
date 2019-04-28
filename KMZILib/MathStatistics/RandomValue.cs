@@ -393,7 +393,7 @@ namespace KMZILib
         }
 
         /// <summary>
-        /// Возвращает результат F-критерия или, другими словами, критерия Фишера. 
+        /// Возвращает результат F-критерия или, другими словами, критерия Фишера для множественных коэффициентов корреляции. 
         /// </summary>
         /// <param name="DeterminationCoefficient">Коэффициент детерминации.</param>
         /// <param name="TableLength">Число наблюдений.</param>
@@ -682,10 +682,37 @@ namespace KMZILib
         }
 
         /// <summary>
+        /// Возвращает эмпирическое значение F-критерия оценка значимости регрессионного уравнения.
+        /// </summary>
+        /// <param name="Parametres"></param>
+        /// <param name="ResultValue"></param>
+        /// <param name="RegressionEquation"></param>
+        /// <returns></returns>
+        public static double GetFCriteriaEquation(RandomValue[] Parametres, RandomValue ResultValue,
+            double[] RegressionEquation)
+        {
+            double[][] XArray = new double[Parametres.First().Count][];
+            for (int i = 0; i < XArray.Length; i++)
+            {
+                XArray[i] = new double[Parametres.Length + 1];
+                XArray[i][0] = 1;
+                Parametres.Select(param => param.Values[i]).ToArray().CopyTo(XArray[i], 1);
+            }
+            Matrix X = new Matrix(XArray);
+            double[] NewY = (X * new Matrix(new[] {RegressionEquation}).Transpose()).Values.Select(row => row.First())
+                .ToArray();
+            int n = Parametres.Length + 1;
+            int k = 1;
+            return (new Matrix(new[] {NewY}).Transpose() * new Matrix(new[] {NewY})).Values.First().First() / (k + 1) *
+                   (n - k - 1) / (ResultValue.Values.Select((val, ind) => Math.Pow(val - NewY[ind], 2)).Sum());
+        }
+
+
+        /// <summary>
         /// Возвращает критической значение критерия хи-квадрат для a = 0.05 с заданным числом степеней свободы.
         /// </summary>
         /// <param name="CountFreeDegree"></param>
         /// <returns></returns>
-        public static double GetChiSquaredCritical(int CountFreeDegree) => Misc.Data.ChiSquaredCriticals[CountFreeDegree - 1];
+        public static double GetChiSquaredCritical(int CountFreeDegree) => Data.ChiSquaredCriticals[CountFreeDegree - 1];
     };
 }
