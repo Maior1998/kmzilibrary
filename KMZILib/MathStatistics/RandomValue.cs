@@ -639,7 +639,7 @@ namespace KMZILib
         }
 
         /// <summary>
-        /// Возвращает значение t значимости коэффициента корреляции Стюдента для заданного выборочного частного коэффициента корреляции и числа параметров.
+        /// Возвращает значение t значимости коэффициента корреляции Стьюдента для заданного выборочного частного коэффициента корреляции и числа параметров.
         /// </summary>
         /// <param name="PCCV"></param>
         /// <param name="n"></param>
@@ -647,6 +647,50 @@ namespace KMZILib
         public static double GetCSC(double PCCV, int n)
         {
             return Math.Abs(PCCV) * Math.Sqrt((n - 2) / (1 - Math.Pow(PCCV, 2)));
+        }
+
+        /// <summary>
+        /// Возвращает интервальную оценку регрессии в виде пары чисел, задающих границы отрезка.
+        /// </summary>
+        /// <param name="X"></param>
+        /// <param name="A"></param>
+        /// <param name="FreedomDegree"></param>
+        /// <param name="ParametresDispersion"></param>
+        /// <returns></returns>
+        public static (double Lower, double Higher) GetIntervalRegressionAssessment(Matrix X, Matrix A, int FreedomDegree,
+            double ParametresDispersion)
+        {
+            //Первася строка X, записанная в виде столбца
+            Matrix FirstRow = new Matrix(new[] { X.Values[0] }).Transpose();
+
+            //База, с которой будут суммироваться и вычитаться дельты.
+            double Base = (FirstRow.TransposedCopy() * A)[0][0];
+
+            //Дельты
+            double Delta = GetCSCCritical(FreedomDegree) * Math.Sqrt(ParametresDispersion) * Math.Sqrt((FirstRow.TransposedCopy() * (X.TransposedCopy() * X).Reverse * FirstRow)[0][0]);
+            return (Base - Delta, Base + Delta);
+        }
+
+        /// <summary>
+        /// Возвращает интервал предсказания регрессии в виде пары чисел, задающих границы отрезка.
+        /// </summary>
+        /// <param name="X"></param>
+        /// <param name="A"></param>
+        /// <param name="FreedomDegree"></param>
+        /// <param name="ParametresDispersion"></param>
+        /// <returns></returns>
+        public static (double Lower, double Higher) GetPredictionInterval(Matrix X, Matrix A, int FreedomDegree,
+            double ParametresDispersion)
+        {
+            //Первася строка X, записанная в виде столбца
+            Matrix FirstRow = new Matrix(new[] { X.Values[0] }).Transpose();
+
+            //База, с которой будут суммироваться и вычитаться дельты.
+            double Base = (FirstRow.TransposedCopy() * A)[0][0];
+
+            //Дельты
+            double Delta = GetCSCCritical(FreedomDegree) * Math.Sqrt(ParametresDispersion) * Math.Sqrt((FirstRow.TransposedCopy() * (X.TransposedCopy() * X).Reverse * FirstRow)[0][0] + 1);
+            return (Base - Delta, Base + Delta);
         }
 
         /// <summary>
@@ -699,14 +743,42 @@ namespace KMZILib
                 Parametres.Select(param => param.Values[i]).ToArray().CopyTo(XArray[i], 1);
             }
             Matrix X = new Matrix(XArray);
-            double[] NewY = (X * new Matrix(new[] {RegressionEquation}).Transpose()).Values.Select(row => row.First())
+            double[] NewY = (X * new Matrix(new[] { RegressionEquation }).Transpose()).Values.Select(row => row.First())
                 .ToArray();
-            int n = Parametres.Length + 1;
+            int n = Parametres.Length;
             int k = 1;
-            return (new Matrix(new[] {NewY}).Transpose() * new Matrix(new[] {NewY})).Values.First().First() / (k + 1) *
+            return (new Matrix(new[] { NewY }).Transpose() * new Matrix(new[] { NewY })).Values.First().First() / (k + 1) *
                    (n - k - 1) / (ResultValue.Values.Select((val, ind) => Math.Pow(val - NewY[ind], 2)).Sum());
         }
 
+        /// <summary>
+        /// Возврвщает значение дисперсии, используемой при оценке значимости отдельных параметров регрессии. S^^2.
+        /// </summary>
+        /// <param name="FreedomDegree">Число степеней свободы</param>
+        /// <param name="Y">Массив-матрица истинных значений функции.</param>
+        /// <param name="X">Расширенная матрица коэффициентов размерности mx(n+1)</param>
+        /// <param name="A">Полученная до этого матрица коэффициентов регрессионного уравнения.</param>
+        /// <returns></returns>
+        public static double GetParametresDispersion(int FreedomDegree, Matrix Y, Matrix X, Matrix A)
+        {
+            double Result = 1.0 / FreedomDegree;
+            Result *= ((Y - X * A).TransposedCopy() * (Y - X * A)).Values[0][0];
+            return Result;
+        }
+
+        /// <summary>
+        /// Возврвщает значение дисперсии, используемой при оценке значимости заданного регрессии. S^(bj).
+        /// </summary>
+        /// <param name="ParametresDispersion">Дисперсия, полученная до этого.</param>
+        /// <param name="X">Расширенная матрица коэффициентов размерности mx(n+1)</param>
+        /// <param name="j">Индекс нужного параметра. Отсчет от 0.</param>
+        /// <returns></returns>
+        public static double GetParametresDispersion(double ParametresDispersion, Matrix X, int j)
+        {
+            double Result = ParametresDispersion;
+            ParametresDispersion *= ((X.TransposedCopy() * X)).Reverse[j + 1][j + 1];
+            return ParametresDispersion;
+        }
 
         /// <summary>
         /// Возвращает критической значение критерия хи-квадрат для a = 0.05 с заданным числом степеней свободы.
