@@ -805,7 +805,7 @@ namespace KMZILib
         public static double GetParametresDispersion(double ParametresDispersion, Matrix X, int j)
         {
             double Result = ParametresDispersion;
-            ParametresDispersion *= ((X.TransposedCopy() * X)).Reverse[j + 1][j + 1];
+            ParametresDispersion *= ((X.TransposedCopy() * X)).Reverse[j][j];
             return ParametresDispersion;
         }
 
