@@ -18,7 +18,6 @@ namespace Ручной_тест
         
         static void Main(string[] args)
         {
-            Console.WriteLine(MathStatistics.GetFCritical(70,52));
         }
 
         

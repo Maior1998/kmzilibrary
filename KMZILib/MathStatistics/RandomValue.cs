@@ -672,6 +672,22 @@ namespace KMZILib
         }
 
         /// <summary>
+        /// Возвращает интервальную оценку коэффициента в виде пары чисел, задающих границы отрезка.
+        /// </summary>
+        /// <param name="X"></param>
+        /// <param name="A"></param>
+        /// <param name="FreedomDegree"></param>
+        /// <param name="ParametresDispersion"></param>
+        /// <returns></returns>
+        public static (double Lower, double Higher) GetIntervalParameterAssessment(Matrix X, Matrix A, int j, int FreedomDegree,
+            double ParametresDispersion)
+        {
+            double Result = A[j][0];
+            double Lambda = GetCSCCritical(FreedomDegree) * GetParametresDispersion(ParametresDispersion, X, j);
+            return (Result - Lambda, Result + Lambda);
+        }
+
+        /// <summary>
         /// Возвращает интервал предсказания регрессии в виде пары чисел, задающих границы отрезка.
         /// </summary>
         /// <param name="X"></param>
@@ -691,6 +707,19 @@ namespace KMZILib
             //Дельты
             double Delta = GetCSCCritical(FreedomDegree) * Math.Sqrt(ParametresDispersion) * Math.Sqrt((FirstRow.TransposedCopy() * (X.TransposedCopy() * X).Reverse * FirstRow)[0][0] + 1);
             return (Base - Delta, Base + Delta);
+        }
+
+        /// <summary>
+        /// Возвращает t-критерий оценки значимости коэффициентов уравнения регрессии.
+        /// </summary>
+        /// <param name="A"></param>
+        /// <param name="j"></param>
+        /// <param name="ParametresDispersion"></param>
+        /// <param name="X"></param>
+        /// <returns></returns>
+        public static double GetPointRegressionAssessment(Matrix A, int j, double ParametresDispersion, Matrix X)
+        {
+            return A[j][0] / GetParametresDispersion(ParametresDispersion, X, j);
         }
 
         /// <summary>
@@ -726,7 +755,7 @@ namespace KMZILib
         }
 
         /// <summary>
-        /// Возвращает эмпирическое значение F-критерия оценка значимости регрессионного уравнения.
+        /// Возвращает эмпирическое значение F-критерия оценки значимости регрессионного уравнения.
         /// </summary>
         /// <param name="Parametres"></param>
         /// <param name="ResultValue"></param>
@@ -752,7 +781,7 @@ namespace KMZILib
         }
 
         /// <summary>
-        /// Возврвщает значение дисперсии, используемой при оценке значимости отдельных параметров регрессии. S^^2.
+        /// Возвращает значение дисперсии, используемой при оценке значимости отдельных параметров регрессии. S^^2.
         /// </summary>
         /// <param name="FreedomDegree">Число степеней свободы</param>
         /// <param name="Y">Массив-матрица истинных значений функции.</param>
@@ -783,8 +812,8 @@ namespace KMZILib
         /// <summary>
         /// Возвращает критической значение критерия хи-квадрат для a = 0.05 с заданным числом степеней свободы.
         /// </summary>
-        /// <param name="CountFreeDegree"></param>
+        /// <param name="freedomDegree"></param>
         /// <returns></returns>
-        public static double GetChiSquaredCritical(int CountFreeDegree) => Data.ChiSquaredCriticals[CountFreeDegree - 1];
+        public static double GetChiSquaredCritical(int freedomDegree) => Data.ChiSquaredCriticals[freedomDegree - 1];
     };
 }
