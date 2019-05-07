@@ -23,7 +23,8 @@ namespace KMZILib
             get => valuesarray;
             set
             {
-                if (value.Length != (int)Math.Pow(2, new byte[32].Select((val, ind) => ind + 1).First(val => Math.Pow(2, val) >= value.Length)))
+                if (value.Length != (int) Math.Pow(2,
+                        new byte[32].Select((val, ind) => ind + 1).First(val => Math.Pow(2, val) >= value.Length)))
                     throw new InvalidOperationException("Длина столбца значений должна быть степенью 2.");
                 valuesarray = value;
             }
@@ -35,7 +36,7 @@ namespace KMZILib
         /// <param name="Length">Число переменных функции</param>
         public BinaryFunction(byte Length)
         {
-            ValuesArray = new bool[(int)Math.Pow(2, Length)];
+            ValuesArray = new bool[(int) Math.Pow(2, Length)];
 
             for (int i = 0; i < ValuesArray.Length; i++)
                 ValuesArray[i] = RD.Rand.Next(2) == 1;
@@ -81,7 +82,7 @@ namespace KMZILib
         public BinaryFunction(int Source)
         {
 
-            ValuesArray = GetBinaryArray(Source, (int)Math.Ceiling(Math.Log(Source, 2)));
+            ValuesArray = global::Misc.GetBinaryArray(Source, (int) Math.Ceiling(Math.Log(Source, 2)));
         }
 
         /// <summary>
@@ -91,7 +92,7 @@ namespace KMZILib
         /// <param name="VariablesCount"></param>
         public BinaryFunction(int Source, int VariablesCount)
         {
-            ValuesArray = GetBinaryArray(Source, (int)Math.Pow(2, VariablesCount));
+            ValuesArray = global::Misc.GetBinaryArray(Source, (int) Math.Pow(2, VariablesCount));
         }
 
         /// <summary>
@@ -111,11 +112,11 @@ namespace KMZILib
         {
             get
             {
-                int TableLength = (int)Math.Pow(2, CountOfVariables);
+                int TableLength = (int) Math.Pow(2, CountOfVariables);
                 bool[,] Result = new bool[TableLength, CountOfVariables + 1];
                 for (int i = 0; i < TableLength; i++)
                 {
-                    bool[] Row = GetBinaryArray(i, CountOfVariables);
+                    bool[] Row = global::Misc.GetBinaryArray(i, CountOfVariables);
                     for (int j = 0; j < CountOfVariables; j++)
                         Result[i, j] = Row[j];
                     Result[i, CountOfVariables] = ValuesArray[i];
@@ -128,7 +129,7 @@ namespace KMZILib
         /// <summary>
         ///     Число переменных аргументов функции
         /// </summary>
-        public byte CountOfVariables => (byte)Math.Log(ValuesArray.Length, 2);
+        public byte CountOfVariables => (byte) Math.Log(ValuesArray.Length, 2);
 
         /// <summary>
         ///     Свойство функции, показывающее, принадлежит ли она классу функций, сохраняющих нуль
@@ -183,11 +184,11 @@ namespace KMZILib
 
                 for (int i = 0; i < ValuesArray.Length - 1; i++)
                 {
-                    DNF idnf = new DNF(GetBinaryArray(i, CountOfVariables).Select(val => new bool?(val)).ToArray());
+                    DNF idnf = new DNF(global::Misc.GetBinaryArray(i, CountOfVariables).Select(val => new bool?(val)).ToArray());
                     for (int j = i + 1; j < ValuesArray.Length; j++)
                     {
 
-                        DNF jdnf = new DNF(GetBinaryArray(j, CountOfVariables).Select(val => new bool?(val)).ToArray());
+                        DNF jdnf = new DNF(global::Misc.GetBinaryArray(j, CountOfVariables).Select(val => new bool?(val)).ToArray());
                         if (!idnf.IsPrecedeDNF(jdnf))
                             continue;
                         if (ValuesArray[i] && !ValuesArray[j])
@@ -222,7 +223,7 @@ namespace KMZILib
                 {
                     if (!PascalTriangle[i][0])
                         continue;
-                    if (GetBinaryArray(i).Count(val => val) > 1)
+                    if (global::Misc.GetBinaryArray(i).Count(val => val) > 1)
                         return false;
                 }
 
@@ -250,7 +251,7 @@ namespace KMZILib
 
                 //Треугольник Паскаля заполнен.
                 return new int[PascalTriangle.Length].Select((val, ind) => ind)
-                    .Where(val => PascalTriangle[val][0]).Select(index => GetBinaryArray(index).Count(val => val))
+                    .Where(val => PascalTriangle[val][0]).Select(index => global::Misc.GetBinaryArray(index).Count(val => val))
                     .Max();
             }
         }
@@ -259,6 +260,18 @@ namespace KMZILib
         /// Определяет, является ли функция уравновешенной, т.е. имеет ли она одинаковое число нулей и единиц в своем столбце значений.
         /// </summary>
         public bool IsEquilibrium => 2 * ValuesArray.Count(val => val) == ValuesArray.Length;
+
+        /// <summary>
+        /// Всевозможнные наборы переменных данной функции.
+        /// </summary>
+        public bool[][] VariablesSets
+        {
+            get
+            {
+                return Enumerable.Range(0, ValuesArray.Length).Select(set => global::Misc.GetBinaryArray(set, CountOfVariables))
+                    .ToArray();
+            }
+        }
 
         /// <summary>
         ///     Строковое представление СДНФ функции
@@ -275,7 +288,7 @@ namespace KMZILib
                     if (!ValuesArray[i])
                         continue;
 
-                    bool[] variables = GetBinaryArray(i, CountOfVariables);
+                    bool[] variables = global::Misc.GetBinaryArray(i, CountOfVariables);
                     List<string> buffer = new List<string>();
                     for (int j = 0; j < CountOfVariables; j++)
                         buffer.Add(variables[j]
@@ -302,7 +315,7 @@ namespace KMZILib
                 {
                     if (ValuesArray[i])
                         continue;
-                    bool[] variables = GetBinaryArray(i, CountOfVariables);
+                    bool[] variables = global::Misc.GetBinaryArray(i, CountOfVariables);
                     List<string> buffer = new List<string>();
                     for (int j = 0; j < CountOfVariables; j++)
                         buffer.Add(!variables[j]
@@ -330,7 +343,7 @@ namespace KMZILib
                 {
                     if (!ValuesArray[i])
                         continue;
-                    PDNF.Add(GetBinaryArray(i, CountOfVariables).Select(elem => (bool?)elem).ToList());
+                    PDNF.Add(global::Misc.GetBinaryArray(i, CountOfVariables).Select(elem => (bool?)elem).ToList());
                 }
                 //Получили наборы СДНФ
 
@@ -403,7 +416,7 @@ namespace KMZILib
                 {
                     if (!PascalTriangle[i][0])
                         continue;
-                    bool[] variables = GetBinaryArray(i, CountOfVariables);
+                    bool[] variables = global::Misc.GetBinaryArray(i, CountOfVariables);
 
                     List<string> buffer = new List<string>();
                     for (int j = 0; j < CountOfVariables; j++)
@@ -472,6 +485,14 @@ namespace KMZILib
         /// Возвращает максимальный порядок устойчивости данной функции.
         /// </summary>
         public int MaxStableValue => GetMaxStableValue(this);
+
+        public bool GetValue(bool[] Set)
+        {
+            if (Set.Length!=CountOfVariables)
+                throw new InvalidOperationException("Длина набора должна совпадать с числом переменных данной функции");
+            return ValuesArray[
+                Enumerable.Range(0, (int) Math.Pow(CountOfVariables, 2)).First(val => val == Misc.GetValue(Set))];
+        }
 
         /// <summary>
         ///     Строковое представление функции. Возвращается свойство <see cref="Value" />

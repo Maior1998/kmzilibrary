@@ -18,6 +18,9 @@ namespace Ручной_тест
         
         static void Main(string[] args)
         {
+            BinaryFunction test = new BinaryFunction(0b0110,2);
+            for (int i = 0; i < (int)Math.Pow(2, test.CountOfVariables) ; i++)
+                Console.WriteLine(test.GetValue(global::Misc.GetBinaryArray(i,test.CountOfVariables)));
         }
 
         

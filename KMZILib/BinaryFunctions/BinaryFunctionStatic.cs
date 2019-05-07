@@ -42,7 +42,7 @@ namespace KMZILib
             {
                 if (!Source.ValuesArray[i])
                     continue;
-                FourierTransformFormula.Add(GetBinaryArray(i, Source.CountOfVariables));
+                FourierTransformFormula.Add(global::Misc.GetBinaryArray(i, Source.CountOfVariables));
             }
 
             return FourierTransformFormula.ToArray();
@@ -78,7 +78,7 @@ namespace KMZILib
             int[] Result = new int[Source.ValuesArray.Length];
             for (int i = 0; i < Source.ValuesArray.Length; i++)
             {
-                bool[] CurrentSet = GetBinaryArray(i, Source.CountOfVariables);
+                bool[] CurrentSet = global::Misc.GetBinaryArray(i, Source.CountOfVariables);
                 Result[i] = FourierTransformFormula[0].All(boo => !boo) ? 1 : 0;
                 for (int j = FourierTransformFormula[0].All(boo => !boo) ? 1 : 0;
                     j < FourierTransformFormula.Length;
@@ -107,7 +107,7 @@ namespace KMZILib
                 return false;
             for (int i = 0; i < Source.ValuesArray.Length; i++)
             {
-                bool[] CurrentSet = GetBinaryArray(i, Source.CountOfVariables);
+                bool[] CurrentSet = global::Misc.GetBinaryArray(i, Source.CountOfVariables);
                 int Weight = CurrentSet.Count(val => val);
                 if (Weight > m || Weight == 0)
                     continue;
@@ -133,7 +133,7 @@ namespace KMZILib
                 List<bool[]> States = new List<bool[]>();
                 for (int i = 0; i < (int) Math.Pow(2, Source.CountOfVariables); i++)
                 {
-                    bool[] CurrentSet = GetBinaryArray(i, Source.CountOfVariables);
+                    bool[] CurrentSet = global::Misc.GetBinaryArray(i, Source.CountOfVariables);
                     if (CurrentSet.Count(val => val) != FixedVariablesCount)
                         continue;
                     if (States.Any(set => set.Select((boo, ind) => boo == CurrentSet[ind]).All(boo => boo)))
@@ -146,7 +146,7 @@ namespace KMZILib
                     for (int j = 0; j < Source.ValuesArray.Length; j++)
                     {
                         //Текущая строка таблицы истинности
-                        bool[] CurrentFuncSet = GetBinaryArray(j, Source.CountOfVariables);
+                        bool[] CurrentFuncSet = global::Misc.GetBinaryArray(j, Source.CountOfVariables);
                         bool FuncValue = Source.ValuesArray[j];
                         if (NewFunctions.Keys.Any(row =>
                             row.Select((variable, index) => !CurrentSet[index] || variable == CurrentFuncSet[index])
@@ -180,7 +180,7 @@ namespace KMZILib
             for (; m < Source.CountOfVariables; m++)
             for (int i = 0; i < Source.ValuesArray.Length; i++)
             {
-                bool[] CurrentSet = GetBinaryArray(i, Source.CountOfVariables);
+                bool[] CurrentSet = global::Misc.GetBinaryArray(i, Source.CountOfVariables);
                 int Weight = CurrentSet.Count(val => val);
                 if (Weight > m || Weight == 0)
                     continue;
@@ -204,7 +204,7 @@ namespace KMZILib
                 throw new InvalidOperationException("Число m должно быть меньше числа аргументов функции.");
             for (int i = 0; i < Source.ValuesArray.Length; i++)
             {
-                bool[] CurrentSet = GetBinaryArray(i, Source.CountOfVariables);
+                bool[] CurrentSet = global::Misc.GetBinaryArray(i, Source.CountOfVariables);
                 int Weight = CurrentSet.Count(val => val);
                 if (Weight > m || Weight == 0)
                     continue;
@@ -225,7 +225,7 @@ namespace KMZILib
         {
             List<(bool[], bool)> FourierTransformFormula = new List<(bool[], bool)>();
             for (int i = 0; i < Source.ValuesArray.Length; i++)
-                FourierTransformFormula.Add((GetBinaryArray(i, Source.CountOfVariables), Source.ValuesArray[i]));
+                FourierTransformFormula.Add((global::Misc.GetBinaryArray(i, Source.CountOfVariables), Source.ValuesArray[i]));
 
             return FourierTransformFormula.ToArray();
         }
@@ -264,7 +264,7 @@ namespace KMZILib
             int[] Result = new int[Source.ValuesArray.Length];
             for (int i = 0; i < Source.ValuesArray.Length; i++)
             {
-                bool[] CurrentSet = GetBinaryArray(i, Source.CountOfVariables);
+                bool[] CurrentSet = global::Misc.GetBinaryArray(i, Source.CountOfVariables);
                 Result[i] = WalshHadamardTransformFormula[0].Item1.All(boo => !boo)
                     ? WalshHadamardTransformFormula[0].Item2 ? -1 : 1
                     : 0;
@@ -385,67 +385,17 @@ namespace KMZILib
             return BufferDNFs;
         }
 
-        /// <summary>
-        ///     Возвращает значение целого числа в виде массива двоичных значений в указанном количество от его начала
-        ///     (младших бит)
-        /// </summary>
-        /// <param name="Number">Число, которое необходимо перевести в двоичную систему счисления</param>
-        /// <param name="Count">Число разрядов. Отсчет ведется от младших к старщим</param>
-        /// <returns>Массив двоичных значение - двоичное представление числа</returns>
-        public static bool[] GetBinaryArray(BigInteger Number, int Count)
+        public static BinaryFunction GetDerivativeInDirection(BinaryFunction Source, bool[] Direction)
         {
-            if (Number < 0)
-                throw new InvalidOperationException("Число должно быть положительным.");
-            BitArray number = new BitArray(Number.ToByteArray());
-            bool[] buffer = number.Cast<bool>().Reverse().SkipWhile(val => !val).ToArray();
-            bool[] Result = new bool[Count];
-            Array.Copy(buffer, 0, Result, Count < buffer.Length ? 0 : Count - buffer.Length,
-                Math.Min(Count, buffer.Length));
-            return Result.ToArray();
+            if(Source.CountOfVariables!=Direction.Length)
+                throw new InvalidOperationException("Длина набора направления взятия производной должна совпадать с числом переменных функции.");
+            //получили все наборы переменных для данной функции.
+            bool[][] Sets = Source.VariablesSets;
+            //Выполняем XOR между наборами переменных и заданным направление производной.
+            Sets = Sets.Select(val => val.Select((bol, ind) => bol ^ Direction[ind]).ToArray()).ToArray();
+            return null;
         }
 
-        /// <summary>
-        ///     Возвращает значение целого числа в виде массива двоичных значений
-        /// </summary>
-        /// <param name="Number">Число, которое необходимо перевести в двоичную систему счисления</param>
-        /// <returns>Массив двоичных значение - двоичное представление числа</returns>
-        public static bool[] GetBinaryArray(BigInteger Number)
-        {
-            if (Number < 0)
-                throw new InvalidOperationException("Число должно быть положительным.");
-            BitArray number = new BitArray(Number.ToByteArray());
-
-            int i = number.Count - 1;
-            while (i >= 0 && !number[i])
-                i--;
-            bool[] Result = new bool[i + 1];
-            for (int k = 0; i >= 0; i--, k++)
-                Result[k] = number[i];
-            return Result;
-        }
-
-        /// <summary>
-        ///     Возвращает бинарное представление целого числа.
-        ///     (младших бит)
-        /// </summary>
-        /// <param name="Number">Число, которое необходимо перевести в двоичную систему счисления</param>
-        /// <returns>Строка - двоичное представление числа</returns>
-        public static string GetBinaryString(BigInteger Number)
-        {
-            return string.Concat(GetBinaryArray(Number).Select(val => val ? '1' : '0'));
-        }
-
-        /// <summary>
-        ///     Возвращает бинарное представление целого числа с заданным числом разрядов.
-        ///     (младших бит)
-        /// </summary>
-        /// <param name="Number">Число, которое необходимо перевести в двоичную систему счисления</param>
-        /// <param name="Count">Число разрядов. Отсчет ведется от младших к старщим</param>
-        /// <returns>Строка - двоичное представление числа</returns>
-        public static string GetBinaryString(BigInteger Number, int Count)
-        {
-            return string.Concat(GetBinaryArray(Number, Count).Select(val => val ? '1' : '0'));
-        }
 
         /// <summary>
         ///     Метод, возвращающий таблицу Поста для заданного множества функций. Строки - функции. Столбцы - класс функций T0,
