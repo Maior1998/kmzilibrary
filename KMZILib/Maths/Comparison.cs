@@ -471,7 +471,7 @@ namespace KMZILib
             {
                 BigInteger a = 5;
                 LinearComparison Result = new LinearComparison(source.A, source.M);
-                bool[] sma = global::Misc.GetBinaryArray(degree).Skip(1).ToArray();
+                bool[] sma = Misc.GetBinaryArray(degree).Skip(1).ToArray();
                 foreach (bool bit in sma)
                 {
                     Result.A *= Result.A;

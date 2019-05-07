@@ -42,7 +42,7 @@ namespace KMZILib
             {
                 if (!Source.ValuesArray[i])
                     continue;
-                FourierTransformFormula.Add(global::Misc.GetBinaryArray(i, Source.CountOfVariables));
+                FourierTransformFormula.Add(Misc.GetBinaryArray(i, Source.CountOfVariables));
             }
 
             return FourierTransformFormula.ToArray();
@@ -78,7 +78,7 @@ namespace KMZILib
             int[] Result = new int[Source.ValuesArray.Length];
             for (int i = 0; i < Source.ValuesArray.Length; i++)
             {
-                bool[] CurrentSet = global::Misc.GetBinaryArray(i, Source.CountOfVariables);
+                bool[] CurrentSet = Misc.GetBinaryArray(i, Source.CountOfVariables);
                 Result[i] = FourierTransformFormula[0].All(boo => !boo) ? 1 : 0;
                 for (int j = FourierTransformFormula[0].All(boo => !boo) ? 1 : 0;
                     j < FourierTransformFormula.Length;
@@ -107,7 +107,7 @@ namespace KMZILib
                 return false;
             for (int i = 0; i < Source.ValuesArray.Length; i++)
             {
-                bool[] CurrentSet = global::Misc.GetBinaryArray(i, Source.CountOfVariables);
+                bool[] CurrentSet = Misc.GetBinaryArray(i, Source.CountOfVariables);
                 int Weight = CurrentSet.Count(val => val);
                 if (Weight > m || Weight == 0)
                     continue;
@@ -133,7 +133,7 @@ namespace KMZILib
                 List<bool[]> States = new List<bool[]>();
                 for (int i = 0; i < (int) Math.Pow(2, Source.CountOfVariables); i++)
                 {
-                    bool[] CurrentSet = global::Misc.GetBinaryArray(i, Source.CountOfVariables);
+                    bool[] CurrentSet = Misc.GetBinaryArray(i, Source.CountOfVariables);
                     if (CurrentSet.Count(val => val) != FixedVariablesCount)
                         continue;
                     if (States.Any(set => set.Select((boo, ind) => boo == CurrentSet[ind]).All(boo => boo)))
@@ -146,7 +146,7 @@ namespace KMZILib
                     for (int j = 0; j < Source.ValuesArray.Length; j++)
                     {
                         //Текущая строка таблицы истинности
-                        bool[] CurrentFuncSet = global::Misc.GetBinaryArray(j, Source.CountOfVariables);
+                        bool[] CurrentFuncSet = Misc.GetBinaryArray(j, Source.CountOfVariables);
                         bool FuncValue = Source.ValuesArray[j];
                         if (NewFunctions.Keys.Any(row =>
                             row.Select((variable, index) => !CurrentSet[index] || variable == CurrentFuncSet[index])
@@ -180,7 +180,7 @@ namespace KMZILib
             for (; m < Source.CountOfVariables; m++)
             for (int i = 0; i < Source.ValuesArray.Length; i++)
             {
-                bool[] CurrentSet = global::Misc.GetBinaryArray(i, Source.CountOfVariables);
+                bool[] CurrentSet = Misc.GetBinaryArray(i, Source.CountOfVariables);
                 int Weight = CurrentSet.Count(val => val);
                 if (Weight > m || Weight == 0)
                     continue;
@@ -204,7 +204,7 @@ namespace KMZILib
                 throw new InvalidOperationException("Число m должно быть меньше числа аргументов функции.");
             for (int i = 0; i < Source.ValuesArray.Length; i++)
             {
-                bool[] CurrentSet = global::Misc.GetBinaryArray(i, Source.CountOfVariables);
+                bool[] CurrentSet = Misc.GetBinaryArray(i, Source.CountOfVariables);
                 int Weight = CurrentSet.Count(val => val);
                 if (Weight > m || Weight == 0)
                     continue;
@@ -225,7 +225,7 @@ namespace KMZILib
         {
             List<(bool[], bool)> FourierTransformFormula = new List<(bool[], bool)>();
             for (int i = 0; i < Source.ValuesArray.Length; i++)
-                FourierTransformFormula.Add((global::Misc.GetBinaryArray(i, Source.CountOfVariables), Source.ValuesArray[i]));
+                FourierTransformFormula.Add((Misc.GetBinaryArray(i, Source.CountOfVariables), Source.ValuesArray[i]));
 
             return FourierTransformFormula.ToArray();
         }
@@ -264,7 +264,7 @@ namespace KMZILib
             int[] Result = new int[Source.ValuesArray.Length];
             for (int i = 0; i < Source.ValuesArray.Length; i++)
             {
-                bool[] CurrentSet = global::Misc.GetBinaryArray(i, Source.CountOfVariables);
+                bool[] CurrentSet = Misc.GetBinaryArray(i, Source.CountOfVariables);
                 Result[i] = WalshHadamardTransformFormula[0].Item1.All(boo => !boo)
                     ? WalshHadamardTransformFormula[0].Item2 ? -1 : 1
                     : 0;
@@ -385,6 +385,12 @@ namespace KMZILib
             return BufferDNFs;
         }
 
+        /// <summary>
+        /// Возвращает производную бинарной функции по заданному направлению.
+        /// </summary>
+        /// <param name="Source"></param>
+        /// <param name="Direction"></param>
+        /// <returns></returns>
         public static BinaryFunction GetDerivativeInDirection(BinaryFunction Source, bool[] Direction)
         {
             if(Source.CountOfVariables!=Direction.Length)
@@ -393,9 +399,22 @@ namespace KMZILib
             bool[][] Sets = Source.VariablesSets;
             //Выполняем XOR между наборами переменных и заданным направление производной.
             Sets = Sets.Select(val => val.Select((bol, ind) => bol ^ Direction[ind]).ToArray()).ToArray();
-            return null;
+            return new BinaryFunction(Sets.Select((set,ind)=>Source.GetValue(set)^Source.ValuesArray[ind]).ToArray());
         }
 
+        /// <summary>
+        /// Получает значение заданной функции на заданном наборе.
+        /// </summary>
+        /// <param name="Source"></param>
+        /// <param name="Set"></param>
+        /// <returns></returns>
+        public static bool GetValue(BinaryFunction Source, bool[] Set)
+        {
+            if (Set.Length != Source.CountOfVariables)
+                throw new InvalidOperationException("Длина набора должна совпадать с числом переменных данной функции");
+            return Source.ValuesArray[
+                Enumerable.Range(0, (int)Math.Pow(Source.CountOfVariables, 2)).First(val => val == Misc.GetValue(Set))];
+        }
 
         /// <summary>
         ///     Метод, возвращающий таблицу Поста для заданного множества функций. Строки - функции. Столбцы - класс функций T0,

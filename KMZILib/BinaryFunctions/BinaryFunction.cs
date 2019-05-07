@@ -82,7 +82,7 @@ namespace KMZILib
         public BinaryFunction(int Source)
         {
 
-            ValuesArray = global::Misc.GetBinaryArray(Source, (int) Math.Ceiling(Math.Log(Source, 2)));
+            ValuesArray = Misc.GetBinaryArray(Source, (int) Math.Ceiling(Math.Log(Source, 2)));
         }
 
         /// <summary>
@@ -92,7 +92,7 @@ namespace KMZILib
         /// <param name="VariablesCount"></param>
         public BinaryFunction(int Source, int VariablesCount)
         {
-            ValuesArray = global::Misc.GetBinaryArray(Source, (int) Math.Pow(2, VariablesCount));
+            ValuesArray = Misc.GetBinaryArray(Source, (int) Math.Pow(2, VariablesCount));
         }
 
         /// <summary>
@@ -116,7 +116,7 @@ namespace KMZILib
                 bool[,] Result = new bool[TableLength, CountOfVariables + 1];
                 for (int i = 0; i < TableLength; i++)
                 {
-                    bool[] Row = global::Misc.GetBinaryArray(i, CountOfVariables);
+                    bool[] Row = Misc.GetBinaryArray(i, CountOfVariables);
                     for (int j = 0; j < CountOfVariables; j++)
                         Result[i, j] = Row[j];
                     Result[i, CountOfVariables] = ValuesArray[i];
@@ -184,11 +184,11 @@ namespace KMZILib
 
                 for (int i = 0; i < ValuesArray.Length - 1; i++)
                 {
-                    DNF idnf = new DNF(global::Misc.GetBinaryArray(i, CountOfVariables).Select(val => new bool?(val)).ToArray());
+                    DNF idnf = new DNF(Misc.GetBinaryArray(i, CountOfVariables).Select(val => new bool?(val)).ToArray());
                     for (int j = i + 1; j < ValuesArray.Length; j++)
                     {
 
-                        DNF jdnf = new DNF(global::Misc.GetBinaryArray(j, CountOfVariables).Select(val => new bool?(val)).ToArray());
+                        DNF jdnf = new DNF(Misc.GetBinaryArray(j, CountOfVariables).Select(val => new bool?(val)).ToArray());
                         if (!idnf.IsPrecedeDNF(jdnf))
                             continue;
                         if (ValuesArray[i] && !ValuesArray[j])
@@ -223,7 +223,7 @@ namespace KMZILib
                 {
                     if (!PascalTriangle[i][0])
                         continue;
-                    if (global::Misc.GetBinaryArray(i).Count(val => val) > 1)
+                    if (Misc.GetBinaryArray(i).Count(val => val) > 1)
                         return false;
                 }
 
@@ -251,7 +251,7 @@ namespace KMZILib
 
                 //Треугольник Паскаля заполнен.
                 return new int[PascalTriangle.Length].Select((val, ind) => ind)
-                    .Where(val => PascalTriangle[val][0]).Select(index => global::Misc.GetBinaryArray(index).Count(val => val))
+                    .Where(val => PascalTriangle[val][0]).Select(index => Misc.GetBinaryArray(index).Count(val => val))
                     .Max();
             }
         }
@@ -268,7 +268,7 @@ namespace KMZILib
         {
             get
             {
-                return Enumerable.Range(0, ValuesArray.Length).Select(set => global::Misc.GetBinaryArray(set, CountOfVariables))
+                return Enumerable.Range(0, ValuesArray.Length).Select(set => Misc.GetBinaryArray(set, CountOfVariables))
                     .ToArray();
             }
         }
@@ -288,7 +288,7 @@ namespace KMZILib
                     if (!ValuesArray[i])
                         continue;
 
-                    bool[] variables = global::Misc.GetBinaryArray(i, CountOfVariables);
+                    bool[] variables = Misc.GetBinaryArray(i, CountOfVariables);
                     List<string> buffer = new List<string>();
                     for (int j = 0; j < CountOfVariables; j++)
                         buffer.Add(variables[j]
@@ -315,7 +315,7 @@ namespace KMZILib
                 {
                     if (ValuesArray[i])
                         continue;
-                    bool[] variables = global::Misc.GetBinaryArray(i, CountOfVariables);
+                    bool[] variables = Misc.GetBinaryArray(i, CountOfVariables);
                     List<string> buffer = new List<string>();
                     for (int j = 0; j < CountOfVariables; j++)
                         buffer.Add(!variables[j]
@@ -343,7 +343,7 @@ namespace KMZILib
                 {
                     if (!ValuesArray[i])
                         continue;
-                    PDNF.Add(global::Misc.GetBinaryArray(i, CountOfVariables).Select(elem => (bool?)elem).ToList());
+                    PDNF.Add(Misc.GetBinaryArray(i, CountOfVariables).Select(elem => (bool?)elem).ToList());
                 }
                 //Получили наборы СДНФ
 
@@ -416,7 +416,7 @@ namespace KMZILib
                 {
                     if (!PascalTriangle[i][0])
                         continue;
-                    bool[] variables = global::Misc.GetBinaryArray(i, CountOfVariables);
+                    bool[] variables = Misc.GetBinaryArray(i, CountOfVariables);
 
                     List<string> buffer = new List<string>();
                     for (int j = 0; j < CountOfVariables; j++)
@@ -486,12 +486,24 @@ namespace KMZILib
         /// </summary>
         public int MaxStableValue => GetMaxStableValue(this);
 
+        /// <summary>
+        /// Получает значение текущей функции на заданном наборе.
+        /// </summary>
+        /// <param name="Set"></param>
+        /// <returns></returns>
         public bool GetValue(bool[] Set)
         {
-            if (Set.Length!=CountOfVariables)
-                throw new InvalidOperationException("Длина набора должна совпадать с числом переменных данной функции");
-            return ValuesArray[
-                Enumerable.Range(0, (int) Math.Pow(CountOfVariables, 2)).First(val => val == Misc.GetValue(Set))];
+            return GetValue(this, Set);
+        }
+
+        /// <summary>
+        /// Возвращает производную текущей бинарной функции по заданному направлению.
+        /// </summary>
+        /// <param name="Direction"></param>
+        /// <returns></returns>
+        public BinaryFunction GetDerivativeInDirection(bool[] Direction)
+        {
+            return GetDerivativeInDirection(this, Direction);
         }
 
         /// <summary>
