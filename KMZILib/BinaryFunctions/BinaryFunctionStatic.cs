@@ -198,7 +198,7 @@ namespace KMZILib
         public static int GetMaxCorrelationImmunityValue(BinaryFunction Source)
         {
 
-            for (int m = 1; m < Source.CountOfVariables; m++)
+            for (int m = 1; m <= Source.CountOfVariables; m++)
                 for (int i = 0; i < Source.ValuesArray.Length; i++)
                 {
                     bool[] CurrentSet = Misc.GetBinaryArray(i, Source.CountOfVariables);
