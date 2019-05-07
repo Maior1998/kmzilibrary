@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Configuration;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
@@ -83,7 +84,7 @@ namespace KMZILib
                 for (int j = FourierTransformFormula[0].All(boo => !boo) ? 1 : 0;
                     j < FourierTransformFormula.Length;
                     j++)
-                    Result[i] += (int) Math.Pow(-1,
+                    Result[i] += (int)Math.Pow(-1,
                         CurrentSet.Where((val, ind) => FourierTransformFormula[j][ind])
                             .Aggregate(false, (Current, next) => Current ^ next)
                             ? 1
@@ -101,20 +102,40 @@ namespace KMZILib
         /// <returns></returns>
         public static bool IsStable(BinaryFunction Source, int m)
         {
-            if (m >= Source.CountOfVariables)
-                throw new InvalidOperationException("Число m должно быть меньше числа аргументов функции.");
-            if (!Source.IsEquilibrium)
-                return false;
-            for (int i = 0; i < Source.ValuesArray.Length; i++)
+            //Выбираем, какие переменные фиксировать. Задаем наборы, в которых на местах фиксированных переменных будут 1, на месте свободных 0.
+            List<bool[]> States = new List<bool[]>();
+            for (int i = 0; i < (int)Math.Pow(2, Source.CountOfVariables); i++)
             {
                 bool[] CurrentSet = Misc.GetBinaryArray(i, Source.CountOfVariables);
-                int Weight = CurrentSet.Count(val => val);
-                if (Weight > m || Weight == 0)
+                if (CurrentSet.Count(val => val) != m)
                     continue;
-                if (Source.ValuesArray[i])
+                if (States.Any(set => set.Select((boo, ind) => boo == CurrentSet[ind]).All(boo => boo)))
+                    continue;
+                States.Add(CurrentSet);
+                //Выбрали, какие переменные зафиксировать.
+
+                //Создаем словарь, где ключи - конкретный зафиксированный набор, а значения - значения столбца функции в таких наборах
+                Dictionary<bool[], List<bool>> NewFunctions = new Dictionary<bool[], List<bool>>();
+                for (int j = 0; j < Source.ValuesArray.Length; j++)
+                {
+                    //Текущая строка таблицы истинности
+                    bool[] CurrentFuncSet = Misc.GetBinaryArray(j, Source.CountOfVariables);
+                    bool FuncValue = Source.ValuesArray[j];
+                    if (NewFunctions.Keys.Any(row =>
+                        row.Select((variable, index) => !CurrentSet[index] || variable == CurrentFuncSet[index])
+                            .All(res => res)))
+                    {
+                        NewFunctions[NewFunctions.Keys.First(row =>
+                            row.Select((variable, index) => !CurrentSet[index] || variable == CurrentFuncSet[index])
+                                .All(res => res))].Add(FuncValue);
+                    }
+                    else
+                        NewFunctions.Add(CurrentFuncSet, new List<bool>(new[] { FuncValue }));
+                }
+
+                if (NewFunctions.Values.Any(val => !new BinaryFunction(val.ToArray()).IsEquilibrium))
                     return false;
             }
-
 
             return true;
         }
@@ -131,7 +152,7 @@ namespace KMZILib
             {
                 //Выбираем, какие переменные фиксировать. Задаем наборы, в которых на местах фиксированных переменных будут 1, на месте свободных 0.
                 List<bool[]> States = new List<bool[]>();
-                for (int i = 0; i < (int) Math.Pow(2, Source.CountOfVariables); i++)
+                for (int i = 0; i < (int)Math.Pow(2, Source.CountOfVariables); i++)
                 {
                     bool[] CurrentSet = Misc.GetBinaryArray(i, Source.CountOfVariables);
                     if (CurrentSet.Count(val => val) != FixedVariablesCount)
@@ -157,7 +178,7 @@ namespace KMZILib
                                     .All(res => res))].Add(FuncValue);
                         }
                         else
-                            NewFunctions.Add(CurrentFuncSet, new List<bool>(new[] {FuncValue}));
+                            NewFunctions.Add(CurrentFuncSet, new List<bool>(new[] { FuncValue }));
                     }
 
                     if (NewFunctions.Values.Any(val => !new BinaryFunction(val.ToArray()).IsEquilibrium))
@@ -170,26 +191,26 @@ namespace KMZILib
         }
 
         /// <summary>
-        ///     Возвращает максимальный порядок имунности для заданной функции.
+        ///     Возвращает максимальный порядок корреляционной имунности для заданной функции.
         /// </summary>
         /// <param name="Source"></param>
         /// <returns></returns>
         public static int GetMaxCorrelationImmunityValue(BinaryFunction Source)
         {
-            int m = 1;
-            for (; m < Source.CountOfVariables; m++)
-            for (int i = 0; i < Source.ValuesArray.Length; i++)
-            {
-                bool[] CurrentSet = Misc.GetBinaryArray(i, Source.CountOfVariables);
-                int Weight = CurrentSet.Count(val => val);
-                if (Weight > m || Weight == 0)
-                    continue;
-                if (Source.ValuesArray[i])
-                    break;
-            }
+
+            for (int m = 1; m < Source.CountOfVariables; m++)
+                for (int i = 0; i < Source.ValuesArray.Length; i++)
+                {
+                    bool[] CurrentSet = Misc.GetBinaryArray(i, Source.CountOfVariables);
+                    int Weight = CurrentSet.Count(val => val);
+                    if (Weight != m)
+                        continue;
+                    if (Source.WalshHadamardSpectrum[i] != 0)
+                        return m-1;
+                }
 
 
-            return m - 1;
+            return Source.CountOfVariables;
         }
 
         /// <summary>
@@ -208,10 +229,114 @@ namespace KMZILib
                 int Weight = CurrentSet.Count(val => val);
                 if (Weight > m || Weight == 0)
                     continue;
-                if (Source.ValuesArray[i])
+                if (Source.WalshHadamardSpectrum[i]!=0)
                     return false;
             }
 
+
+            return true;
+        }
+
+        /// <summary>
+        /// Определяет, удовлетворяет ли заданная функция критерию распространения заданной степени.
+        /// </summary>
+        /// <param name="Source">Исходная функция.</param>
+        /// <param name="l">Степень критерия.</param>
+        /// <returns></returns>
+        public static bool HasSAC(BinaryFunction Source, int l)
+        {
+            if (l > Source.CountOfVariables)
+                throw new InvalidOperationException("Число l не должно превышать числа аргументов функции.");
+            if (l <= 1)
+                throw new InvalidOperationException("Число l должно быть больше единицы.");
+            for (int i = 0; i < Source.ValuesArray.Length; i++)
+            {
+                bool[] CurrentSet = Misc.GetBinaryArray(i, Source.CountOfVariables);
+                int Weight = CurrentSet.Count(val => val);
+                if (Weight >= l || Weight == 0)
+                    continue;
+                if (!Source.GetDerivativeInDirection(CurrentSet).IsEquilibrium)
+                    return false;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Определяет наивысшую степень критерия распространения для заданной функции.
+        /// </summary>
+        /// <param name="Source">Исходная функция.</param>
+        /// <returns></returns>
+        public static int GetMaxSACValue(BinaryFunction Source)
+        {
+            for (int l = 2; l < Source.CountOfVariables; l++)
+            {
+                for (int i = 0; i < Source.ValuesArray.Length; i++)
+                {
+                    bool[] CurrentSet = Misc.GetBinaryArray(i, Source.CountOfVariables);
+                    int Weight = CurrentSet.Count(val => val);
+                    if (Weight != l)
+                        continue;
+                    if (!Source.GetDerivativeInDirection(CurrentSet).IsEquilibrium)
+                        return l - 1;
+                }
+            }
+
+            return Source.CountOfVariables;
+
+        }
+
+        /// <summary>
+        /// Определяет, удовлетворяет ли заданная функция критерию распространения заданной степени и порядка.
+        /// </summary>
+        /// <param name="Source">Исходная функция.</param>
+        /// <param name="l">Степень критерия распространения.</param>
+        /// <param name="k">Порядок критерия распространения.</param>
+        /// <returns></returns>
+        public static bool HasSAC(BinaryFunction Source, int l, int k)
+        {
+            if (l > Source.CountOfVariables)
+                throw new InvalidOperationException("Число l не должно превышать числа аргументов функции.");
+            if (l <= 1)
+                throw new InvalidOperationException("Число l должно быть больше единицы.");
+            if (k >= Source.CountOfVariables)
+                throw new InvalidOperationException("Число k должно быть меньше числа аргументов функции.");
+            if (k < 1)
+                throw new InvalidOperationException("Число k не должно быть меньше единицы.");
+
+            //Выбираем, какие переменные фиксировать. Задаем наборы, в которых на местах фиксированных переменных будут 1, на месте свободных 0.
+            List<bool[]> States = new List<bool[]>();
+            for (int i = 0; i < (int)Math.Pow(2, Source.CountOfVariables); i++)
+            {
+                bool[] CurrentSet = Misc.GetBinaryArray(i, Source.CountOfVariables);
+                if (CurrentSet.Count(val => val) != k)
+                    continue;
+                if (States.Any(set => set.Select((boo, ind) => boo == CurrentSet[ind]).All(boo => boo)))
+                    continue;
+                States.Add(CurrentSet);
+                //Выбрали, какие переменные зафиксировать.
+
+                //Создаем словарь, где ключи - конкретный зафиксированный набор, а значения - значения столбца функции в таких наборах
+                Dictionary<bool[], List<bool>> NewFunctions = new Dictionary<bool[], List<bool>>();
+                for (int j = 0; j < Source.ValuesArray.Length; j++)
+                {
+                    //Текущая строка таблицы истинности
+                    bool[] CurrentFuncSet = Misc.GetBinaryArray(j, Source.CountOfVariables);
+                    bool FuncValue = Source.ValuesArray[j];
+                    if (NewFunctions.Keys.Any(row =>
+                        row.Select((variable, index) => !CurrentSet[index] || variable == CurrentFuncSet[index])
+                            .All(res => res)))
+                    {
+                        NewFunctions[NewFunctions.Keys.First(row =>
+                            row.Select((variable, index) => !CurrentSet[index] || variable == CurrentFuncSet[index])
+                                .All(res => res))].Add(FuncValue);
+                    }
+                    else
+                        NewFunctions.Add(CurrentFuncSet, new List<bool>(new[] { FuncValue }));
+                }
+
+                if (NewFunctions.Values.Any(val => !new BinaryFunction(val.ToArray()).HasSAC(l)))
+                    return false;
+            }
 
             return true;
         }
@@ -271,7 +396,7 @@ namespace KMZILib
                 for (int j = WalshHadamardTransformFormula[0].Item1.All(boo => !boo) ? 1 : 0;
                     j < WalshHadamardTransformFormula.Length;
                     j++)
-                    Result[i] += (int) Math.Pow(-1,
+                    Result[i] += (int)Math.Pow(-1,
                         CurrentSet.Where((val, ind) => WalshHadamardTransformFormula[j].Item1[ind])
                             .Aggregate(false, (Current, next) => Current ^ next) ^
                         WalshHadamardTransformFormula[j].Item2
@@ -291,7 +416,7 @@ namespace KMZILib
         /// <returns></returns>
         public static int Distance(BinaryFunction First, BinaryFunction[] Second)
         {
-            return Distance(new[] {First}, Second);
+            return Distance(new[] { First }, Second);
         }
 
         /// <summary>
@@ -312,8 +437,8 @@ namespace KMZILib
             DNF[] TargetingColumns =
                 QuineTable[TargetRow].Keys.Where(key => QuineTable[TargetRow][key]).ToArray();
             foreach (KeyValuePair<DNF, Dictionary<DNF, bool>> row in QuineTable)
-            foreach (DNF targetingColumn in TargetingColumns)
-                row.Value.Remove(targetingColumn);
+                foreach (DNF targetingColumn in TargetingColumns)
+                    row.Value.Remove(targetingColumn);
         }
 
         /// <summary>
@@ -393,13 +518,13 @@ namespace KMZILib
         /// <returns></returns>
         public static BinaryFunction GetDerivativeInDirection(BinaryFunction Source, bool[] Direction)
         {
-            if(Source.CountOfVariables!=Direction.Length)
+            if (Source.CountOfVariables != Direction.Length)
                 throw new InvalidOperationException("Длина набора направления взятия производной должна совпадать с числом переменных функции.");
             //получили все наборы переменных для данной функции.
             bool[][] Sets = Source.VariablesSets;
             //Выполняем XOR между наборами переменных и заданным направление производной.
             Sets = Sets.Select(val => val.Select((bol, ind) => bol ^ Direction[ind]).ToArray()).ToArray();
-            return new BinaryFunction(Sets.Select((set,ind)=>Source.GetValue(set)^Source.ValuesArray[ind]).ToArray());
+            return new BinaryFunction(Sets.Select((set, ind) => Source.GetValue(set) ^ Source.ValuesArray[ind]).ToArray());
         }
 
         /// <summary>

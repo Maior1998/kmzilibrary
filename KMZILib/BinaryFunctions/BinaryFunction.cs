@@ -487,6 +487,18 @@ namespace KMZILib
         public int MaxStableValue => GetMaxStableValue(this);
 
         /// <summary>
+        /// Определяет максимальную степень критерия распространения для данной функции.
+        /// </summary>
+        public int MaxSACValue => GetMaxSACValue(this);
+
+        /// <summary>
+        /// Определяет, удовлетворяет ли данная функция критерию распространения заданной степени.
+        /// </summary>
+        /// <param name="l">Степень критерия.</param>
+        /// <returns></returns>
+        public bool HasSAC(int l) => HasSAC(this, l);
+
+        /// <summary>
         /// Получает значение текущей функции на заданном наборе.
         /// </summary>
         /// <param name="Set"></param>
