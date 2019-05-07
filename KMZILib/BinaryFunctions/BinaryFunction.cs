@@ -393,7 +393,7 @@ namespace KMZILib
         /// <summary>
         ///     Строковое представление функции в виде полинома Жегалкина
         /// </summary>
-        public string ZhegalkinPolynomial
+        public string ANF
         {
             get
             {
