@@ -411,8 +411,9 @@ namespace KMZILib
                 }
 
                 //Треугольник Паскаля заполнен.
+                //TODO: в идеале нужно выводить по кодам Грея
                 List<string> answer = new List<string>();
-                for (int i = 0; i < ValuesArray.Length; i++)
+                for (int i = ValuesArray.Length-1; i >=0; i--)
                 {
                     if (!PascalTriangle[i][0])
                         continue;

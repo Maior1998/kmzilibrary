@@ -18,7 +18,8 @@ namespace Ручной_тест
         
         static void Main(string[] args)
         {
-            Console.WriteLine(BinaryFunction.GetDerivativeInDirection(new BinaryFunction(0b0110, 2), new[] {false, true}).Value);
+            string Alphabet = Ciphers.Languages.EnglishLanguage.GetInstanse().Alphabet + ",.!?*+";
+            Console.WriteLine(Alphabet[0b11100]);
         }
 
         
