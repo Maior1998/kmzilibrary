@@ -109,7 +109,7 @@ namespace KMZILib
                     //k - это число частей, на которые нам необходимо разбивать вероятности
                     double[] ProbCop = new double[Probabilities.Length];
                     Probabilities.CopyTo(ProbCop, 0);
-                    Array.Sort(ProbCop, (d, d1) => (int) (d1 - d));
+                    Array.Sort(ProbCop, (d, d1) => Math.Sign((d1 - d)));
                     //отсортировали свою копию массива в порядке убывания вероятностей
 
                     Stack<int> Insertions = new Stack<int>();

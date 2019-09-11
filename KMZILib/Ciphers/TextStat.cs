@@ -21,6 +21,7 @@ namespace KMZILib
             Dictionary<char, int> Result = Ciphers.Languages.CurrentLanguage.AlphabetArray.ToDictionary<char, char, int>(letter => letter, letter => 0);
             foreach (char symbol in SourceText)
             {
+                
                 if (!Ciphers.Languages.CurrentLanguage.Alphabet.Contains(symbol))
                     continue;
                 Result[symbol]++;
