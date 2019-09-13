@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using static KMZILib.Comparison;
 
@@ -24,7 +25,7 @@ namespace KMZILib
             }
 
             /// <summary>
-            ///     Инициализирует вектор, представляющий заданный массив байтов
+            ///     Инициализирует вектор, представляющий заданный массив байт.
             /// </summary>
             /// <param name="value"></param>
             public ByteSet(byte[] value)
@@ -39,6 +40,17 @@ namespace KMZILib
             /// <param name="Other"></param>
             public ByteSet(ByteSet Other) : this(Other.Value)
             {
+            }
+
+            /// <summary>
+            /// Инициализирует новый вектор по заданной строке.
+            /// </summary>
+            /// <param name="Source">Строка из нулей и единиц.</param>
+            public ByteSet(string Source)
+            {
+                if(Source.Any(chr=>chr!='0'&&chr!='1')) throw new InvalidCastException("Строка содержит неизвестные символы! Допускаются только символы \'0\' и \'1\'.''''");
+                Value=Source.Select(val=>val=='1'?(byte)1:(byte)0).ToArray();
+
             }
 
             /// <summary>
