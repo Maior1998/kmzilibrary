@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Text;
 using static KMZILib.Comparison;
 
 namespace KMZILib
@@ -84,6 +85,37 @@ namespace KMZILib
         }
 
         /// <summary>
+        /// Осуществляет декодирование битовой строки по заданному алфавитному набору. Рабоатет только для префиксных кодов.
+        /// </summary>
+        /// <param name="Source"></param>
+        /// <param name="Codes"></param>
+        /// <returns></returns>
+        public static string Decode(string Source, Dictionary<char, string> Codes)
+        {
+            StringBuilder Result = new StringBuilder();
+            int index = 0;
+            while (index != Source.Length)
+            {
+                char CurSymbol = Codes.First(codepair => Source.IndexOf(codepair.Value, index) == index).Key;
+                Result.Append(CurSymbol);
+                index += Codes[CurSymbol].Length;
+            }
+
+            return Result.ToString();
+        }
+
+        /// <summary>
+        /// Осуществляет кодирование строки в битовую строку по заданному словарю какого-либо кода.
+        /// </summary>
+        /// <param name="Source">Исходная строка.</param>
+        /// <param name="Codes">Словарь, полученный из кодовых методов.</param>
+        /// <returns></returns>
+        public static string Encode(string Source, Dictionary<char, string> Codes)
+        {
+            return string.Concat(Source.Select(chr => Codes[chr]));
+        }
+
+        /// <summary>
         ///     Коды, осуществляющие сжатие данных
         /// </summary>
         public static class DataCompressionCodes
@@ -103,7 +135,7 @@ namespace KMZILib
                 ///     Массив <see cref="ByteSet" />[], содержащий в себе коды, расположенные в соответствии введенным частотам в
                 ///     порядке убывания.
                 /// </returns>
-                public static ByteSet[] Encode(double[] Probabilities, int k, out double AverageLength)
+                public static ByteSet[] GetCodes(double[] Probabilities, int k, out double AverageLength)
                 {
                     AverageLength = 0;
                     if (k >= Probabilities.Length)
@@ -207,7 +239,86 @@ namespace KMZILib
                     AverageLength += Probabilities.Select((t, i) => t * Answer[i].Length).Sum();
                     return Answer.ToArray();
                 }
+
+                
             }
+
+            /// <summary>
+            /// Представляет код Шеннона.
+            /// </summary>
+            public static class ShannonCoding
+            {
+                /// <summary>
+                /// Возвращает дробную часть вещественного числа в двоичном представлении.
+                /// </summary>
+                /// <param name="Source">Вещественное число.</param>
+                /// <param name="Length">Необходимое число знаков после запятой.</param>
+                /// <returns></returns>
+                private static string DouleFractToString(double Source, int Length)
+                {
+                    Source -= (int)Source;
+                    StringBuilder Result = new StringBuilder();
+                    while (Result.Length < Length)
+                    {
+                        Source *= 2;
+                        if (Source > 1)
+                        {
+                            Source -= 1;
+                            Result.Append('1');
+                        }
+                        else
+                        {
+                            Result.Append('0');
+                        }
+                    }
+
+                    //Если набрали меньше символов, чем в заданной длине, то дополняем до неё.
+                    if (Result.Length < Length)
+                        Result.Append(new char[Length - Result.Length].Select(ch => '0').ToArray());
+
+                    //отдаем ответ.
+                    return Result.ToString();
+                }
+
+                /// <summary>
+                /// Возвращает значение L, необходимое для алгоритма Шеннона, для заданной вероятности.
+                /// </summary>
+                /// <param name="Prob"></param>
+                /// <returns></returns>
+                private static int GetL(double Prob)
+                {
+                    //неэффективно. Лучше использовать логарифм, но чет так впадлу округлять
+                    int Result;
+                    for (Result = 1; Math.Pow(2, -Result) > Prob; Result++)
+                    {
+                    }
+
+                    return Result;
+
+                }
+
+                /// <summary>
+                /// Осуществляет кодирование Шеннона.
+                /// </summary>
+                /// <param name="Probabilities">Массив вероятностей исходных символов. Будут возвращены отсортированные в порядке убывания вероятностей коды.</param>
+                /// <returns></returns>
+                public static ByteSet[] GetCodes(double[] Probabilities, out double AverageLength)
+                {
+                    AverageLength = 0;
+                    ByteSet[] Result = new ByteSet[Probabilities.Length];
+                    double[] Probs = Probabilities.OrderByDescending(val => val).ToArray();
+                    double Sum = 0;
+                    for (int i = 0; i < Probs.Length; i++)
+                    {
+                        Result[i] = new ByteSet(DouleFractToString(Sum, GetL(Probs[i])));
+                        Sum += Probs[i];
+                    }
+                    AverageLength += Probabilities.Select((t, i) => t * Result[i].Length).Sum();
+                    return Result;
+                }
+            }
+
+            
         }
     }
 }
