@@ -248,37 +248,7 @@ namespace KMZILib
             /// </summary>
             public static class ShannonCoding
             {
-                /// <summary>
-                /// Возвращает дробную часть вещественного числа в двоичном представлении.
-                /// </summary>
-                /// <param name="Source">Вещественное число.</param>
-                /// <param name="Length">Необходимое число знаков после запятой.</param>
-                /// <returns></returns>
-                private static string DouleFractToString(double Source, int Length)
-                {
-                    Source -= (int)Source;
-                    StringBuilder Result = new StringBuilder();
-                    while (Result.Length < Length)
-                    {
-                        Source *= 2;
-                        if (Source > 1)
-                        {
-                            Source -= 1;
-                            Result.Append('1');
-                        }
-                        else
-                        {
-                            Result.Append('0');
-                        }
-                    }
-
-                    //Если набрали меньше символов, чем в заданной длине, то дополняем до неё.
-                    if (Result.Length < Length)
-                        Result.Append(new char[Length - Result.Length].Select(ch => '0').ToArray());
-
-                    //отдаем ответ.
-                    return Result.ToString();
-                }
+                
 
                 /// <summary>
                 /// Возвращает значение L, необходимое для алгоритма Шеннона, для заданной вероятности.
@@ -310,7 +280,7 @@ namespace KMZILib
                     double Sum = 0;
                     for (int i = 0; i < Probs.Length; i++)
                     {
-                        Result[i] = new ByteSet(DouleFractToString(Sum, GetL(Probs[i])));
+                        Result[i] = new ByteSet(DoubleFractToString(Sum, GetL(Probs[i])));
                         Sum += Probs[i];
                     }
                     AverageLength += Probabilities.Select((t, i) => t * Result[i].Length).Sum();
@@ -318,7 +288,59 @@ namespace KMZILib
                 }
             }
 
-            
+            /// <summary>
+            /// Возвращает дробную часть вещественного числа в двоичном представлении.
+            /// </summary>
+            /// <param name="Source">Вещественное число.</param>
+            /// <param name="Length">Необходимое число знаков после запятой.</param>
+            /// <returns></returns>
+            private static string DoubleFractToString(double Source, int Length)
+            {
+                Source -= (int)Source;
+                StringBuilder Result = new StringBuilder();
+                while (Result.Length < Length)
+                {
+                    Source *= 2;
+                    if (Source > 1)
+                    {
+                        Source -= 1;
+                        Result.Append('1');
+                    }
+                    else
+                    {
+                        Result.Append('0');
+                    }
+                }
+
+                //Если набрали меньше символов, чем в заданной длине, то дополняем до неё.
+                if (Result.Length < Length)
+                    Result.Append(new char[Length - Result.Length].Select(ch => '0').ToArray());
+
+                //отдаем ответ.
+                return Result.ToString();
+            }
+
+            public static class GilbertCoding
+            {
+                public static ByteSet[] GetCodes(double[] Probabilities, out double AverageLength)
+                {
+
+                    AverageLength = 0;
+                    double[] Q=new double[Probabilities.Length];
+                    ByteSet[] Result = new ByteSet[Probabilities.Length];
+
+                    for (int i = 0; i < Q.Length; i++)
+                    {
+                        Q[i] += Probabilities[i]/2;
+                        Result[i]=new ByteSet(DoubleFractToString(Q[i],(int)-Math.Log(Probabilities[i],2)+1));
+                        for (int j = i + 1; j < Probabilities.Length; j++)
+                            Q[j] += Probabilities[j];
+                    }
+
+                    AverageLength = Result.Select((res, ind) => res.Length * Probabilities[ind]).Sum();
+                    return Result.OrderBy(set => set.Length).ToArray();
+                }
+            }
         }
     }
 }
