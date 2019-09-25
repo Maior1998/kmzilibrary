@@ -65,7 +65,7 @@ namespace KMZILib
             public string StringValue => string.Join("", Value);
 
             /// <summary>
-            ///     Длина вектора (число байтов)
+            ///     Длина вектора (число байт)
             /// </summary>
             public int Length => Value.Length;
 
@@ -75,7 +75,7 @@ namespace KMZILib
             }
 
             /// <summary>
-            ///     Строковое представление байтового ветора
+            ///     Строковое представление байтового вектора.
             /// </summary>
             /// <returns>Строка, представляющая все байты ветокра</returns>
             public override string ToString()
@@ -257,7 +257,7 @@ namespace KMZILib
                 /// <returns></returns>
                 private static int GetL(double Prob)
                 {
-                    //неэффективно. Лучше использовать логарифм, но чет так впадлу округлять
+                    //неэффективно. Лучше использовать логарифм, но чет так впадлу округлять.
                     int Result;
                     for (Result = 1; Math.Pow(2, -Result) > Prob; Result++)
                     {
@@ -338,7 +338,7 @@ namespace KMZILib
                     }
 
                     AverageLength = Result.Select((res, ind) => res.Length * Probabilities[ind]).Sum();
-                    return Result.OrderBy(set => set.Length).ToArray();
+                    return Result;
                 }
             }
         }
