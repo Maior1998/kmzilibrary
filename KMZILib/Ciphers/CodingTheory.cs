@@ -332,7 +332,7 @@ namespace KMZILib
                     for (int i = 0; i < Q.Length; i++)
                     {
                         Q[i] += Probabilities[i]/2;
-                        Result[i]=new ByteSet(DoubleFractToString(Q[i],(int)-Math.Log(Probabilities[i],2)+1));
+                        Result[i]=new ByteSet(DoubleFractToString(Q[i],(int)Math.Ceiling(-Math.Log(Probabilities[i],2))+1));
                         for (int j = i + 1; j < Probabilities.Length; j++)
                             Q[j] += Probabilities[j];
                     }
