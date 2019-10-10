@@ -257,14 +257,7 @@ namespace KMZILib
                 /// <returns></returns>
                 private static int GetL(double Prob)
                 {
-                    //неэффективно. Лучше использовать логарифм, но чет так впадлу округлять.
-                    int Result;
-                    for (Result = 1; Math.Pow(2, -Result) > Prob; Result++)
-                    {
-                    }
-
-                    return Result;
-
+                    return (int) Math.Ceiling(-Math.Log(Prob, 2));
                 }
 
                 /// <summary>
