@@ -13,6 +13,37 @@ namespace KMZILib
     /// </summary>
     public static partial class Misc
     {
+        /// <summary>
+        /// Возвращает дробную часть вещественного числа в двоичном представлении.
+        /// </summary>
+        /// <param name="Source">Вещественное число.</param>
+        /// <param name="Length">Необходимое число знаков после запятой.</param>
+        /// <returns></returns>
+        public static string DoubleFractToString(double Source, int Length)
+        {
+            Source -= (int)Source;
+            StringBuilder Result = new StringBuilder();
+            while (Result.Length < Length)
+            {
+                Source *= 2;
+                if (Source>1-Math.Pow(10,-4))
+                {
+                    Source -= 1;
+                    Result.Append('1');
+                }
+                else
+                {
+                    Result.Append('0');
+                }
+            }
+            //Если набрали меньше символов, чем в заданной длине, то дополняем до неё.
+            if (Result.Length < Length)
+                Result.Append(new char[Length - Result.Length].Select(ch => '0').ToArray());
+
+            //отдаем ответ.
+            return Result.ToString();
+        }
+
         public static string GetSignedValue(double Source, int CountOfDigits=-1)
         {
             return $" {(Source >= 0 ? "+" : "-")} {(CountOfDigits==-1? Math.Abs(Source): Math.Abs(Math.Round(Source,CountOfDigits)))}";

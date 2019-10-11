@@ -10,6 +10,7 @@ using Ciphers = KMZILib.Ciphers;
 using Languages = KMZILib.Ciphers.Languages;
 using Polynoms = KMZILib.Polynoms;
 using ModularPolynom=KMZILib.Polynoms.ModularPolynom;
+using DataCompressionCodes=KMZILib.CodingTheory.DataCompressionCodes;
 
 namespace Ручной_тест
 {
@@ -18,21 +19,21 @@ namespace Ручной_тест
         
         static void Main(string[] args)
         {
-            string test_str = "Съешь же ещё этих мягких французских булочек да выпей чаю.";
-            KeyValuePair<char, double>[] Stats = GetStatisticOnegram(test_str, false);
-            CodingTheory.ByteSet[] res = CodingTheory.DataCompressionCodes.GilbertCoding.GetCodes(Stats.Select(row => row.Value).ToArray(), out double AverageLength);
-            Console.WriteLine();
+            Console.OutputEncoding=Encoding.Default;
+            Console.WriteLine(DataCompressionCodes.ShannonCoding.GetL(0.0217391304347826));
         }
 
 
-        public static KeyValuePair<char, double>[] GetStatisticOnegram(string SourceText, bool sort = true)
+        public static KeyValuePair<char, double>[] GetStatisticOnegram(string SourceText, bool sort)
         {
             SourceText = SourceText.ToUpper();
             Dictionary<char, double> Result = new Dictionary<char, double>();
             foreach (char symbol in SourceText)
             {
                 if (!Result.ContainsKey(symbol))
+                {
                     Result.Add(symbol, 0.0);
+                }
 
                 Result[symbol]++;
             }
@@ -42,7 +43,6 @@ namespace Ручной_тест
                 Result[resultKey] /= Sum;
             return sort ? Result.OrderByDescending(a => a.Value).ToArray() : Result.ToArray();
         }
-
     }
 }
 
