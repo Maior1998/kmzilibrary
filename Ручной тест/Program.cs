@@ -19,30 +19,12 @@ namespace Ручной_тест
         
         static void Main(string[] args)
         {
-            Console.OutputEncoding=Encoding.Default;
-            Console.WriteLine(DataCompressionCodes.ShannonCoding.GetL(0.0217391304347826));
+            string test = "bcbabbbbcc";
+            Console.WriteLine(Misc.DoubleFractToString(CodingTheory.DataCompressionCodes.ArithmeticCoding.GetCode(test,out double AL),9));
         }
 
 
-        public static KeyValuePair<char, double>[] GetStatisticOnegram(string SourceText, bool sort)
-        {
-            SourceText = SourceText.ToUpper();
-            Dictionary<char, double> Result = new Dictionary<char, double>();
-            foreach (char symbol in SourceText)
-            {
-                if (!Result.ContainsKey(symbol))
-                {
-                    Result.Add(symbol, 0.0);
-                }
-
-                Result[symbol]++;
-            }
-
-            double Sum = Result.Values.Sum();
-            foreach (char resultKey in Result.Keys.ToList())
-                Result[resultKey] /= Sum;
-            return sort ? Result.OrderByDescending(a => a.Value).ToArray() : Result.ToArray();
-        }
+        
     }
 }
 

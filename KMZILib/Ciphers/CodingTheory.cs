@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO.Ports;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
+using JetBrains.Annotations;
 using static KMZILib.Comparison;
 
 namespace KMZILib
@@ -49,8 +52,8 @@ namespace KMZILib
             /// <param name="Source">Строка из нулей и единиц.</param>
             public ByteSet(string Source)
             {
-                if(Source.Any(chr=>chr!='0'&&chr!='1')) throw new InvalidCastException("Строка содержит неизвестные символы! Допускаются только символы \'0\' и \'1\'.''''");
-                Value=Source.Select(val=>val=='1'?(byte)1:(byte)0).ToArray();
+                if (Source.Any(chr => chr != '0' && chr != '1')) throw new InvalidCastException("Строка содержит неизвестные символы! Допускаются только символы \'0\' и \'1\'.''''");
+                Value = Source.Select(val => val == '1' ? (byte)1 : (byte)0).ToArray();
 
             }
 
@@ -71,7 +74,7 @@ namespace KMZILib
 
             internal void Expand(byte value)
             {
-                Value = new List<byte>(Value) {value}.ToArray();
+                Value = new List<byte>(Value) { value }.ToArray();
             }
 
             /// <summary>
@@ -116,6 +119,46 @@ namespace KMZILib
         }
 
         /// <summary>
+        /// Возвращает энтропию поданной на вход статистики
+        /// </summary>
+        /// <param name="StatsDouble"></param>
+        /// <returns></returns>
+        public static double GetEntropy(KeyValuePair<char, double>[] StatsDouble)
+        {
+            double Result = 0;
+            foreach (KeyValuePair<char, double> pair in StatsDouble)
+                Result += pair.Value * Math.Log(pair.Value, 2);
+            Result *= -1;
+            return Result;
+        }
+
+        /// <summary>
+        /// Находит побуквенную статистику источника текста. Алфавит составляется из букв прибывшего текста.
+        /// </summary>
+        /// <param name="SourceText">Исходный текст.</param>
+        /// <param name="sort">Нужно ли сортировать буквы по убыванию статистики.</param>
+        /// <returns></returns>
+        public static KeyValuePair<char, double>[] GetStatisticOnegram(string SourceText, bool sort = true)
+        {
+            SourceText = SourceText.ToUpper();
+            Dictionary<char, double> Result = new Dictionary<char, double>();
+            foreach (char symbol in SourceText)
+            {
+                if (!Result.ContainsKey(symbol))
+                {
+                    Result.Add(symbol, 0.0);
+                }
+
+                Result[symbol]++;
+            }
+
+            double Sum = Result.Values.Sum();
+            foreach (char resultKey in Result.Keys.ToList())
+                Result[resultKey] /= Sum;
+            return sort ? Result.OrderByDescending(a => a.Value).ToArray() : Result.ToArray();
+        }
+
+        /// <summary>
         ///     Коды, осуществляющие сжатие данных
         /// </summary>
         public static class DataCompressionCodes
@@ -143,7 +186,7 @@ namespace KMZILib
                         ByteSet[] answer = new ByteSet[Probabilities.Length];
                         for (int i = 0; i < Probabilities.Length; i++)
                         {
-                            answer[i] = new ByteSet {Value = new[] {(byte) i}};
+                            answer[i] = new ByteSet { Value = new[] { (byte)i } };
                             AverageLength += Probabilities[i];
                         }
 
@@ -170,7 +213,7 @@ namespace KMZILib
                         else if (k0.A == 1)
                             FirstConvolutionLength = k;
                         else
-                            FirstConvolutionLength = (int) k0.A;
+                            FirstConvolutionLength = (int)k0.A;
                     }
 
                     double Sum = ProbCop.Skip(ProbCop.Length - FirstConvolutionLength).Sum();
@@ -203,7 +246,7 @@ namespace KMZILib
 
                     List<ByteSet> Answer = new List<ByteSet>();
                     for (int i = 0; i < ProbCop.Length; i++)
-                        Answer.Add(new ByteSet {Value = new[] {(byte) i}});
+                        Answer.Add(new ByteSet { Value = new[] { (byte)i } });
 
                     int Moving;
                     List<ByteSet> buffer;
@@ -217,7 +260,7 @@ namespace KMZILib
                         for (int i = 0; i < k; i++)
                         {
                             buffer.Add(new ByteSet(Answer[Moving]));
-                            buffer.Last().Expand((byte) i);
+                            buffer.Last().Expand((byte)i);
                         }
 
                         Answer = buffer;
@@ -231,7 +274,7 @@ namespace KMZILib
                     for (int i = 0; i < FirstConvolutionLength; i++)
                     {
                         buffer.Add(new ByteSet(Answer[Moving]));
-                        buffer.Last().Expand((byte) i);
+                        buffer.Last().Expand((byte)i);
                     }
 
                     Answer = buffer;
@@ -240,7 +283,7 @@ namespace KMZILib
                     return Answer.ToArray();
                 }
 
-                
+
             }
 
             /// <summary>
@@ -248,7 +291,7 @@ namespace KMZILib
             /// </summary>
             public static class ShannonCoding
             {
-                
+
 
                 /// <summary>
                 /// Возвращает значение L, необходимое для алгоритма Шеннона, для заданной вероятности.
@@ -257,7 +300,7 @@ namespace KMZILib
                 /// <returns></returns>
                 public static int GetL(double Prob)
                 {
-                    return (int) Math.Ceiling(-Math.Log(Prob, 2));
+                    return (int)Math.Ceiling(-Math.Log(Prob, 2));
                 }
 
                 /// <summary>
@@ -281,26 +324,143 @@ namespace KMZILib
                 }
             }
 
-            
-
+            /// <summary>
+            /// Представляет код Гилберта-Мура.
+            /// </summary>
             public static class GilbertCoding
             {
                 public static ByteSet[] GetCodes(double[] Probabilities, out double AverageLength)
                 {
                     AverageLength = 0;
-                    double[] Q=new double[Probabilities.Length];
+                    double[] Q = new double[Probabilities.Length];
                     ByteSet[] Result = new ByteSet[Probabilities.Length];
 
                     for (int i = 0; i < Q.Length; i++)
                     {
-                        Q[i] += Probabilities[i]/2;
-                        Result[i]=new ByteSet(Misc.DoubleFractToString(Q[i],(int)Math.Ceiling(-Math.Log(Probabilities[i],2))+1));
+                        Q[i] += Probabilities[i] / 2;
+                        Result[i] = new ByteSet(Misc.DoubleFractToString(Q[i], (int)Math.Ceiling(-Math.Log(Probabilities[i], 2)) + 1));
                         for (int j = i + 1; j < Probabilities.Length; j++)
                             Q[j] += Probabilities[i];
                     }
 
                     AverageLength = Result.Select((res, ind) => res.Length * Probabilities[ind]).Sum();
                     return Result;
+                }
+            }
+
+            /// <summary>
+            /// Представляет арифметический код.
+            /// </summary>
+            public static class ArithmeticCoding
+            {
+
+                /// <summary>
+                /// Информация о букве в пределах алгоритма арифметического кодирования.
+                /// </summary>
+                private class LetterInfo
+                {
+                    /// <summary>
+                    /// Индекс начала зоны данной буквы.
+                    /// </summary>
+                    public double StartInd;
+
+                    /// <summary>
+                    /// Индекс конца зоны данной буквы.
+                    /// </summary>
+                    public double EndInd;
+
+                    /// <summary>
+                    /// Сам символ.
+                    /// </summary>
+                    public char Symbol;
+
+                    /// <summary>
+                    /// Вероятность встречи символа.
+                    /// </summary>
+                    public double Stat;
+
+                    public LetterInfo() { }
+                }
+                public static double GetCodeMy(string Source, out double AverageLength)
+                {
+                    Source = Source.ToUpper();
+                    KeyValuePair<char, double>[] Statistic = GetStatisticOnegram(Source, false).OrderBy(row => row.Key).ToArray();
+                    Dictionary<char, LetterInfo> Letters = new Dictionary<char, LetterInfo>();
+                    //словарь "буква <-> инфа о ней"
+                    foreach (KeyValuePair<char, double> symbol in Statistic)
+                        Letters.Add(symbol.Key, new LetterInfo()
+                        {
+                            Symbol = symbol.Key,
+                            Stat = symbol.Value
+                        });
+
+                    double LeftBorder = 0;
+                    double RightBorder = 1;
+                    Letters[Statistic[0].Key].EndInd = Letters[Statistic[0].Key].Stat;
+                    for (int i = 1; i < Statistic.Length; i++)
+                    {
+                        Letters[Statistic[i].Key].StartInd = Letters[Statistic[i - 1].Key].EndInd;
+                        Letters[Statistic[i].Key].EndInd = Letters[Statistic[i].Key].StartInd + Letters[Statistic[i].Key].Stat;
+                    }
+
+                    foreach (char Letter in Source)
+                    {
+                        double Length = RightBorder - LeftBorder;
+                        //Границы отрезков известны
+                        RightBorder = LeftBorder + Length * Letters[Letter].EndInd;
+                        LeftBorder = LeftBorder + Length * Letters[Letter].StartInd;
+
+                    }
+
+                    AverageLength = 0;
+                    return (LeftBorder + RightBorder) / 2;
+                }
+
+                public static double GetCode(string Source, out double AverageLength)
+                {
+                    Source = Source.ToUpper();
+                    KeyValuePair<char, double>[] Statistic = GetStatisticOnegram(Source, false).OrderBy(row => row.Key).ToArray();
+                    double[] q = new double[Statistic.Length];
+                    for (int i = 1; i < Statistic.Length; i++)
+                        q[i] = q[i - 1] + Statistic[i-1].Value;
+                    double F = 0;
+                    double G = 1;
+                    for (int i = 0; i < Source.Length; i++)
+                    {
+                        int LetInd = 0;
+                        while (Source[i] != Statistic[LetInd].Key) LetInd++;
+                        
+                        //F = F + q(xi)*G
+                        F += q[LetInd] * G;
+                        
+                        //G = G*p(xi)
+                        G *= Statistic[LetInd].Value;
+
+                    }
+
+                    AverageLength = 0;
+                    return F + G / 2;
+                }
+
+                public static string Decode(double F, char[] Alphabet, double[] P, int Length)
+                {
+                    double[] q = new double[P.Length+1];
+                    for (int i = 1; i < P.Length; i++)
+                        q[i] = q[i - 1] + P[i - 1];
+                    q[P.Length] = 1;
+                    double S = 0;
+                    double G = 1;
+                    StringBuilder Result = new StringBuilder();
+                    for (int i = 0; i < Length; i++)
+                    {
+                        int j = 0;
+                        while (S + q[j + 1] * G < F) j++;
+                        S += q[j] * G;
+                        G *= P[j];
+                        Result.Append(Alphabet[j]);
+                    }
+
+                    return Result.ToString();
                 }
             }
         }
