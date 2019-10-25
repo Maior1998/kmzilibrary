@@ -353,10 +353,8 @@ namespace KMZILib
             /// </summary>
             public static class ArithmeticCoding
             {
-
-                /// <summary>
-                /// Информация о букве в пределах алгоритма арифметического кодирования.
-                /// </summary>
+                
+                
                 private class LetterInfo
                 {
                     /// <summary>
@@ -416,6 +414,9 @@ namespace KMZILib
                     return (LeftBorder + RightBorder) / 2;
                 }
 
+                /// <summary>
+                /// Информация о букве в пределах алгоритма арифметического кодирования.
+                /// </summary>
                 public static double GetCode(string Source, out double AverageLength)
                 {
                     Source = Source.ToUpper();

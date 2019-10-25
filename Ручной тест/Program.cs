@@ -19,8 +19,7 @@ namespace Ручной_тест
         
         static void Main(string[] args)
         {
-            string test = "bcbabbbbcc";
-            Console.WriteLine(Misc.DoubleFractToString(CodingTheory.DataCompressionCodes.ArithmeticCoding.GetCode(test,out double AL),9));
+            Console.WriteLine(Misc.BinaryStringToFract("110101110"));
         }
 
 
