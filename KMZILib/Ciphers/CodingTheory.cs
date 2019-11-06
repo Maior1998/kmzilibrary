@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO.Ports;
@@ -52,8 +53,10 @@ namespace KMZILib
             /// <param name="Source">Строка из нулей и единиц.</param>
             public ByteSet(string Source)
             {
-                if (Source.Any(chr => chr != '0' && chr != '1')) throw new InvalidCastException("Строка содержит неизвестные символы! Допускаются только символы \'0\' и \'1\'.''''");
-                Value = Source.Select(val => val == '1' ? (byte)1 : (byte)0).ToArray();
+                if (Source.Any(chr => chr != '0' && chr != '1'))
+                    throw new InvalidCastException(
+                        "Строка содержит неизвестные символы! Допускаются только символы \'0\' и \'1\'.''''");
+                Value = Source.Select(val => val == '1' ? (byte) 1 : (byte) 0).ToArray();
 
             }
 
@@ -74,7 +77,40 @@ namespace KMZILib
 
             internal void Expand(byte value)
             {
-                Value = new List<byte>(Value) { value }.ToArray();
+                Value = new List<byte>(Value) {value}.ToArray();
+            }
+
+            /// <summary>
+            /// Вставляет бит по указанному индексу.
+            /// </summary>
+            /// <param name="TargetIndex"></param>
+            /// <param name="TargetValue"></param>
+            internal void Put(int TargetIndex, byte TargetValue)
+            {
+                byte[] buffer = new byte[Value.Length + 1];
+                for (int i = 0; i < TargetIndex; i++)
+                    buffer[i] = Value[i];
+                buffer[TargetIndex] = TargetValue;
+                for (int i = TargetIndex + 1; i < buffer.Length; i++)
+                    buffer[i] = Value[i - 1];
+                Value = buffer;
+            }
+
+            /// <summary>
+            /// Вставляет биты по указанному индексу.
+            /// </summary>
+            /// <param name="TargetIndex"></param>
+            /// <param name="TargetValue"></param>
+            internal void Put(int TargetIndex, byte[] TargetValue)
+            {
+                byte[] buffer = new byte[Value.Length + TargetValue.Length];
+                for (int i = 0; i < TargetIndex; i++)
+                    buffer[i] = Value[i];
+                for (int i = 0; i < TargetValue.Length; i++)
+                    buffer[i + TargetIndex] = TargetValue[i];
+                for (int i = TargetIndex + TargetValue.Length; i < buffer.Length; i++)
+                    buffer[i] = Value[i - TargetValue.Length];
+                Value = buffer;
             }
 
             /// <summary>
@@ -186,7 +222,7 @@ namespace KMZILib
                         ByteSet[] answer = new ByteSet[Probabilities.Length];
                         for (int i = 0; i < Probabilities.Length; i++)
                         {
-                            answer[i] = new ByteSet { Value = new[] { (byte)i } };
+                            answer[i] = new ByteSet {Value = new[] {(byte) i}};
                             AverageLength += Probabilities[i];
                         }
 
@@ -213,7 +249,7 @@ namespace KMZILib
                         else if (k0.A == 1)
                             FirstConvolutionLength = k;
                         else
-                            FirstConvolutionLength = (int)k0.A;
+                            FirstConvolutionLength = (int) k0.A;
                     }
 
                     double Sum = ProbCop.Skip(ProbCop.Length - FirstConvolutionLength).Sum();
@@ -246,7 +282,7 @@ namespace KMZILib
 
                     List<ByteSet> Answer = new List<ByteSet>();
                     for (int i = 0; i < ProbCop.Length; i++)
-                        Answer.Add(new ByteSet { Value = new[] { (byte)i } });
+                        Answer.Add(new ByteSet {Value = new[] {(byte) i}});
 
                     int Moving;
                     List<ByteSet> buffer;
@@ -260,7 +296,7 @@ namespace KMZILib
                         for (int i = 0; i < k; i++)
                         {
                             buffer.Add(new ByteSet(Answer[Moving]));
-                            buffer.Last().Expand((byte)i);
+                            buffer.Last().Expand((byte) i);
                         }
 
                         Answer = buffer;
@@ -274,7 +310,7 @@ namespace KMZILib
                     for (int i = 0; i < FirstConvolutionLength; i++)
                     {
                         buffer.Add(new ByteSet(Answer[Moving]));
-                        buffer.Last().Expand((byte)i);
+                        buffer.Last().Expand((byte) i);
                     }
 
                     Answer = buffer;
@@ -300,7 +336,7 @@ namespace KMZILib
                 /// <returns></returns>
                 public static int GetL(double Prob)
                 {
-                    return (int)Math.Ceiling(-Math.Log(Prob, 2));
+                    return (int) Math.Ceiling(-Math.Log(Prob, 2));
                 }
 
                 /// <summary>
@@ -319,10 +355,13 @@ namespace KMZILib
                         Result[i] = new ByteSet(Misc.DoubleFractToString(Sum, GetL(Probs[i])));
                         Sum += Probs[i];
                     }
+
                     AverageLength += Probabilities.Select((t, i) => t * Result[i].Length).Sum();
                     return Result;
                 }
             }
+
+
 
             /// <summary>
             /// Представляет код Гилберта-Мура.
@@ -338,7 +377,8 @@ namespace KMZILib
                     for (int i = 0; i < Q.Length; i++)
                     {
                         Q[i] += Probabilities[i] / 2;
-                        Result[i] = new ByteSet(Misc.DoubleFractToString(Q[i], (int)Math.Ceiling(-Math.Log(Probabilities[i], 2)) + 1));
+                        Result[i] = new ByteSet(Misc.DoubleFractToString(Q[i],
+                            (int) Math.Ceiling(-Math.Log(Probabilities[i], 2)) + 1));
                         for (int j = i + 1; j < Probabilities.Length; j++)
                             Q[j] += Probabilities[i];
                     }
@@ -348,120 +388,147 @@ namespace KMZILib
                 }
             }
 
-            /// <summary>
-            /// Представляет арифметический код.
-            /// </summary>
-            public static class ArithmeticCoding
+            public static class LevenshteinCoding
             {
-                
-                
-                private class LetterInfo
+                public static ByteSet GetCode(int Source)
                 {
-                    /// <summary>
-                    /// Индекс начала зоны данной буквы.
-                    /// </summary>
-                    public double StartInd;
-
-                    /// <summary>
-                    /// Индекс конца зоны данной буквы.
-                    /// </summary>
-                    public double EndInd;
-
-                    /// <summary>
-                    /// Сам символ.
-                    /// </summary>
-                    public char Symbol;
-
-                    /// <summary>
-                    /// Вероятность встречи символа.
-                    /// </summary>
-                    public double Stat;
-
-                    public LetterInfo() { }
-                }
-                public static double GetCodeMy(string Source, out double AverageLength)
-                {
-                    Source = Source.ToUpper();
-                    KeyValuePair<char, double>[] Statistic = GetStatisticOnegram(Source, false).OrderBy(row => row.Key).ToArray();
-                    Dictionary<char, LetterInfo> Letters = new Dictionary<char, LetterInfo>();
-                    //словарь "буква <-> инфа о ней"
-                    foreach (KeyValuePair<char, double> symbol in Statistic)
-                        Letters.Add(symbol.Key, new LetterInfo()
-                        {
-                            Symbol = symbol.Key,
-                            Stat = symbol.Value
-                        });
-
-                    double LeftBorder = 0;
-                    double RightBorder = 1;
-                    Letters[Statistic[0].Key].EndInd = Letters[Statistic[0].Key].Stat;
-                    for (int i = 1; i < Statistic.Length; i++)
+                    ByteSet Result = new ByteSet();
+                    int buffer = Source;
+                    int C = 1;
+                    while (buffer != 0)
                     {
-                        Letters[Statistic[i].Key].StartInd = Letters[Statistic[i - 1].Key].EndInd;
-                        Letters[Statistic[i].Key].EndInd = Letters[Statistic[i].Key].StartInd + Letters[Statistic[i].Key].Stat;
+                        bool[] Binary = Misc.GetBinaryArray(buffer).Skip(1).ToArray();
+                        buffer = Binary.Length;
+                        if (buffer == 0) break;
+                        Result.Put(0, Binary.Select(bol => bol ? (byte) 1 : (byte) 0).ToArray());
+                        C++;
                     }
 
-                    foreach (char Letter in Source)
-                    {
-                        double Length = RightBorder - LeftBorder;
-                        //Границы отрезков известны
-                        RightBorder = LeftBorder + Length * Letters[Letter].EndInd;
-                        LeftBorder = LeftBorder + Length * Letters[Letter].StartInd;
-
-                    }
-
-                    AverageLength = 0;
-                    return (LeftBorder + RightBorder) / 2;
+                    Result.Put(0, Enumerable.Repeat((byte) 1, C).Concat(new[] {(byte) 0}).ToArray());
+                    return Result;
                 }
 
                 /// <summary>
-                /// Информация о букве в пределах алгоритма арифметического кодирования.
+                /// Представляет арифметический код.
                 /// </summary>
-                public static double GetCode(string Source, out double AverageLength)
+                public static class ArithmeticCoding
                 {
-                    Source = Source.ToUpper();
-                    KeyValuePair<char, double>[] Statistic = GetStatisticOnegram(Source, false).OrderBy(row => row.Key).ToArray();
-                    double[] q = new double[Statistic.Length];
-                    for (int i = 1; i < Statistic.Length; i++)
-                        q[i] = q[i - 1] + Statistic[i-1].Value;
-                    double F = 0;
-                    double G = 1;
-                    for (int i = 0; i < Source.Length; i++)
-                    {
-                        int LetInd = 0;
-                        while (Source[i] != Statistic[LetInd].Key) LetInd++;
-                        
-                        //F = F + q(xi)*G
-                        F += q[LetInd] * G;
-                        
-                        //G = G*p(xi)
-                        G *= Statistic[LetInd].Value;
 
+
+                    private class LetterInfo
+                    {
+                        /// <summary>
+                        /// Индекс начала зоны данной буквы.
+                        /// </summary>
+                        public double StartInd;
+
+                        /// <summary>
+                        /// Индекс конца зоны данной буквы.
+                        /// </summary>
+                        public double EndInd;
+
+                        /// <summary>
+                        /// Сам символ.
+                        /// </summary>
+                        public char Symbol;
+
+                        /// <summary>
+                        /// Вероятность встречи символа.
+                        /// </summary>
+                        public double Stat;
+
+                        public LetterInfo()
+                        {
+                        }
                     }
 
-                    AverageLength = 0;
-                    return F + G / 2;
-                }
-
-                public static string Decode(double F, char[] Alphabet, double[] P, int Length)
-                {
-                    double[] q = new double[P.Length+1];
-                    for (int i = 1; i < P.Length; i++)
-                        q[i] = q[i - 1] + P[i - 1];
-                    q[P.Length] = 1;
-                    double S = 0;
-                    double G = 1;
-                    StringBuilder Result = new StringBuilder();
-                    for (int i = 0; i < Length; i++)
+                    public static double GetCodeMy(string Source, out double AverageLength)
                     {
-                        int j = 0;
-                        while (S + q[j + 1] * G < F) j++;
-                        S += q[j] * G;
-                        G *= P[j];
-                        Result.Append(Alphabet[j]);
+                        Source = Source.ToUpper();
+                        KeyValuePair<char, double>[] Statistic =
+                            GetStatisticOnegram(Source, false).OrderBy(row => row.Key).ToArray();
+                        Dictionary<char, LetterInfo> Letters = new Dictionary<char, LetterInfo>();
+                        //словарь "буква <-> инфа о ней"
+                        foreach (KeyValuePair<char, double> symbol in Statistic)
+                            Letters.Add(symbol.Key, new LetterInfo()
+                            {
+                                Symbol = symbol.Key,
+                                Stat = symbol.Value
+                            });
+
+                        double LeftBorder = 0;
+                        double RightBorder = 1;
+                        Letters[Statistic[0].Key].EndInd = Letters[Statistic[0].Key].Stat;
+                        for (int i = 1; i < Statistic.Length; i++)
+                        {
+                            Letters[Statistic[i].Key].StartInd = Letters[Statistic[i - 1].Key].EndInd;
+                            Letters[Statistic[i].Key].EndInd =
+                                Letters[Statistic[i].Key].StartInd + Letters[Statistic[i].Key].Stat;
+                        }
+
+                        foreach (char Letter in Source)
+                        {
+                            double Length = RightBorder - LeftBorder;
+                            //Границы отрезков известны
+                            RightBorder = LeftBorder + Length * Letters[Letter].EndInd;
+                            LeftBorder = LeftBorder + Length * Letters[Letter].StartInd;
+
+                        }
+
+                        AverageLength = 0;
+                        return (LeftBorder + RightBorder) / 2;
                     }
 
-                    return Result.ToString();
+                    /// <summary>
+                    /// Информация о букве в пределах алгоритма арифметического кодирования.
+                    /// </summary>
+                    public static double GetCode(string Source, out double AverageLength)
+                    {
+                        Source = Source.ToUpper();
+                        KeyValuePair<char, double>[] Statistic =
+                            GetStatisticOnegram(Source, false).OrderBy(row => row.Key).ToArray();
+                        double[] q = new double[Statistic.Length];
+                        for (int i = 1; i < Statistic.Length; i++)
+                            q[i] = q[i - 1] + Statistic[i - 1].Value;
+                        double F = 0;
+                        double G = 1;
+                        for (int i = 0; i < Source.Length; i++)
+                        {
+                            int LetInd = 0;
+                            while (Source[i] != Statistic[LetInd].Key) LetInd++;
+
+                            //F = F + q(xi)*G
+                            F += q[LetInd] * G;
+
+                            //G = G*p(xi)
+                            G *= Statistic[LetInd].Value;
+
+                        }
+
+                        AverageLength = 0;
+                        return F + G / 2;
+                    }
+
+                    public static string Decode(double F, char[] Alphabet, double[] P, int Length)
+                    {
+                        double[] q = new double[P.Length + 1];
+                        for (int i = 1; i < P.Length; i++)
+                            q[i] = q[i - 1] + P[i - 1];
+                        q[P.Length] = 1;
+                        double S = 0;
+                        double G = 1;
+                        StringBuilder Result = new StringBuilder();
+                        for (int i = 0; i < Length; i++)
+                        {
+                            int j = 0;
+                            while (S + q[j + 1] * G < F) j++;
+                            S += q[j] * G;
+                            G *= P[j];
+                            Result.Append(Alphabet[j]);
+                        }
+
+                        return Result.ToString();
+                    }
                 }
             }
         }
