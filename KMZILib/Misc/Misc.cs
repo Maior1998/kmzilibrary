@@ -44,6 +44,20 @@ namespace KMZILib
             return Result.ToString();
         }
 
+        /// <summary>
+        /// Переводит дробное двочисное число из интервала (0;1) в десятичное представление.
+        /// </summary>
+        /// <param name="Source">Строка, содержащая цифры после запятой исходного числа.</param>
+        /// <returns></returns>
+        public static double BinaryStringToFract(string Source)
+        {
+            double Result = 0;
+            int FractIndex = -1;
+            for (int i = 0; i < Source.Length; i++, FractIndex--)
+                Result += (Source[i] == '1' ? 1 : 0) * Math.Pow(2, FractIndex);
+            return Result;
+        }
+
         public static string GetSignedValue(double Source, int CountOfDigits=-1)
         {
             return $" {(Source >= 0 ? "+" : "-")} {(CountOfDigits==-1? Math.Abs(Source): Math.Abs(Math.Round(Source,CountOfDigits)))}";
