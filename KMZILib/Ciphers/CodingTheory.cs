@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -49,8 +50,8 @@ namespace KMZILib
             /// <param name="Source">Строка из нулей и единиц.</param>
             public ByteSet(string Source)
             {
-                if(Source.Any(chr=>chr!='0'&&chr!='1')) throw new InvalidCastException("Строка содержит неизвестные символы! Допускаются только символы \'0\' и \'1\'.''''");
-                Value=Source.Select(val=>val=='1'?(byte)1:(byte)0).ToArray();
+                if (Source.Any(chr => chr != '0' && chr != '1')) throw new InvalidCastException("Строка содержит неизвестные символы! Допускаются только символы \'0\' и \'1\'.''''");
+                Value = Source.Select(val => val == '1' ? (byte)1 : (byte)0).ToArray();
 
             }
 
@@ -71,7 +72,40 @@ namespace KMZILib
 
             internal void Expand(byte value)
             {
-                Value = new List<byte>(Value) {value}.ToArray();
+                Value = new List<byte>(Value) { value }.ToArray();
+            }
+
+            /// <summary>
+            /// Вставляет бит по указанному индексу.
+            /// </summary>
+            /// <param name="TargetIndex"></param>
+            /// <param name="TargetValue"></param>
+            internal void Put(int TargetIndex, byte TargetValue)
+            {
+                byte[] buffer = new byte[Value.Length + 1];
+                for (int i = 0; i < TargetIndex; i++)
+                    buffer[i] = Value[i];
+                buffer[TargetIndex] = TargetValue;
+                for (int i = TargetIndex + 1; i < buffer.Length; i++)
+                    buffer[i] = Value[i - 1];
+                Value = buffer;
+            }
+
+            /// <summary>
+            /// Вставляет биты по указанному индексу.
+            /// </summary>
+            /// <param name="TargetIndex"></param>
+            /// <param name="TargetValue"></param>
+            internal void Put(int TargetIndex, byte[] TargetValue)
+            {
+                byte[] buffer = new byte[Value.Length + TargetValue.Length];
+                for (int i = 0; i < TargetIndex; i++)
+                    buffer[i] = Value[i];
+                for (int i = 0; i < TargetValue.Length; i++)
+                    buffer[i + TargetIndex] = TargetValue[i];
+                for (int i = TargetIndex + TargetValue.Length ; i < buffer.Length; i++)
+                    buffer[i] = Value[i - TargetValue.Length];
+                Value = buffer;
             }
 
             /// <summary>
@@ -143,7 +177,7 @@ namespace KMZILib
                         ByteSet[] answer = new ByteSet[Probabilities.Length];
                         for (int i = 0; i < Probabilities.Length; i++)
                         {
-                            answer[i] = new ByteSet {Value = new[] {(byte) i}};
+                            answer[i] = new ByteSet { Value = new[] { (byte)i } };
                             AverageLength += Probabilities[i];
                         }
 
@@ -170,7 +204,7 @@ namespace KMZILib
                         else if (k0.A == 1)
                             FirstConvolutionLength = k;
                         else
-                            FirstConvolutionLength = (int) k0.A;
+                            FirstConvolutionLength = (int)k0.A;
                     }
 
                     double Sum = ProbCop.Skip(ProbCop.Length - FirstConvolutionLength).Sum();
@@ -203,7 +237,7 @@ namespace KMZILib
 
                     List<ByteSet> Answer = new List<ByteSet>();
                     for (int i = 0; i < ProbCop.Length; i++)
-                        Answer.Add(new ByteSet {Value = new[] {(byte) i}});
+                        Answer.Add(new ByteSet { Value = new[] { (byte)i } });
 
                     int Moving;
                     List<ByteSet> buffer;
@@ -217,7 +251,7 @@ namespace KMZILib
                         for (int i = 0; i < k; i++)
                         {
                             buffer.Add(new ByteSet(Answer[Moving]));
-                            buffer.Last().Expand((byte) i);
+                            buffer.Last().Expand((byte)i);
                         }
 
                         Answer = buffer;
@@ -231,7 +265,7 @@ namespace KMZILib
                     for (int i = 0; i < FirstConvolutionLength; i++)
                     {
                         buffer.Add(new ByteSet(Answer[Moving]));
-                        buffer.Last().Expand((byte) i);
+                        buffer.Last().Expand((byte)i);
                     }
 
                     Answer = buffer;
@@ -240,7 +274,7 @@ namespace KMZILib
                     return Answer.ToArray();
                 }
 
-                
+
             }
 
             /// <summary>
@@ -248,7 +282,7 @@ namespace KMZILib
             /// </summary>
             public static class ShannonCoding
             {
-                
+
 
                 /// <summary>
                 /// Возвращает значение L, необходимое для алгоритма Шеннона, для заданной вероятности.
@@ -257,7 +291,7 @@ namespace KMZILib
                 /// <returns></returns>
                 public static int GetL(double Prob)
                 {
-                    return (int) Math.Ceiling(-Math.Log(Prob, 2));
+                    return (int)Math.Ceiling(-Math.Log(Prob, 2));
                 }
 
                 /// <summary>
@@ -281,25 +315,46 @@ namespace KMZILib
                 }
             }
 
-            
+
 
             public static class GilbertCoding
             {
                 public static ByteSet[] GetCodes(double[] Probabilities, out double AverageLength)
                 {
                     AverageLength = 0;
-                    double[] Q=new double[Probabilities.Length];
+                    double[] Q = new double[Probabilities.Length];
                     ByteSet[] Result = new ByteSet[Probabilities.Length];
 
                     for (int i = 0; i < Q.Length; i++)
                     {
-                        Q[i] += Probabilities[i]/2;
-                        Result[i]=new ByteSet(Misc.DoubleFractToString(Q[i],(int)Math.Ceiling(-Math.Log(Probabilities[i],2))+1));
+                        Q[i] += Probabilities[i] / 2;
+                        Result[i] = new ByteSet(Misc.DoubleFractToString(Q[i], (int)Math.Ceiling(-Math.Log(Probabilities[i], 2)) + 1));
                         for (int j = i + 1; j < Probabilities.Length; j++)
                             Q[j] += Probabilities[i];
                     }
 
                     AverageLength = Result.Select((res, ind) => res.Length * Probabilities[ind]).Sum();
+                    return Result;
+                }
+            }
+
+            public static class LevenshteinCoding
+            {
+                public static ByteSet GetCode(int Source)
+                {
+                    ByteSet Result = new ByteSet();
+                    int buffer = Source;
+                    int C = 1;
+                    while (buffer != 0)
+                    {
+                        bool[] Binary = Misc.GetBinaryArray(buffer).Skip(1).ToArray();
+                        buffer = Binary.Length;
+                        if (buffer == 0) break;
+                        Result.Put(0, Binary.Select(bol => bol ? (byte)1 : (byte)0).ToArray());
+                        C++;
+                    }
+
+                    Result.Put(0, Enumerable.Repeat((byte)1, C).Concat(new[] { (byte)0 }).ToArray());
                     return Result;
                 }
             }

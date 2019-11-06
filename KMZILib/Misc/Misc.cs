@@ -89,6 +89,7 @@ namespace KMZILib
         {
             if (Number < 0)
                 throw new InvalidOperationException("Число должно быть положительным.");
+            if (Number == 0) return new[] {false};
             BitArray number = new BitArray(Number.ToByteArray());
 
             int i = number.Count - 1;
