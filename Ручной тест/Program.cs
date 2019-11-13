@@ -8,11 +8,7 @@ using System.Linq;
 using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading;
-using Ciphers = KMZILib.Ciphers;
-using Languages = KMZILib.Ciphers.Languages;
-using Polynoms = KMZILib.Polynoms;
-using ModularPolynom = KMZILib.Polynoms.ModularPolynom;
-using DataCompressionCodes = KMZILib.CodingTheory.DataCompressionCodes;
+using LevenshteinCoding = KMZILib.CodingTheory.DataCompressionCodes.LevenshteinCoding;
 
 namespace Ручной_тест
 {
@@ -21,7 +17,7 @@ namespace Ручной_тест
 
         static void Main(string[] args)
         {
-            Console.WriteLine(CodingTheory.DataCompressionCodes.LevenshteinCoding.GetCode(14));
+                Console.WriteLine(LevenshteinCoding.Decode(LevenshteinCoding.GetCode(14)));
         }
     }
 }

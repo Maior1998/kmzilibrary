@@ -117,6 +117,45 @@ namespace KMZILib
             }
 
             /// <summary>
+            /// Вырезает бит на нужной позиции.
+            /// </summary>
+            /// <param name="TargetIndex"></param>
+            internal void CutAt(int TargetIndex)
+            {
+                byte[] buffer = new byte[Value.Length - 1];
+                for (int i = 0; i < TargetIndex; i++)
+                    buffer[i] = Value[i];
+                for (int i = TargetIndex + 1; i < Value.Length; i++)
+                    buffer[i - 1] = Value[i];
+                Value = buffer;
+            }
+
+            /// <summary>
+            /// Вырезает нужное число бит от стартовой до конечной позиции включительно.
+            /// </summary>
+            /// <param name="StartIndex"></param>
+            /// <param name="EndIndex"></param>
+            internal void CutAt(int StartIndex, int EndIndex)
+            {
+                Cut(StartIndex, EndIndex - StartIndex + 1);
+            }
+
+            /// <summary>
+            /// Вырезает нужное число бит начиная с указанной позиции.
+            /// </summary>
+            /// <param name="StartIndex"></param>
+            /// <param name="Length"></param>
+            internal void Cut(int StartIndex, int Length)
+            {
+                byte[] buffer = new byte[Value.Length - Length];
+                for (int i = 0; i < StartIndex; i++)
+                    buffer[i] = Value[i];
+                for (int i = StartIndex + Length; i < Value.Length; i++)
+                    buffer[i - Length] = Value[i];
+                Value = buffer;
+            }
+
+            /// <summary>
             ///     Строковое представление байтового вектора.
             /// </summary>
             /// <returns>Строка, представляющая все байты ветокра</returns>
@@ -466,7 +505,7 @@ namespace KMZILib
                 {
                     ByteSet Result = new ByteSet();
                     int buffer = Source;
-                    int C = 1;
+                    int C = Source != 0 ? 1 : 0;
                     while (buffer != 0)
                     {
                         bool[] Binary = Misc.GetBinaryArray(buffer).Skip(1).ToArray();
@@ -480,7 +519,26 @@ namespace KMZILib
                     return Result;
                 }
 
-
+                public static int Decode(ByteSet Source)
+                {
+                    int c = 0;
+                    while (Source.Value[c] != 0) c++;
+                    if (c == 0) return 0;
+                    Source.Cut(0, c + 1);
+                    int N = 1;
+                    int P = c - 1;
+                    while (P != 0)
+                    {
+                        Source.Cut(0, N);
+                        Source.Put(0, 1);
+                        N = 0;
+                        for (int i = Source.Value.Length - 1; i >= 0; i--)
+                            if (Source.Value[i] == 1)
+                                N += (int)Math.Pow(2, Source.Length - 1 - i);
+                        P--;
+                    }
+                    return N;
+                }
             }
         }
     }
