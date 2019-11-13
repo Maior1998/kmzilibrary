@@ -78,7 +78,11 @@ namespace KMZILib
             /// </summary>
             public int Length => Value.Length;
 
-            internal void Expand(byte value)
+            /// <summary>
+            /// Приписывает бит в конец битовой строки.
+            /// </summary>
+            /// <param name="value"></param>
+            internal void Append(byte value)
             {
                 Value = new List<byte>(Value) { value }.ToArray();
             }
@@ -120,14 +124,17 @@ namespace KMZILib
             /// Вырезает бит на нужной позиции.
             /// </summary>
             /// <param name="TargetIndex"></param>
-            internal void CutAt(int TargetIndex)
+            internal ByteSet CutAt(int TargetIndex)
             {
+                ByteSet Result=new ByteSet();
                 byte[] buffer = new byte[Value.Length - 1];
                 for (int i = 0; i < TargetIndex; i++)
                     buffer[i] = Value[i];
+                Result.Append(Value[TargetIndex]);
                 for (int i = TargetIndex + 1; i < Value.Length; i++)
                     buffer[i - 1] = Value[i];
                 Value = buffer;
+                return Result;
             }
 
             /// <summary>
@@ -135,9 +142,9 @@ namespace KMZILib
             /// </summary>
             /// <param name="StartIndex"></param>
             /// <param name="EndIndex"></param>
-            internal void CutAt(int StartIndex, int EndIndex)
+            internal ByteSet CutAt(int StartIndex, int EndIndex)
             {
-                Cut(StartIndex, EndIndex - StartIndex + 1);
+                return Cut(StartIndex, EndIndex - StartIndex + 1);
             }
 
             /// <summary>
@@ -145,14 +152,18 @@ namespace KMZILib
             /// </summary>
             /// <param name="StartIndex"></param>
             /// <param name="Length"></param>
-            internal void Cut(int StartIndex, int Length)
+            internal ByteSet Cut(int StartIndex, int Length)
             {
+                ByteSet Result = new ByteSet();
                 byte[] buffer = new byte[Value.Length - Length];
                 for (int i = 0; i < StartIndex; i++)
                     buffer[i] = Value[i];
+                for(int i=0;i<Length;i++)
+                    Result.Append(Value[StartIndex+i]);
                 for (int i = StartIndex + Length; i < Value.Length; i++)
                     buffer[i - Length] = Value[i];
                 Value = buffer;
+                return Result;
             }
 
             /// <summary>
@@ -165,36 +176,7 @@ namespace KMZILib
             }
         }
 
-        /// <summary>
-        /// Осуществляет декодирование битовой строки по заданному алфавитному набору. Рабоатет только для префиксных кодов.
-        /// </summary>
-        /// <param name="Source"></param>
-        /// <param name="Codes"></param>
-        /// <returns></returns>
-        public static string Decode(string Source, Dictionary<char, string> Codes)
-        {
-            StringBuilder Result = new StringBuilder();
-            int index = 0;
-            while (index != Source.Length)
-            {
-                char CurSymbol = Codes.First(codepair => Source.IndexOf(codepair.Value, index) == index).Key;
-                Result.Append(CurSymbol);
-                index += Codes[CurSymbol].Length;
-            }
-
-            return Result.ToString();
-        }
-
-        /// <summary>
-        /// Осуществляет кодирование строки в битовую строку по заданному словарю какого-либо кода.
-        /// </summary>
-        /// <param name="Source">Исходная строка.</param>
-        /// <param name="Codes">Словарь, полученный из кодовых методов.</param>
-        /// <returns></returns>
-        public static string Encode(string Source, Dictionary<char, string> Codes)
-        {
-            return string.Concat(Source.Select(chr => Codes[chr]));
-        }
+        
 
         /// <summary>
         /// Возвращает энтропию поданной на вход статистики
@@ -343,7 +325,7 @@ namespace KMZILib
                             for (int i = 0; i < k; i++)
                             {
                                 buffer.Add(new ByteSet(Answer[Moving]));
-                                buffer.Last().Expand((byte)i);
+                                buffer.Last().Append((byte)i);
                             }
 
                             Answer = buffer;
@@ -357,7 +339,7 @@ namespace KMZILib
                         for (int i = 0; i < FirstConvolutionLength; i++)
                         {
                             buffer.Add(new ByteSet(Answer[Moving]));
-                            buffer.Last().Expand((byte)i);
+                            buffer.Last().Append((byte)i);
                         }
 
                         Answer = buffer;
@@ -387,7 +369,7 @@ namespace KMZILib
                     /// </summary>
                     /// <param name="Probabilities">Массив вероятностей исходных символов. Будут возвращены отсортированные в порядке убывания вероятностей коды.</param>
                     /// <returns></returns>
-                    public static ByteSet[] GetCodes(double[] Probabilities, out double AverageLength)
+                    public static ByteSet[] Encode(double[] Probabilities, out double AverageLength)
                     {
                         AverageLength = 0;
                         ByteSet[] Result = new ByteSet[Probabilities.Length];
@@ -409,7 +391,7 @@ namespace KMZILib
                 /// </summary>
                 public static class GilbertCoding
                 {
-                    public static ByteSet[] GetCodes(double[] Probabilities, out double AverageLength)
+                    public static ByteSet[] Encode(double[] Probabilities, out double AverageLength)
                     {
                         AverageLength = 0;
                         double[] Q = new double[Probabilities.Length];
@@ -428,6 +410,37 @@ namespace KMZILib
                         return Result;
                     }
                 }
+
+                /// <summary>
+                /// Осуществляет декодирование битовой строки по заданному алфавитному набору. Рабоатет только для префиксных кодов.
+                /// </summary>
+                /// <param name="Source"></param>
+                /// <param name="Codes"></param>
+                /// <returns></returns>
+                public static string Decode(string Source, Dictionary<char, string> Codes)
+                {
+                    StringBuilder Result = new StringBuilder();
+                    int index = 0;
+                    while (index != Source.Length)
+                    {
+                        char CurSymbol = Codes.First(codepair => Source.IndexOf(codepair.Value, index) == index).Key;
+                        Result.Append(CurSymbol);
+                        index += Codes[CurSymbol].Length;
+                    }
+
+                    return Result.ToString();
+                }
+
+                /// <summary>
+                /// Осуществляет кодирование строки в битовую строку по заданному словарю какого-либо кода.
+                /// </summary>
+                /// <param name="Source">Исходная строка.</param>
+                /// <param name="Codes">Словарь, полученный из кодовых методов.</param>
+                /// <returns></returns>
+                public static string Encode(string Source, Dictionary<char, string> Codes)
+                {
+                    return string.Concat(Source.Select(chr => Codes[chr]));
+                }
             }
 
 
@@ -439,7 +452,7 @@ namespace KMZILib
                 /// <summary>
                 /// Осуществляет процедуру нахождения арифметического кода. Работает точно для фраз длиной до 12 символов включительно.
                 /// </summary>
-                public static double GetCode(string Source, out double AverageLength)
+                public static double Encode(string Source, out double AverageLength)
                 {
                     Source = Source.ToUpper();
                     KeyValuePair<char, double>[] Statistic =
@@ -501,7 +514,7 @@ namespace KMZILib
                 /// </summary>
                 /// <param name="Source"></param>
                 /// <returns></returns>
-                public static ByteSet GetCode(int Source)
+                public static ByteSet Encode(int Source)
                 {
                     ByteSet Result = new ByteSet();
                     int buffer = Source;
@@ -519,6 +532,11 @@ namespace KMZILib
                     return Result;
                 }
 
+                /// <summary>
+                /// Осуществляет декодирование алгоритмом Левенштейна.
+                /// </summary>
+                /// <param name="Source"></param>
+                /// <returns></returns>
                 public static int Decode(ByteSet Source)
                 {
                     int c = 0;
@@ -529,12 +547,12 @@ namespace KMZILib
                     int P = c - 1;
                     while (P != 0)
                     {
-                        Source.Cut(0, N);
-                        Source.Put(0, 1);
+                        ByteSet buffer = Source.Cut(0, N);
+                        buffer.Put(0, 1);
                         N = 0;
-                        for (int i = Source.Value.Length - 1; i >= 0; i--)
-                            if (Source.Value[i] == 1)
-                                N += (int)Math.Pow(2, Source.Length - 1 - i);
+                        for (int i = buffer.Value.Length - 1; i >= 0; i--)
+                            if (buffer.Value[i] == 1)
+                                N += (int)Math.Pow(2, buffer.Length - 1 - i);
                         P--;
                     }
                     return N;

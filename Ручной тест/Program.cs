@@ -17,7 +17,11 @@ namespace Ручной_тест
 
         static void Main(string[] args)
         {
-                Console.WriteLine(LevenshteinCoding.Decode(LevenshteinCoding.GetCode(14)));
+            for (int i = 0; i < 25; i++)
+            {
+
+                Console.WriteLine(LevenshteinCoding.Decode(LevenshteinCoding.Encode(i)));
+            }
         }
     }
 }
