@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.IO.Ports;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using JetBrains.Annotations;
@@ -574,11 +575,16 @@ namespace KMZILib
                     /// <returns></returns>
                     public static int Encode(string Source, int MaxValue)
                     {
-                        //TODO: <END OF MESSAGE>?
-                        //TODO: Какое число возвращать в ответ?
-                        Source = Source.ToUpper();
+                        Source = Source.ToUpper() + '\0';
                         KeyValuePair<char, double>[] Statistic =
                             GetStatisticOnegram(Source, false).OrderBy(row => row.Key).ToArray();
+                        
+                        
+                        KeyValuePair<char, double> buffer = Statistic[0];
+                        for (int i = 0; i < Statistic.Length - 1; i++)
+                            Statistic[i] = Statistic[i + 1];
+                        Statistic[Statistic.Length - 1] = buffer;
+
                         double[] q = new double[Statistic.Length];
                         for (int i = 1; i < Statistic.Length; i++)
                             q[i] = q[i - 1] + Statistic[i - 1].Value;
@@ -590,14 +596,14 @@ namespace KMZILib
                             while (Source[i] != Statistic[LetInd].Key) LetInd++;
 
                             //F = F + q(xi)*G
-                            F += (int)(q[LetInd] * G);
+                            F = (int)(F + q[LetInd] * G);
 
                             //G = G*p(xi)
-                            G *= (int)(Statistic[LetInd].Value);
+                            G = (int)(G * Statistic[LetInd].Value);
 
                         }
-
-                        return F + G / 2;
+                        //TODO: какое значение возвращать? как понять соклько сиволов брать?
+                        return F + 1;
                     }
 
                     /// <summary>
