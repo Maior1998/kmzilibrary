@@ -126,7 +126,7 @@ namespace KMZILib
             /// <param name="TargetIndex"></param>
             internal ByteSet CutAt(int TargetIndex)
             {
-                ByteSet Result=new ByteSet();
+                ByteSet Result = new ByteSet();
                 byte[] buffer = new byte[Value.Length - 1];
                 for (int i = 0; i < TargetIndex; i++)
                     buffer[i] = Value[i];
@@ -158,8 +158,8 @@ namespace KMZILib
                 byte[] buffer = new byte[Value.Length - Length];
                 for (int i = 0; i < StartIndex; i++)
                     buffer[i] = Value[i];
-                for(int i=0;i<Length;i++)
-                    Result.Append(Value[StartIndex+i]);
+                for (int i = 0; i < Length; i++)
+                    Result.Append(Value[StartIndex + i]);
                 for (int i = StartIndex + Length; i < Value.Length; i++)
                     buffer[i - Length] = Value[i];
                 Value = buffer;
@@ -176,7 +176,7 @@ namespace KMZILib
             }
         }
 
-        
+
 
         /// <summary>
         /// Возвращает энтропию поданной на вход статистики
@@ -443,121 +443,175 @@ namespace KMZILib
                 }
             }
 
-
             /// <summary>
-            /// Представляет арифметическое кодирование.
+            /// Коды энтропийного кодирования.
             /// </summary>
-            public static class ArithmeticCoding
+            public static class EntropyCoding
             {
                 /// <summary>
-                /// Осуществляет процедуру нахождения арифметического кода. Работает точно для фраз длиной до 12 символов включительно.
+                /// Представляет арифметическое кодирование.
                 /// </summary>
-                public static double Encode(string Source, out double AverageLength)
+                public static class ArithmeticCoding
                 {
-                    Source = Source.ToUpper();
-                    KeyValuePair<char, double>[] Statistic =
-                        GetStatisticOnegram(Source, false).OrderBy(row => row.Key).ToArray();
-                    double[] q = new double[Statistic.Length];
-                    for (int i = 1; i < Statistic.Length; i++)
-                        q[i] = q[i - 1] + Statistic[i - 1].Value;
-                    double F = 0;
-                    double G = 1;
-                    for (int i = 0; i < Source.Length; i++)
+                    /// <summary>
+                    /// Осуществляет процедуру нахождения арифметического кода. Работает точно для фраз длиной до 12 символов включительно.
+                    /// </summary>
+                    public static double Encode(string Source)
                     {
-                        int LetInd = 0;
-                        while (Source[i] != Statistic[LetInd].Key) LetInd++;
+                        Source = Source.ToUpper();
+                        KeyValuePair<char, double>[] Statistic =
+                            GetStatisticOnegram(Source, false).OrderBy(row => row.Key).ToArray();
+                        double[] q = new double[Statistic.Length];
+                        for (int i = 1; i < Statistic.Length; i++)
+                            q[i] = q[i - 1] + Statistic[i - 1].Value;
+                        double F = 0;
+                        double G = 1;
+                        for (int i = 0; i < Source.Length; i++)
+                        {
+                            int LetInd = 0;
+                            while (Source[i] != Statistic[LetInd].Key) LetInd++;
 
-                        //F = F + q(xi)*G
-                        F += q[LetInd] * G;
+                            //F = F + q(xi)*G
+                            F += q[LetInd] * G;
 
-                        //G = G*p(xi)
-                        G *= Statistic[LetInd].Value;
+                            //G = G*p(xi)
+                            G *= Statistic[LetInd].Value;
 
+                        }
+
+                        return F + G / 2;
                     }
 
-                    AverageLength = 0;
-                    return F + G / 2;
+                    /// <summary>
+                    /// Осуществляет декодирование арифметического кода.
+                    /// </summary>
+                    public static string Decode(double F, char[] Alphabet, double[] P, int Length)
+                    {
+                        double[] q = new double[P.Length + 1];
+                        for (int i = 1; i < P.Length; i++)
+                            q[i] = q[i - 1] + P[i - 1];
+                        q[P.Length] = 1;
+                        double S = 0;
+                        double G = 1;
+                        StringBuilder Result = new StringBuilder();
+                        for (int i = 0; i < Length; i++)
+                        {
+                            int j = 0;
+                            while (S + q[j + 1] * G < F) j++;
+                            S += q[j] * G;
+                            G *= P[j];
+                            Result.Append(Alphabet[j]);
+                        }
+
+                        return Result.ToString();
+                    }
                 }
 
                 /// <summary>
-                /// Осуществляет декодирование арифметического кода.
+                /// Представляет код Левенштейна.
                 /// </summary>
-                public static string Decode(double F, char[] Alphabet, double[] P, int Length)
+                public static class LevenshteinCoding
                 {
-                    double[] q = new double[P.Length + 1];
-                    for (int i = 1; i < P.Length; i++)
-                        q[i] = q[i - 1] + P[i - 1];
-                    q[P.Length] = 1;
-                    double S = 0;
-                    double G = 1;
-                    StringBuilder Result = new StringBuilder();
-                    for (int i = 0; i < Length; i++)
+                    /// <summary>
+                    /// Осуществляет кодирование алгоритмом Левенштейна.
+                    /// </summary>
+                    /// <param name="Source"></param>
+                    /// <returns></returns>
+                    public static ByteSet Encode(int Source)
                     {
-                        int j = 0;
-                        while (S + q[j + 1] * G < F) j++;
-                        S += q[j] * G;
-                        G *= P[j];
-                        Result.Append(Alphabet[j]);
+                        ByteSet Result = new ByteSet();
+                        int buffer = Source;
+                        int C = Source != 0 ? 1 : 0;
+                        while (buffer != 0)
+                        {
+                            bool[] Binary = Misc.GetBinaryArray(buffer).Skip(1).ToArray();
+                            buffer = Binary.Length;
+                            if (buffer == 0) break;
+                            Result.Put(0, Binary.Select(bol => bol ? (byte)1 : (byte)0).ToArray());
+                            C++;
+                        }
+
+                        Result.Put(0, Enumerable.Repeat((byte)1, C).Concat(new[] { (byte)0 }).ToArray());
+                        return Result;
                     }
 
-                    return Result.ToString();
+                    /// <summary>
+                    /// Осуществляет декодирование алгоритмом Левенштейна.
+                    /// </summary>
+                    /// <param name="Source"></param>
+                    /// <returns></returns>
+                    public static int Decode(ByteSet Source)
+                    {
+                        int c = 0;
+                        while (Source.Value[c] != 0) c++;
+                        if (c == 0) return 0;
+                        Source.Cut(0, c + 1);
+                        int N = 1;
+                        int P = c - 1;
+                        while (P != 0)
+                        {
+                            ByteSet buffer = Source.Cut(0, N);
+                            buffer.Put(0, 1);
+                            N = 0;
+                            for (int i = buffer.Value.Length - 1; i >= 0; i--)
+                                if (buffer.Value[i] == 1)
+                                    N += (int)Math.Pow(2, buffer.Length - 1 - i);
+                            P--;
+                        }
+                        return N;
+                    }
+                }
+
+                /// <summary>
+                /// Представляет интервальное кодирование.
+                /// </summary>
+                public static class RangeCoding
+                {
+                    /// <summary>
+                    /// Осуществляет кодирование интервальным алгоритмом.
+                    /// </summary>
+                    /// <param name="Source"></param>
+                    /// <returns></returns>
+                    public static int Encode(string Source, int MaxValue)
+                    {
+                        //TODO: <END OF MESSAGE>?
+                        //TODO: Какое число возвращать в ответ?
+                        Source = Source.ToUpper();
+                        KeyValuePair<char, double>[] Statistic =
+                            GetStatisticOnegram(Source, false).OrderBy(row => row.Key).ToArray();
+                        double[] q = new double[Statistic.Length];
+                        for (int i = 1; i < Statistic.Length; i++)
+                            q[i] = q[i - 1] + Statistic[i - 1].Value;
+                        int F = 0;
+                        int G = MaxValue;
+                        for (int i = 0; i < Source.Length; i++)
+                        {
+                            int LetInd = 0;
+                            while (Source[i] != Statistic[LetInd].Key) LetInd++;
+
+                            //F = F + q(xi)*G
+                            F += (int)(q[LetInd] * G);
+
+                            //G = G*p(xi)
+                            G *= (int)(Statistic[LetInd].Value);
+
+                        }
+
+                        return F + G / 2;
+                    }
+
+                    /// <summary>
+                    /// Осуществляет декодирование интервальным алгоритмом.
+                    /// </summary>
+                    /// <param name="Source"></param>
+                    /// <returns></returns>
+                    public static string Decode(int Source)
+                    {
+                        return null;
+                    }
                 }
             }
 
-            /// <summary>
-            /// Представляет код Левенштейна.
-            /// </summary>
-            public static class LevenshteinCoding
-            {
-                /// <summary>
-                /// Осуществляет кодирование алгоритмом Левенштейна.
-                /// </summary>
-                /// <param name="Source"></param>
-                /// <returns></returns>
-                public static ByteSet Encode(int Source)
-                {
-                    ByteSet Result = new ByteSet();
-                    int buffer = Source;
-                    int C = Source != 0 ? 1 : 0;
-                    while (buffer != 0)
-                    {
-                        bool[] Binary = Misc.GetBinaryArray(buffer).Skip(1).ToArray();
-                        buffer = Binary.Length;
-                        if (buffer == 0) break;
-                        Result.Put(0, Binary.Select(bol => bol ? (byte)1 : (byte)0).ToArray());
-                        C++;
-                    }
-
-                    Result.Put(0, Enumerable.Repeat((byte)1, C).Concat(new[] { (byte)0 }).ToArray());
-                    return Result;
-                }
-
-                /// <summary>
-                /// Осуществляет декодирование алгоритмом Левенштейна.
-                /// </summary>
-                /// <param name="Source"></param>
-                /// <returns></returns>
-                public static int Decode(ByteSet Source)
-                {
-                    int c = 0;
-                    while (Source.Value[c] != 0) c++;
-                    if (c == 0) return 0;
-                    Source.Cut(0, c + 1);
-                    int N = 1;
-                    int P = c - 1;
-                    while (P != 0)
-                    {
-                        ByteSet buffer = Source.Cut(0, N);
-                        buffer.Put(0, 1);
-                        N = 0;
-                        for (int i = buffer.Value.Length - 1; i >= 0; i--)
-                            if (buffer.Value[i] == 1)
-                                N += (int)Math.Pow(2, buffer.Length - 1 - i);
-                        P--;
-                    }
-                    return N;
-                }
-            }
         }
     }
 }
