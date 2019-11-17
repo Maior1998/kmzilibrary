@@ -132,6 +132,12 @@ namespace KMZILib
             return gcd(Second, First % Second, oldx - x * q, oldy - y * q, x, y);
         }
 
+        /// <summary>
+        /// Вычисляет НОД для многочленов.
+        /// </summary>
+        /// <param name="First"></param>
+        /// <param name="Second"></param>
+        /// <returns></returns>
         public static Polynoms.ModularPolynom GCDResult(Polynoms.ModularPolynom First, Polynoms.ModularPolynom Second)
         {
             Console.WriteLine($"{First}\t\t\t{new Polynoms.ModularPolynom(new[] { 1 }, First.Module)}\t\t\t{new Polynoms.ModularPolynom(0, First.Module)}\t\t\t-");

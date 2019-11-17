@@ -391,6 +391,12 @@ namespace KMZILib
                 /// </summary>
                 public static class GilbertCoding
                 {
+                    /// <summary>
+                    /// Осуществляет кодирование алгоритмом Гилберта-Мура.
+                    /// </summary>
+                    /// <param name="Probabilities"></param>
+                    /// <param name="AverageLength"></param>
+                    /// <returns></returns>
                     public static ByteSet[] Encode(double[] Probabilities, out double AverageLength)
                     {
                         AverageLength = 0;
