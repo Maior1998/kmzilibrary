@@ -6,9 +6,10 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using System.Reflection.Metadata.Ecma335;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
-using LevenshteinCoding = KMZILib.CodingTheory.DataCompressionCodes.LevenshteinCoding;
+using RangeConding=KMZILib.CodingTheory.DataCompressionCodes.EntropyCoding.RangeCoding;
 
 namespace Ручной_тест
 {
@@ -17,10 +18,7 @@ namespace Ручной_тест
 
         static void Main(string[] args)
         {
-            for (int i = 0; i < 25; i++)
-            {
-                Console.WriteLine(LevenshteinCoding.Decode(LevenshteinCoding.Encode(i)));
-            }
+            Console.WriteLine(RangeConding.Encode("AABA",100000));
         }
     }
 }
