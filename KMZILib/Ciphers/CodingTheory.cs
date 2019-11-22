@@ -20,6 +20,10 @@ namespace KMZILib
 
     public static class CodingTheory
     {
+        public static string bin(int Source)
+        {
+            return string.Concat(Misc.GetBinaryString(Source).Skip(1));
+        }
         /// <summary>
         ///     Представляет собой двоичный набор данных
         /// </summary>
@@ -512,6 +516,43 @@ namespace KMZILib
 
                         return Result.ToString();
                     }
+
+
+                }
+
+                /// <summary>
+                /// Монотонные коды.
+                /// </summary>
+                public static class MonotoneCoding
+                {
+                    /// <summary>
+                    /// Представляет унарный код.
+                    /// </summary>
+                    public static class UnaryCoding
+                    {
+                        //TODO: Переделать в виде ByteSet.
+
+                        /// <summary>
+                        /// Осуществляет кодирование в унарный код.
+                        /// </summary>
+                        /// <param name="Source"></param>
+                        /// <returns></returns>
+                        public static string Encode(int Source)
+                        {
+                            return string.Concat(new String('1', Source - 1), '0');
+                        }
+
+                        /// <summary>
+                        /// Осуществляет процедуру декодирования унарного кода.
+                        /// </summary>
+                        /// <param name="Source"></param>
+                        /// <returns></returns>
+                        public static int Decode(string Source)
+                        {
+                            return Source.Length;
+                        }
+                    }
+
                 }
 
                 /// <summary>
@@ -570,6 +611,22 @@ namespace KMZILib
                 }
 
                 /// <summary>
+                /// Представляет код Элайеса.
+                /// </summary>
+                public static class EliasCoding
+                {
+                    public static string Encode(int Source)
+                    {
+                        if (Source == 1) return "0";
+                        string bini = bin(Source);
+                        string bini_bini = bin(bini.Length);
+                        return string.Concat(MonotoneCoding.UnaryCoding.Encode(bini_bini.Length + 2),
+                            bini_bini,
+                            bini);
+                    }
+                }
+
+                /// <summary>
                 /// Представляет интервальное кодирование.
                 /// </summary>
                 public static class RangeCoding
@@ -579,49 +636,40 @@ namespace KMZILib
                     /// </summary>
                     /// <param name="Source"></param>
                     /// <returns></returns>
-                    public static int Encode(string Source, int MaxValue)
+                    public static int[] Encode(string Source)
                     {
-                        Source = Source.ToUpper() + '\0';
-                        KeyValuePair<char, double>[] Statistic =
-                            GetStatisticOnegram(Source, false).OrderBy(row => row.Key).ToArray();
-                        
-                        
-                        KeyValuePair<char, double> buffer = Statistic[0];
-                        for (int i = 0; i < Statistic.Length - 1; i++)
-                            Statistic[i] = Statistic[i + 1];
-                        Statistic[Statistic.Length - 1] = buffer;
+                        Source = Source.ToUpper();
+                        List<char> buffer = new List<char>();
+                        foreach (char symbol in Source)
+                        {
+                            if (!buffer.Contains(symbol))
+                                buffer.Add(symbol);
+                        }
 
-                        double[] q = new double[Statistic.Length];
-                        for (int i = 1; i < Statistic.Length; i++)
-                            q[i] = q[i - 1] + Statistic[i - 1].Value;
-                        int F = 0;
-                        int G = MaxValue;
+                        buffer.Sort();
+                        Dictionary<char, int> LastFound = new Dictionary<char, int>();
+                        for (int i = 0; i < buffer.Count; i++)
+                            LastFound.Add(buffer[i], i - buffer.Count);
+                        int[] Result = new int[Source.Length];
                         for (int i = 0; i < Source.Length; i++)
                         {
-                            int LetInd = 0;
-                            while (Source[i] != Statistic[LetInd].Key) LetInd++;
-
-                            //F = F + q(xi)*G
-                            F = (int)(F + q[LetInd] * G);
-
-                            //G = G*p(xi)
-                            G = (int)(G * Statistic[LetInd].Value);
-
+                            int sub = i - LastFound[Source[i]] - 1;
+                            LastFound[Source[i]] = i;
+                            Result[i] = sub;
                         }
-                        //TODO: какое значение возвращать? как понять соклько сиволов брать?
-                        return F + 1;
+                        return Result;
                     }
 
-                    /// <summary>
-                    /// Осуществляет декодирование интервальным алгоритмом.
-                    /// </summary>
-                    /// <param name="Source"></param>
-                    /// <returns></returns>
-                    public static string Decode(int Source)
-                    {
-                        return null;
-                    }
                 }
+
+                /// <summary>
+                /// Представляет кодирование методом "стопки книг".
+                /// </summary>
+                public static class BookStack
+                {
+
+                }
+
             }
 
         }
