@@ -639,23 +639,18 @@ namespace KMZILib
                     public static int[] Encode(string Source)
                     {
                         Source = Source.ToUpper();
-                        List<char> buffer = new List<char>();
-                        foreach (char symbol in Source)
-                        {
-                            if (!buffer.Contains(symbol))
-                                buffer.Add(symbol);
-                        }
-
+                        List<char> buffer = Source.Distinct().ToList();
                         buffer.Sort();
                         Dictionary<char, int> LastFound = new Dictionary<char, int>();
                         for (int i = 0; i < buffer.Count; i++)
-                            LastFound.Add(buffer[i], i - buffer.Count);
+                            LastFound.Add(buffer[i], i);
                         int[] Result = new int[Source.Length];
-                        for (int i = 0; i < Source.Length; i++)
+                        Source = string.Concat(string.Join("", LastFound.Select(row => row.Key)), Source);
+                        for (int i = buffer.Count; i < Source.Length; i++)
                         {
                             int sub = i - LastFound[Source[i]] - 1;
                             LastFound[Source[i]] = i;
-                            Result[i] = sub;
+                            Result[i - buffer.Count] = sub;
                         }
                         return Result;
                     }
@@ -667,7 +662,29 @@ namespace KMZILib
                 /// </summary>
                 public static class BookStack
                 {
-
+                    /// <summary>
+                    /// Осуществляет кодирование алгоритмом "стопка книг".
+                    /// </summary>
+                    /// <param name="Source">Исходная строка, которую нужно закодировать.</param>
+                    /// <returns>Последовательность натуральных чисел, отражающая данную строку.</returns>
+                    public static int[] Encode(string Source)
+                    {
+                        Source = Source.ToUpper();
+                        List<char> buffer = Source.Distinct().ToList();
+                        buffer.Sort();
+                        Dictionary<char, int> LastFound = new Dictionary<char, int>();
+                        for (int i = 0; i < buffer.Count; i++)
+                            LastFound.Add(buffer[i], i);
+                        int[] Result = new int[Source.Length];
+                        Source = string.Concat(string.Join("", LastFound.Select(row => row.Key)), Source);
+                        for (int i = buffer.Count; i < Source.Length; i++)
+                        {
+                            int sub = i - LastFound[Source[i]] - 1;
+                            Result[i - buffer.Count] = Source.Substring(LastFound[Source[i]]+1,sub).Distinct().Count();
+                            LastFound[Source[i]] = i;
+                        }
+                        return Result;
+                    }
                 }
 
             }
