@@ -20,8 +20,7 @@ namespace Ручной_тест
 
         static void Main(string[] args)
         {
-            string test = "cabbbabbac";
-            Console.WriteLine(CodingTheory.DataCompressionCodes.EntropyCoding.BookStack.Encode(test));
+            Console.WriteLine(CodingTheory.DataCompressionCodes.EntropyCoding.LevenshteinCoding.Encode(21));
         }
     }
 }

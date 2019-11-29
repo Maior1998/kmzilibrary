@@ -20,7 +20,7 @@ namespace KMZILib
 
     public static class CodingTheory
     {
-        public static string bin(int Source)
+        private static string bin(int Source)
         {
             return string.Concat(Misc.GetBinaryString(Source).Skip(1));
         }
@@ -530,8 +530,6 @@ namespace KMZILib
                     /// </summary>
                     public static class UnaryCoding
                     {
-                        //TODO: Переделать в виде ByteSet.
-
                         /// <summary>
                         /// Осуществляет кодирование в унарный код.
                         /// </summary>
@@ -542,6 +540,19 @@ namespace KMZILib
                             return string.Concat(new String('1', Source - 1), '0');
                         }
 
+
+                        /// <summary>
+                        /// Осуществляет кодирование в унарный код со сдвигом.
+                        /// </summary>
+                        /// <param name="Source"></param>
+                        /// <returns></returns>
+                        public static string EncodeShifted(int Source)
+                        {
+                            Source++;
+                            return string.Concat(new String('1', Source - 1), '0');
+                        }
+
+
                         /// <summary>
                         /// Осуществляет процедуру декодирования унарного кода.
                         /// </summary>
@@ -550,6 +561,16 @@ namespace KMZILib
                         public static int Decode(string Source)
                         {
                             return Source.Length;
+                        }
+
+                        /// <summary>
+                        /// Осуществляет процедуру декодирования унарного кодасо сдвигом.
+                        /// </summary>
+                        /// <param name="Source"></param>
+                        /// <returns></returns>
+                        public static int DecodeShifted(string Source)
+                        {
+                            return Source.Length-1;
                         }
                     }
 
@@ -565,11 +586,12 @@ namespace KMZILib
                     /// </summary>
                     /// <param name="Source"></param>
                     /// <returns></returns>
-                    public static ByteSet Encode(int Source)
+                    public static string Encode(int Source)
                     {
+                        if (Source == 0) return "0";
                         ByteSet Result = new ByteSet();
                         int buffer = Source;
-                        int C = Source != 0 ? 1 : 0;
+                        int C =  1 ;
                         while (buffer != 0)
                         {
                             bool[] Binary = Misc.GetBinaryArray(buffer).Skip(1).ToArray();
@@ -579,8 +601,8 @@ namespace KMZILib
                             C++;
                         }
 
-                        Result.Put(0, Enumerable.Repeat((byte)1, C).Concat(new[] { (byte)0 }).ToArray());
-                        return Result;
+                        Result.Put(0, Enumerable.Repeat((byte)1, C-1).Concat(new[] { (byte)0 }).ToArray());
+                        return Result.ToString();
                     }
 
                     /// <summary>
@@ -620,7 +642,7 @@ namespace KMZILib
                         if (Source == 1) return "0";
                         string bini = bin(Source);
                         string bini_bini = bin(bini.Length);
-                        return string.Concat(MonotoneCoding.UnaryCoding.Encode(bini_bini.Length + 2),
+                        return string.Concat(MonotoneCoding.UnaryCoding.EncodeShifted( bini_bini.Length + 2),
                             bini_bini,
                             bini);
                     }
