@@ -616,8 +616,16 @@ namespace KMZILib
         /// </summary>
         public static class EliasCoding
         {
+            /// <summary>
+            /// Осуществляет кодирование алгоритмом Элайеса.
+            /// </summary>
+            /// <param name="Source">Натуральное число, которое необходимо закодировать.</param>
+            /// <returns>Строковое предсталвение кода Элайеса для данного числа.</returns>
+            /// <exception cref="InvalidOperationException">Введено ненатуральное число.</exception>
             public static string Encode(int Source)
             {
+                if(Source<1)
+                    throw new InvalidOperationException("Число должно быть натуральным!");
                 if (Source == 1) return "0";
                 string bini = bin(Source);
                 string bini_bini = bin(bini.Length);
