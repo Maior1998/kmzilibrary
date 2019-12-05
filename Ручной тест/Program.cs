@@ -11,7 +11,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using CodingTheory = KMZILib.CodingTheory;
-using RangeConding=KMZILib.CodingTheory.DataCompressionCodes.EntropyCoding.RangeCoding;
 
 namespace Ручной_тест
 {
@@ -20,7 +19,7 @@ namespace Ручной_тест
 
         static void Main(string[] args)
         {
-            Console.WriteLine(CodingTheory.DataCompressionCodes.EntropyCoding.LevenshteinCoding.Encode(21));
+            Console.WriteLine(CodingTheory.EliasCoding.Encode(21));
         }
     }
 }

@@ -621,7 +621,7 @@ namespace KMZILib
                 if (Source == 1) return "0";
                 string bini = bin(Source);
                 string bini_bini = bin(bini.Length);
-                return string.Concat(UnaryCoding.EncodeShifted(bini_bini.Length + 2),
+                return string.Concat(UnaryCoding.Encode(bini_bini.Length + 2),
                     bini_bini,
                     bini);
             }
@@ -661,7 +661,7 @@ namespace KMZILib
         /// <summary>
         /// Представляет кодирование методом "стопки книг".
         /// </summary>
-        public static class BookStack
+        public static class BookStackCoding
         {
             /// <summary>
             /// Осуществляет кодирование алгоритмом "стопка книг".
