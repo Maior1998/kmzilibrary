@@ -181,8 +181,6 @@ namespace KMZILib
             }
         }
 
-
-
         /// <summary>
         /// Возвращает энтропию поданной на вход статистики
         /// </summary>
@@ -443,7 +441,6 @@ namespace KMZILib
             return string.Concat(Source.Select(chr => Codes[chr]));
         }
 
-
         /// <summary>
         /// Представляет арифметическое кодирование.
         /// </summary>
@@ -554,7 +551,6 @@ namespace KMZILib
             }
         }
 
-
         /// <summary>
         /// Представляет код Левенштейна.
         /// </summary>
@@ -624,7 +620,7 @@ namespace KMZILib
             /// <exception cref="InvalidOperationException">Введено ненатуральное число.</exception>
             public static string Encode(int Source)
             {
-                if(Source<1)
+                if (Source < 1)
                     throw new InvalidOperationException("Число должно быть натуральным!");
                 if (Source == 1) return "0";
                 string bini = bin(Source);
@@ -696,6 +692,67 @@ namespace KMZILib
             }
         }
 
+        /// <summary>
+        /// Представляет алгоритм LZ-77, используемый в архиваторах.
+        /// </summary>
+        public static class LZ77
+        {
+            /// <summary>
+            /// Осуществляет поиск подстроки в блоке указаной длины.
+            /// </summary>
+            /// <param name="Source">Исходная строка, в которой необходимо выполнить поиск.</param>
+            /// <param name="SourceIndex">Индекс, на которой находится новый символ.</param>
+            /// <param name="DictLength">Размер словаря.</param>
+            /// <param name="DestinationIndex">Расстояние до совпавшей подстроки.</param>
+            /// <param name="DestiantionLength">Длина совпавшей подстроки.</param>
+            /// <returns>Найдена подстрока, или нет.</returns>
+            private static bool SearchSubstring(string Source, int SourceIndex, int DictLength, out int DestinationIndex, out int DestiantionLength)
+            {
+                DestinationIndex = -1;
+                DestiantionLength = 0;
+                for (int i = SourceIndex - DictLength < 0 ? 0 : SourceIndex - DictLength; i < SourceIndex; i++)
+                {
+                    if (Source[i] != Source[SourceIndex]) continue;
+                    int CurrentLength = 0;
+                    int CurrentIndex = i;
+                    while (SourceIndex + CurrentLength < Source.Length &&
+                           Source[SourceIndex + CurrentLength] == Source[CurrentIndex + CurrentLength]) CurrentLength++;
+                    if (CurrentLength > DestiantionLength)
+                    {
+                        DestiantionLength = CurrentLength;
+                        DestinationIndex = SourceIndex-CurrentIndex;
+                    }
+                }
+
+                return DestinationIndex != -1;
+            }
+
+            public static string Encode(string Source, int DictLength)
+            {
+                Source = Source.ToUpper();
+                int AlphabetLength = Source.Distinct().Count();
+                int AlphabeticSymbolLength = (int) Math.Ceiling(Math.Log(AlphabetLength,2));
+                int DictSymbolLength = (int) Math.Ceiling(Math.Log(DictLength,2));
+                string Alphabet = string.Concat(Source.Distinct().OrderBy(ch => ch));
+                StringBuilder Result = new StringBuilder();
+                for (int i = 0; i < Source.Length; i++)
+                {
+                    if (SearchSubstring(Source, i, DictLength, out int DestinationIndex, out int DestiantionLength))
+                    {
+                        Result.Append('1');
+                        Result.Append(Misc.GetBinaryString(DestinationIndex, DictSymbolLength));
+                        Result.Append(LevenshteinCoding.Encode(DestiantionLength));
+                        i += DestiantionLength - 1;
+                    }
+                    else
+                    {
+                        Result.Append('0');
+                        Result.Append(Misc.GetBinaryString(Alphabet.IndexOf(Source[i]), AlphabeticSymbolLength));
+                    }
+                }
+                return Result.ToString();
+            }
+        }
 
     }
 }

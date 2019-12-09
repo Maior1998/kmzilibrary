@@ -19,7 +19,7 @@ namespace Ручной_тест
 
         static void Main(string[] args)
         {
-            Console.WriteLine(CodingTheory.EliasCoding.Encode(21));
+            Console.WriteLine(CodingTheory.LZ77.Encode("У животных есть душа. Я видел это в их глазах.", 10));
         }
     }
 }
