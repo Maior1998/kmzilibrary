@@ -720,7 +720,7 @@ namespace KMZILib
                     if (CurrentLength > DestiantionLength)
                     {
                         DestiantionLength = CurrentLength;
-                        DestinationIndex = SourceIndex-CurrentIndex;
+                        DestinationIndex = SourceIndex-CurrentIndex-1;
                     }
                 }
 
