@@ -717,7 +717,7 @@ namespace KMZILib
                     int CurrentIndex = i;
                     while (SourceIndex + CurrentLength < Source.Length &&
                            Source[SourceIndex + CurrentLength] == Source[CurrentIndex + CurrentLength]) CurrentLength++;
-                    if (CurrentLength >= DestiantionLength)
+                    if (CurrentLength > DestiantionLength)
                     {
                         DestiantionLength = CurrentLength;
                         DestinationIndex = SourceIndex-CurrentIndex-1;
