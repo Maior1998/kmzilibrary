@@ -15,22 +15,27 @@ using static KMZILib.Comparison;
 namespace KMZILib
 {
     /// <summary>
-    ///     Класс, отвечающий за работу функций теории кодирования
+    ///     Класс, отвечающий за работу функций теории кодирования.
     /// </summary>
-
     public static class CodingTheory
     {
+        /// <summary>
+        /// Возвращает двочиное представление целого числа без первой единицы.
+        /// </summary>
+        /// <param name="Source">Число, для которого необходимо получить двоичное представление.</param>
+        /// <returns>Битовая строка - представление числа без первой единицы.</returns>
         private static string bin(int Source)
         {
             return string.Concat(Misc.GetBinaryString(Source).Skip(1));
         }
+
         /// <summary>
-        ///     Представляет собой двоичный набор данных
+        ///     Представляет собой двоичный набор данных.
         /// </summary>
         public class ByteSet
         {
             /// <summary>
-            ///     Инициализирует пустой вектор
+            ///     Инициализирует пустой вектор.
             /// </summary>
             public ByteSet()
             {
@@ -40,7 +45,7 @@ namespace KMZILib
             /// <summary>
             ///     Инициализирует вектор, представляющий заданный массив байт.
             /// </summary>
-            /// <param name="value"></param>
+            /// <param name="value">Массив байт, состоящий из нулей и единиц.</param>
             public ByteSet(byte[] value)
             {
                 Value = new byte[value.Length];
@@ -48,9 +53,9 @@ namespace KMZILib
             }
 
             /// <summary>
-            ///     Инициализирует копию указанного вектора
+            ///     Инициализирует копию указанного вектора.
             /// </summary>
-            /// <param name="Other"></param>
+            /// <param name="Other">Вектор ,от которого необходимо взять копию.</param>
             public ByteSet(ByteSet Other) : this(Other.Value)
             {
             }
@@ -69,17 +74,17 @@ namespace KMZILib
             }
 
             /// <summary>
-            ///     Значение текущего бинарного вектора
+            ///     Значение текущего бинарного вектора.
             /// </summary>
             public byte[] Value { get; internal set; }
 
             /// <summary>
-            ///     Строковое представление вектора
+            ///     Строковое представление вектора.
             /// </summary>
             public string StringValue => string.Join("", Value);
 
             /// <summary>
-            ///     Длина вектора (число байт)
+            ///     Длина вектора (число бит).
             /// </summary>
             public int Length => Value.Length;
 
@@ -95,8 +100,8 @@ namespace KMZILib
             /// <summary>
             /// Вставляет бит по указанному индексу.
             /// </summary>
-            /// <param name="TargetIndex"></param>
-            /// <param name="TargetValue"></param>
+            /// <param name="TargetIndex">Индекс, в который необходимо вставить бит.</param>
+            /// <param name="TargetValue">Бит, который необходимо вставить в вектор.</param>
             internal void Put(int TargetIndex, byte TargetValue)
             {
                 byte[] buffer = new byte[Value.Length + 1];
@@ -111,8 +116,8 @@ namespace KMZILib
             /// <summary>
             /// Вставляет биты по указанному индексу.
             /// </summary>
-            /// <param name="TargetIndex"></param>
-            /// <param name="TargetValue"></param>
+            /// <param name="TargetIndex">Индекс, в который необходимо вставить биты.</param>
+            /// <param name="TargetValue">Массив бит, которые будут вставлены в вектор.</param>
             internal void Put(int TargetIndex, byte[] TargetValue)
             {
                 byte[] buffer = new byte[Value.Length + TargetValue.Length];
@@ -128,7 +133,7 @@ namespace KMZILib
             /// <summary>
             /// Вырезает бит на нужной позиции.
             /// </summary>
-            /// <param name="TargetIndex"></param>
+            /// <param name="TargetIndex">Индекс, по которому необходимо вырезать бит.</param>
             internal ByteSet CutAt(int TargetIndex)
             {
                 ByteSet Result = new ByteSet();
@@ -145,8 +150,8 @@ namespace KMZILib
             /// <summary>
             /// Вырезает нужное число бит от стартовой до конечной позиции включительно.
             /// </summary>
-            /// <param name="StartIndex"></param>
-            /// <param name="EndIndex"></param>
+            /// <param name="StartIndex">Индекс начала вырезки.</param>
+            /// <param name="EndIndex">Индекс конца вырезки. Включается в саму вырезку.</param>
             internal ByteSet CutAt(int StartIndex, int EndIndex)
             {
                 return Cut(StartIndex, EndIndex - StartIndex + 1);
@@ -155,8 +160,8 @@ namespace KMZILib
             /// <summary>
             /// Вырезает нужное число бит начиная с указанной позиции.
             /// </summary>
-            /// <param name="StartIndex"></param>
-            /// <param name="Length"></param>
+            /// <param name="StartIndex">Индекс, начиная с которого необходимо вырезать биты.</param>
+            /// <param name="Length">Число вырезаемых бит.</param>
             internal ByteSet Cut(int StartIndex, int Length)
             {
                 ByteSet Result = new ByteSet();
@@ -172,9 +177,9 @@ namespace KMZILib
             }
 
             /// <summary>
-            ///     Строковое представление байтового вектора.
+            ///     Строковое представление битового вектора.
             /// </summary>
-            /// <returns>Строка, представляющая все байты ветокра</returns>
+            /// <returns>Строка, представляющая все биты ветокра</returns>
             public override string ToString()
             {
                 return StringValue;
@@ -182,10 +187,10 @@ namespace KMZILib
         }
 
         /// <summary>
-        /// Возвращает энтропию поданной на вход статистики
+        /// Возвращает энтропию поданной на вход статистики.
         /// </summary>
-        /// <param name="StatsDouble"></param>
-        /// <returns></returns>
+        /// <param name="StatsDouble">Набор статистических данных в виде массива пар "буква - вероятность".</param>
+        /// <returns>Энтропия источника сообщений.</returns>
         public static double GetEntropy(KeyValuePair<char, double>[] StatsDouble)
         {
             double Result = 0;
@@ -200,7 +205,7 @@ namespace KMZILib
         /// </summary>
         /// <param name="SourceText">Исходный текст.</param>
         /// <param name="sort">Нужно ли сортировать буквы по убыванию статистики.</param>
-        /// <returns></returns>
+        /// <returns>Массив пар "буква - вероятность".</returns>
         public static KeyValuePair<char, double>[] GetStatisticOnegram(string SourceText, bool sort = true)
         {
             SourceText = SourceText.ToUpper();
@@ -227,11 +232,11 @@ namespace KMZILib
         public static class HuffmanCoding
         {
             /// <summary>
-            ///     Осуществляет генерацию кодов, подходящим заданным частотам так, чтобы добиться наименьшей средней длины сообщения
+            ///     Осуществляет генерацию кодов, подходящим заданным частотам так, чтобы добиться наименьшей средней длины сообщения.
             /// </summary>
-            /// <param name="Probabilities">Массив - частотный анализ исходного алфавита</param>
-            /// <param name="k">Система счисления, в которой будет произведено кодирование</param>
-            /// <param name="AverageLength">Вычисленная в процессе генерации кодов средняя длина сообщения</param>
+            /// <param name="Probabilities">Массив - частотный анализ исходного алфавита.</param>
+            /// <param name="k">Система счисления, в которой будет произведено кодирование.</param>
+            /// <param name="AverageLength">Вычисленная в процессе генерации кодов средняя длина сообщения.</param>
             /// <returns>
             ///     Массив <see cref="ByteSet" />[], содержащий в себе коды, расположенные в соответствии введенным частотам в
             ///     порядке убывания.
@@ -350,8 +355,8 @@ namespace KMZILib
             /// <summary>
             /// Возвращает значение L, необходимое для алгоритма Шеннона, для заданной вероятности.
             /// </summary>
-            /// <param name="Prob"></param>
-            /// <returns></returns>
+            /// <param name="Prob">Вероятность, для которой необходимо высчитать длину получаемого кодового слова.</param>
+            /// <returns>Целое число - длина необходимого кодового слова.</returns>
             public static int GetL(double Prob)
             {
                 return (int)Math.Ceiling(-Math.Log(Prob, 2));
@@ -360,8 +365,9 @@ namespace KMZILib
             /// <summary>
             /// Осуществляет кодирование Шеннона.
             /// </summary>
-            /// <param name="Probabilities">Массив вероятностей исходных символов. Будут возвращены отсортированные в порядке убывания вероятностей коды.</param>
-            /// <returns></returns>
+            /// <param name="Probabilities">Массив вероятностей исходного алфавита, отсортированный в порядке убывания частот.</param>
+            /// <param name="AverageLength">Средняя длина получаемых кодовых слов.</param>
+            /// <returns>Массив кодов слов, поставленный в соответствие каждой букве исходного алфавита в порядке убывания частот</returns>
             public static ByteSet[] Encode(double[] Probabilities, out double AverageLength)
             {
                 AverageLength = 0;
@@ -387,9 +393,9 @@ namespace KMZILib
             /// <summary>
             /// Осуществляет кодирование алгоритмом Гилберта-Мура.
             /// </summary>
-            /// <param name="Probabilities"></param>
-            /// <param name="AverageLength"></param>
-            /// <returns></returns>
+            /// <param name="Probabilities">Массив вероятностей исходного алфавита, отсортированный в порядке следования букв в исходном тексте.</param>
+            /// <param name="AverageLength">Средняя длина получаемых кодовых слов.</param>
+            /// <returns>Массив кодов слов, поставленный в соответствие каждой букве исходного алфавита в порядке следования букв в исходном тексте.</returns>
             public static ByteSet[] Encode(double[] Probabilities, out double AverageLength)
             {
                 AverageLength = 0;
@@ -447,10 +453,12 @@ namespace KMZILib
         public static class ArithmeticCoding
         {
             /// <summary>
-            /// Осуществляет процедуру нахождения арифметического кода. Работает точно для фраз длиной до 12 символов включительно.
+            /// Осуществляет процедуру нахождения арифметического кода. Работает точно для фраз длиной до 15 символов включительно.
             /// </summary>
             public static double Encode(string Source)
             {
+                if(Source.Length>15)
+                    throw new InvalidOperationException("Длина фразы не должна превышать 15 символов.");
                 Source = Source.ToUpper();
                 KeyValuePair<char, double>[] Statistic =
                     GetStatisticOnegram(Source, false).OrderBy(row => row.Key).ToArray();
@@ -476,10 +484,12 @@ namespace KMZILib
             }
 
             /// <summary>
-            /// Осуществляет декодирование арифметического кода.
+            /// Осуществляет декодирование арифметического кода. Работает точно для фраз длиной до 15 символов включительно.
             /// </summary>
             public static string Decode(double F, char[] Alphabet, double[] P, int Length)
             {
+                if(Length>15)
+                    throw new InvalidOperationException("Длина фразы не должна превышать 15 символов.");
                 double[] q = new double[P.Length + 1];
                 for (int i = 1; i < P.Length; i++)
                     q[i] = q[i - 1] + P[i - 1];
@@ -510,8 +520,8 @@ namespace KMZILib
             /// <summary>
             /// Осуществляет кодирование в унарный код.
             /// </summary>
-            /// <param name="Source"></param>
-            /// <returns></returns>
+            /// <param name="Source">Исходная строка, которую необходимо закодироовать.</param>
+            /// <returns>Битовая закодированная строка.</returns>
             public static string Encode(int Source)
             {
                 return string.Concat(new String('1', Source - 1), '0');
@@ -521,8 +531,8 @@ namespace KMZILib
             /// <summary>
             /// Осуществляет кодирование в унарный код со сдвигом.
             /// </summary>
-            /// <param name="Source"></param>
-            /// <returns></returns>
+            /// <param name="Source">Исходная строка, которую необходимо закодироовать.</param>
+            /// <returns>Битовая закодированная строка.</returns>
             public static string EncodeShifted(int Source)
             {
                 Source++;
@@ -727,6 +737,12 @@ namespace KMZILib
                 return DestinationIndex != -1;
             }
 
+            /// <summary>
+            /// Осуществляет кодирование ансамбля символов алгоритмом LZ-77.
+            /// </summary>
+            /// <param name="Source">Исходная строка, которую необходимо закодировать.</param>
+            /// <param name="DictLength">Размер словаря, W.</param>
+            /// <returns>Закодированнся битовая строка.</returns>
             public static string Encode(string Source, int DictLength)
             {
                 Source = Source.ToUpper();
