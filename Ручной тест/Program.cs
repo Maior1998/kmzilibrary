@@ -19,7 +19,7 @@ namespace Ручной_тест
 
         static void Main(string[] args)
         {
-            Console.WriteLine(CodingTheory.LZ77.Encode("РЕкурсивная рекурсия", 20));
+            
         }
     }
 }
