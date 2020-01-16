@@ -122,7 +122,7 @@ namespace KMZILib
                 Buffer.Add(rowbuffer);
             }
 
-            reader.CloseAsync();
+            reader.Close();
             object[,] result = new object[Buffer.Count, columns_count];
             for (int i = 0; i < result.GetLength(0); i++)
                 for (int j = 0; j < columns_count; j++)
@@ -153,6 +153,68 @@ namespace KMZILib
         public object[,] GetTable(string Name)
         {
             return DoQueryObjArr($"select * from {Name};");
+        }
+
+        /// <summary>
+        /// Выполняет произвольный запрос с участием даты и ничего не возвращает. Поле с датой должно быть помечено как ":target_date". Например: update test set test_date = :target_date where id=0;
+        /// </summary>
+        /// <param name="sql">SQL запрос, который нужно выполнить.</param>
+        /// <param name="Source">Дата, участвующая в запросе. В теле sql запроса должна быть помечена как ":target_date".</param>
+        public void DoQueryDateVoid(string sql, DateTime Source)
+        {
+            sql_command.CommandText = sql;
+            NpgsqlParameter param = new NpgsqlParameter(":target_date", NpgsqlDbType.Date) { Value = Source };
+            sql_command.Parameters.Add(param);
+            sql_command.ExecuteNonQuery();
+            sql_command.Parameters.Remove(param);
+        }
+
+        /// <summary>
+        /// Выполняет произвольный запрос с участием даты и возвращает элемент первой строки первого столбца результата. Поле с датой должно быть помечено как ":target_date". Например: update test set test_date = :target_date where id=0;
+        /// </summary>
+        /// <param name="sql">SQL запрос, который нужно выполнить.</param>
+        /// <param name="Source">Дата, участвующая в запросе. В теле sql запроса должна быть помечена как ":target_date".</param>
+        /// <returns>Элемент первого столбца первой строки результата.</returns>
+        public object DoQueryDateObj(string sql, DateTime Source)
+        {
+            sql_command.CommandText = sql;
+            NpgsqlParameter param = new NpgsqlParameter(":target_date", NpgsqlDbType.Date) { Value = Source };
+            sql_command.Parameters.Add(param);
+            object result = sql_command.ExecuteScalar();
+            sql_command.Parameters.Remove(param);
+            return result;
+        }
+
+        /// <summary>
+        /// Выполняет произвольный запрос с участием даты и возвращает таблицу-результат. Поле с датой должно быть помечено как ":target_date". Например: update test set test_date = :target_date where id=0;
+        /// </summary>
+        /// <param name="sql">SQL запрос, который нужно выполнить.</param>
+        /// <param name="Source">Дата, участвующая в запросе. В теле sql запроса должна быть помечена как ":target_date".</param>
+        /// <returns>Таблица-результат.</returns>
+        public object[,] DoQueryDateObjArr(string sql, DateTime Source)
+        {
+            sql_command.CommandText = sql;
+            NpgsqlParameter param = new NpgsqlParameter(":target_date", NpgsqlDbType.Date) { Value = Source };
+            sql_command.Parameters.Add(param);
+            NpgsqlDataReader reader = sql_command.ExecuteReader();
+            List<object[]> Buffer = new List<object[]>();
+            int columns_count = 0;
+            while (reader.Read())
+            {
+                columns_count = reader.FieldCount;
+                object[] rowbuffer = new object[columns_count];
+                for (int i = 0; i < columns_count; i++)
+                    rowbuffer[i] = reader.GetValue(i);
+                Buffer.Add(rowbuffer);
+            }
+
+            reader.Close();
+            object[,] result = new object[Buffer.Count, columns_count];
+            for (int i = 0; i < result.GetLength(0); i++)
+                for (int j = 0; j < columns_count; j++)
+                    result[i, j] = Buffer[i][j];
+            sql_command.Parameters.Remove(param);
+            return result;
         }
 
         ///// <summary>

@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Configuration;
-using System.Numerics;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace KMZILib
 {
@@ -26,7 +22,7 @@ namespace KMZILib
         public static int Distance(BinaryFunction First, BinaryFunction Second)
         {
             if (First.ValuesArray.Length != Second.ValuesArray.Length)
-                throw new InvalidOperationException("Длины столбцов-значений функций ддолжны совпадать.");
+                throw new InvalidOperationException("Длины столбцов-значений функций должны совпадать.");
 
             return First.ValuesArray.Select((val, ind) => val ^ Second.ValuesArray[ind]).Count(val => val);
         }
