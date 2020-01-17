@@ -85,8 +85,7 @@ namespace KMZILib
         /// <param name="query"></param>
         public void DoQueryVoid(string query)
         {
-            sql_command.CommandText = query;
-            sql_command.ExecuteNonQuery();
+            DoQueryVoidWithParams(query, new NpgsqlDbType[0], new object[0]);
         }
 
         /// <summary>
@@ -96,10 +95,7 @@ namespace KMZILib
         /// <returns></returns>
         public object DoQueryObj(string query)
         {
-            sql_command.CommandText = query;
-            object result = sql_command.ExecuteScalar();
-
-            return result;
+            return DoQueryObjWithParams(query, new NpgsqlDbType[0], new object[0]);
         }
 
         /// <summary>
@@ -109,25 +105,7 @@ namespace KMZILib
         /// <returns></returns>
         public object[,] DoQueryObjArr(string query)
         {
-            sql_command.CommandText = query;
-            NpgsqlDataReader reader = sql_command.ExecuteReader();
-            List<object[]> Buffer = new List<object[]>();
-            int columns_count = 0;
-            while (reader.Read())
-            {
-                columns_count = reader.FieldCount;
-                object[] rowbuffer = new object[columns_count];
-                for (int i = 0; i < columns_count; i++)
-                    rowbuffer[i] = reader.GetValue(i);
-                Buffer.Add(rowbuffer);
-            }
-
-            reader.Close();
-            object[,] result = new object[Buffer.Count, columns_count];
-            for (int i = 0; i < result.GetLength(0); i++)
-                for (int j = 0; j < columns_count; j++)
-                    result[i, j] = Buffer[i][j];
-            return result;
+            return DoQueryObjArrWithParams(query, new NpgsqlDbType[0], new object[0]);
         }
 
         /// <summary>
@@ -156,46 +134,69 @@ namespace KMZILib
         }
 
         /// <summary>
-        /// Выполняет произвольный запрос с участием даты и ничего не возвращает. Поле с датой должно быть помечено как ":target_date". Например: update test set test_date = :target_date where id=0;
+        /// Выполняет произвольный запрос с параметрами заданных типов Npgsql и не возвращает результат. Параметры в запросе должны быть помечены как ":param0", ":param1" и т.д.
+        /// Например: update test set test_date = :param0 file = :param1 where id=0;
         /// </summary>
-        /// <param name="sql">SQL запрос, который нужно выполнить.</param>
-        /// <param name="Source">Дата, участвующая в запросе. В теле sql запроса должна быть помечена как ":target_date".</param>
-        public void DoQueryDateVoid(string sql, DateTime Source)
+        /// <param name="sql">SQL запрос к БД.</param>
+        /// <param name="types">Тип параметра на стороне Npgsql.</param>
+        /// <param name="Sources">Параметр, который необходимо прикрепить к запросу.</param>
+        public void DoQueryVoidWithParams(string sql, NpgsqlDbType[] types, object[] Sources)
         {
             sql_command.CommandText = sql;
-            NpgsqlParameter param = new NpgsqlParameter(":target_date", NpgsqlDbType.Date) { Value = Source };
-            sql_command.Parameters.Add(param);
+            NpgsqlParameter[] paramsbuffer=new NpgsqlParameter[types.Length];
+            for (int i = 0; i < types.Length; i++)
+            {
+                NpgsqlParameter param = new NpgsqlParameter($":param{i}", types[i]) {Value = Sources[i]};
+                sql_command.Parameters.Add(param);
+                paramsbuffer[i] = param;
+            }
             sql_command.ExecuteNonQuery();
-            sql_command.Parameters.Remove(param);
+            for (int i = 0; i < types.Length; i++)
+                sql_command.Parameters.Remove(paramsbuffer[i]);
         }
 
         /// <summary>
-        /// Выполняет произвольный запрос с участием даты и возвращает элемент первой строки первого столбца результата. Поле с датой должно быть помечено как ":target_date". Например: update test set test_date = :target_date where id=0;
+        /// Выполняет произвольный запрос с параметром заданного типа Npgsql и возвращает результат - первый столбец первой строки. Параметры в запросе должны быть помечены как ":param0", ":param1" и т.д.
+        /// Например: update test set test_date = :param0 file = :param1 where id=0;
         /// </summary>
-        /// <param name="sql">SQL запрос, который нужно выполнить.</param>
-        /// <param name="Source">Дата, участвующая в запросе. В теле sql запроса должна быть помечена как ":target_date".</param>
-        /// <returns>Элемент первого столбца первой строки результата.</returns>
-        public object DoQueryDateObj(string sql, DateTime Source)
+        /// <param name="sql">SQL запрос к БД.</param>
+        /// <param name="types">Тип параметра на стороне Npgsql.</param>
+        /// <param name="Sources">Параметр, который необходимо прикрепить к запросу.</param>
+        /// <returns>Результат выполнения операции.</returns>
+        public object DoQueryObjWithParams(string sql, NpgsqlDbType[] types, object[] Sources)
         {
             sql_command.CommandText = sql;
-            NpgsqlParameter param = new NpgsqlParameter(":target_date", NpgsqlDbType.Date) { Value = Source };
-            sql_command.Parameters.Add(param);
+            NpgsqlParameter[] paramsbuffer = new NpgsqlParameter[types.Length];
+            for (int i = 0; i < types.Length; i++)
+            {
+                NpgsqlParameter param = new NpgsqlParameter($":param{i}", types[i]) { Value = Sources[i] };
+                sql_command.Parameters.Add(param);
+                paramsbuffer[i] = param;
+            }
             object result = sql_command.ExecuteScalar();
-            sql_command.Parameters.Remove(param);
+            for (int i = 0; i < types.Length; i++)
+                sql_command.Parameters.Remove(paramsbuffer[i]);
             return result;
         }
 
         /// <summary>
-        /// Выполняет произвольный запрос с участием даты и возвращает таблицу-результат. Поле с датой должно быть помечено как ":target_date". Например: update test set test_date = :target_date where id=0;
+        /// Выполняет произвольный запрос с параметром заданного типа Npgsql и возвращает результат - цельная таблица ответа БД. Параметры в запросе должны быть помечены как ":param0", ":param1" и т.д.
+        /// Например: update test set test_date = :param0 file = :param1 where id=0;
         /// </summary>
-        /// <param name="sql">SQL запрос, который нужно выполнить.</param>
-        /// <param name="Source">Дата, участвующая в запросе. В теле sql запроса должна быть помечена как ":target_date".</param>
-        /// <returns>Таблица-результат.</returns>
-        public object[,] DoQueryDateObjArr(string sql, DateTime Source)
+        /// <param name="sql">SQL запрос к БД.</param>
+        /// <param name="types">Тип параметра на стороне Npgsql.</param>
+        /// <param name="Sources">Параметр, который необходимо прикрепить к запросу.</param>
+        /// <returns>Результат выполнения операции.</returns>
+        public object[,] DoQueryObjArrWithParams(string sql, NpgsqlDbType[] types, object[] Sources)
         {
             sql_command.CommandText = sql;
-            NpgsqlParameter param = new NpgsqlParameter(":target_date", NpgsqlDbType.Date) { Value = Source };
-            sql_command.Parameters.Add(param);
+            NpgsqlParameter[] paramsbuffer = new NpgsqlParameter[types.Length];
+            for (int i = 0; i < types.Length; i++)
+            {
+                NpgsqlParameter param = new NpgsqlParameter($":param{i}", types[i]) { Value = Sources[i] };
+                sql_command.Parameters.Add(param);
+                paramsbuffer[i] = param;
+            }
             NpgsqlDataReader reader = sql_command.ExecuteReader();
             List<object[]> Buffer = new List<object[]>();
             int columns_count = 0;
@@ -207,14 +208,52 @@ namespace KMZILib
                     rowbuffer[i] = reader.GetValue(i);
                 Buffer.Add(rowbuffer);
             }
-
             reader.Close();
             object[,] result = new object[Buffer.Count, columns_count];
             for (int i = 0; i < result.GetLength(0); i++)
                 for (int j = 0; j < columns_count; j++)
                     result[i, j] = Buffer[i][j];
-            sql_command.Parameters.Remove(param);
+            for (int i = 0; i < types.Length; i++)
+                sql_command.Parameters.Remove(paramsbuffer[i]);
             return result;
+        }
+
+        /// <summary>
+        /// Выполняет произвольный запрос с параметром заданного типа Npgsql и не возвращает результат. Параметр в запросе должен быть помечен как ":param0".
+        /// Например: update test set test_date = :param0 where id=0;
+        /// </summary>
+        /// <param name="sql">SQL запрос к БД.</param>
+        /// <param name="type">Тип параметра на стороне Npgsql.</param>
+        /// <param name="Source">Параметр, который необходимо прикрепить к запросу.</param>
+        public void DoQueryVoidWithParam(string sql, NpgsqlDbType type, object Source)
+        {
+            DoQueryVoidWithParams(sql,new []{type},new []{Source});
+        }
+
+        /// <summary>
+        /// Выполняет произвольный запрос с параметром заданного типа Npgsql и возвращает результат - первый столбец первой строки. Параметр в запросе должен быть помечен как ":param0".
+        /// Например: update test set test_date = :param0 where id=0;
+        /// </summary>
+        /// <param name="sql">SQL запрос к БД.</param>
+        /// <param name="type">Тип параметра на стороне Npgsql.</param>
+        /// <param name="Source">Параметр, который необходимо прикрепить к запросу.</param>
+        /// <returns>Результат выполнения операции.</returns>
+        public object DoQueryObjWithParam(string sql, NpgsqlDbType type, object Source)
+        {
+            return DoQueryObjWithParams(sql, new[] {type}, new[] {Source});
+        }
+
+        /// <summary>
+        /// Выполняет произвольный запрос с параметром заданного типа Npgsql и возвращает результат - цельная таблица ответа БД. Параметр в запросе должен быть помечен как ":param0".
+        /// Например: update test set test_date = :param0 where id=0;
+        /// </summary>
+        /// <param name="sql">SQL запрос к БД.</param>
+        /// <param name="type">Тип параметра на стороне Npgsql.</param>
+        /// <param name="Source">Параметр, который необходимо прикрепить к запросу.</param>
+        /// <returns>Результат выполнения операции.</returns>
+        public object[,] DoQueryObjArrWithParam(string sql, NpgsqlDbType type, object Source)
+        {
+            return DoQueryObjArrWithParams(sql, new[] {type}, new[] {Source});
         }
 
         ///// <summary>
