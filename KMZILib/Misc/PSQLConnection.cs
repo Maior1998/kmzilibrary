@@ -9,9 +9,9 @@ using NpgsqlTypes;
 namespace KMZILib
 {
     /// <summary>
-    /// Предоставляет функции для удобной работы с БД PostgreSQL. Выполняет все запросы в пределах одного соединения, поэтому многопоточное выполнение не рекомендуется.
+    /// Представляет собой отдельное подключение к БД PostgreSQL с функциями выполнения запросов. Выполняет все запросы в пределах одного соединения, поэтому многопоточное выполнение не рекомендуется.
     /// </summary>
-    public class SQL : IDisposable
+    public class PSQLConnection : IDisposable
     {
         private readonly NpgsqlConnection conn;
         private readonly NpgsqlCommand sql_command;
@@ -24,7 +24,7 @@ namespace KMZILib
         /// <param name="username">Имя пользователя, под которым необходимо войти.</param>
         /// <param name="password">Пароль пользователя.</param>
         /// <param name="database">Имя базы данных, к которой необходимо подключиться.</param>
-        public SQL(string server, string port, string username, string password, string database)
+        public PSQLConnection(string server, string port, string username, string password, string database)
         {
             Server = server;
             Port = port;
@@ -44,7 +44,7 @@ namespace KMZILib
         /// <param name="username">Имя пользователя, под которым необходимо войти.</param>
         /// <param name="password">Пароль пользователя.</param>
         /// <param name="database">Имя базы данных, к которой необходимо подключиться.</param>
-        public SQL(string server, int port, string username, string password, string database) : this(server,
+        public PSQLConnection(string server, int port, string username, string password, string database) : this(server,
             port.ToString(), username, password, database)
         {
 
@@ -143,16 +143,16 @@ namespace KMZILib
         public void DoQueryVoidWithParams(string sql, NpgsqlDbType[] types, object[] Sources)
         {
             sql_command.CommandText = sql;
-            NpgsqlParameter[] paramsbuffer=new NpgsqlParameter[types.Length];
+            NpgsqlParameter[] Paramsbuffer=new NpgsqlParameter[types.Length];
             for (int i = 0; i < types.Length; i++)
             {
                 NpgsqlParameter param = new NpgsqlParameter($":param{i}", types[i]) {Value = Sources[i]};
                 sql_command.Parameters.Add(param);
-                paramsbuffer[i] = param;
+                Paramsbuffer[i] = param;
             }
             sql_command.ExecuteNonQuery();
             for (int i = 0; i < types.Length; i++)
-                sql_command.Parameters.Remove(paramsbuffer[i]);
+                sql_command.Parameters.Remove(Paramsbuffer[i]);
         }
 
         /// <summary>
@@ -190,12 +190,12 @@ namespace KMZILib
         public object[,] DoQueryObjArrWithParams(string sql, NpgsqlDbType[] types, object[] Sources)
         {
             sql_command.CommandText = sql;
-            NpgsqlParameter[] paramsbuffer = new NpgsqlParameter[types.Length];
+            NpgsqlParameter[] Paramsbuffer = new NpgsqlParameter[types.Length];
             for (int i = 0; i < types.Length; i++)
             {
                 NpgsqlParameter param = new NpgsqlParameter($":param{i}", types[i]) { Value = Sources[i] };
                 sql_command.Parameters.Add(param);
-                paramsbuffer[i] = param;
+                Paramsbuffer[i] = param;
             }
             NpgsqlDataReader reader = sql_command.ExecuteReader();
             List<object[]> Buffer = new List<object[]>();
@@ -214,7 +214,7 @@ namespace KMZILib
                 for (int j = 0; j < columns_count; j++)
                     result[i, j] = Buffer[i][j];
             for (int i = 0; i < types.Length; i++)
-                sql_command.Parameters.Remove(paramsbuffer[i]);
+                sql_command.Parameters.Remove(Paramsbuffer[i]);
             return result;
         }
 

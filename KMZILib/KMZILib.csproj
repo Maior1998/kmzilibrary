@@ -75,7 +75,7 @@
     <Compile Include="Ciphers\CaesarsCipher.cs" />
     <Compile Include="Ciphers\ALanguage.cs" />
     <Compile Include="Ciphers\SecretSharing.cs" />
-    <Compile Include="Misc\SQL.cs" />
+    <Compile Include="Misc\PSQLConnection.cs" />
     <Compile Include="Misc\TextStat.cs" />
     <Compile Include="Ciphers\TranspositionCipher.cs" />
     <Compile Include="Ciphers\VigenereCipher.cs" />
