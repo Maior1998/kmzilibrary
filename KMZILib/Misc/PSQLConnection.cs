@@ -256,44 +256,20 @@ namespace KMZILib
             return DoQueryObjArrWithParams(sql, new[] {type}, new[] {Source});
         }
 
-        ///// <summary>
-        /////     Запись файла с базы.
-        ///// </summary>
-        ///// <param name="path">Путь для записи.</param>
-        ///// <param name="work_id">ID работы.</param>
-        //public void GetFile(string path, int work_id)
-        //{
-        //    sql_command.CommandText = $"SELECT doc FROM student_works w where w.id = {work_id}";
-        //    NpgsqlDataReader dr = sql_command.ExecuteReader();
-        //    byte[] result = null;
-        //    if (dr.Read())
-        //        result = (byte[]) dr[0];
-        //    dr.Close();
-        //    File.WriteAllBytes(path, result);
-        //}
-
-        ///// <summary>
-        /////     Загрузка локального файла на сервер.
-        ///// </summary>
-        ///// <param name="id">ID работы.</param>
-        ///// <param name="bytes">Байты файла.</param>
-        //public void UploadFile(int id, byte[] bytes)
-        //{
-        //    NpgsqlParameter paramet = new NpgsqlParameter("dataParam", NpgsqlDbType.Bytea);
-        //    paramet.Value = bytes;
-        //    sql_command.Parameters.Add(paramet);
-        //    sql_command.CommandText =
-        //        "insert into student_works (doc) values (:dataParam)";
-        //    sql_command.CommandText = $"update student_works set doc = :dataParam where id = {id};";
-        //    try
-        //    {
-        //        sql_command.ExecuteNonQuery();
-        //    }
-        //    finally
-        //    {
-        //        sql_command.Parameters.Remove(paramet);
-        //    }
-        //}
+        /// <summary>
+        /// Выполняет простой запрос и возвращает результат в виде одной таблицы в <see cref="DataSet"/>.
+        /// </summary>
+        /// <param name="query">SQL запрос, который необходимо выполнить.</param>
+        /// <param name="binding">Привязка создаваемого <see cref="DataSet"/></param>
+        /// <returns></returns>
+        public DataSet DoQueryDataSet(string query, string binding)
+        {
+            DataSet ds = new DataSet();
+            NpgsqlCommand cmd = new NpgsqlCommand(query, conn);
+            NpgsqlDataAdapter adp = new NpgsqlDataAdapter(cmd);
+            adp.Fill(ds, binding);
+            return ds;
+        }
 
         private void ReleaseUnmanagedResources()
         {
