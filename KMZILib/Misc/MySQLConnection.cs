@@ -44,8 +44,8 @@ namespace KMZILib
         /// <param name="username">Имя пользователя, под которым необходимо войти.</param>
         /// <param name="password">Пароль пользователя.</param>
         /// <param name="database">Имя базы данных, к которой необходимо подключиться.</param>
-        public MySQLConnection(string server, int port, string username, string password, string database) : this(server,
-            port.ToString(), username, password, database)
+        public MySQLConnection(string server, int port, string database, string username, string password) : this(server,
+            port.ToString(), database, username, password)
         {
 
         }
