@@ -80,6 +80,7 @@
     <Compile Include="Ciphers\SecretSharing.cs" />
     <Compile Include="Misc\MySQLConnection.cs" />
     <Compile Include="Misc\PSQLConnection.cs" />
+    <Compile Include="Misc\TCPClient.cs" />
     <Compile Include="Misc\TextStat.cs" />
     <Compile Include="Ciphers\TranspositionCipher.cs" />
     <Compile Include="Ciphers\VigenereCipher.cs" />
