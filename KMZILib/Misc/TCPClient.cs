@@ -12,12 +12,23 @@ namespace KMZILib
     /// </summary>
     public class TCPClient : IDisposable
     {
+        /// <summary>
+        /// Адрес TCP сервера, к которому произведено подключение.
+        /// </summary>
+        public string Host { get; }
 
-        private string HOST;
-        private int PORT = 33004;
-        private int TIMEOUT = 500;
-        private readonly NetworkStream Stream = null;
-        private readonly TcpClient InnerClient;
+        /// <summary>
+        /// Порт TCP сервера, к которому произведено подключение.
+        /// </summary>
+        public int Port { get; }
+
+        /// <summary>
+        /// Таймаут подключения.
+        /// </summary>
+        public int Timeout { get; }
+
+        private readonly NetworkStream stream;
+        private readonly TcpClient innerClient;
 
         /// <summary>
         /// Инициализирует новый объект TCP соединения и потока с заданными настройками.
@@ -27,10 +38,10 @@ namespace KMZILib
         /// <param name="Timeout">Таймаут подключения.</param>
         public TCPClient(string Host, int Port, int Timeout = 500)
         {
-            InnerClient = new TcpClient();
-            InnerClient.Connect(HOST = Host, PORT = Port);
-            Stream = InnerClient.GetStream();
-            Stream.ReadTimeout = TIMEOUT = Timeout;
+            innerClient = new TcpClient();
+            innerClient.Connect(this.Host = Host, this.Port = Port);
+            stream = innerClient.GetStream();
+            stream.ReadTimeout = this.Timeout = Timeout;
         }
 
         /// <summary>
@@ -40,7 +51,7 @@ namespace KMZILib
         public void Send(string request)
         {
             byte[] data = System.Text.Encoding.UTF8.GetBytes(request + "\n");
-            Stream.Write(data, 0, data.Length);
+            stream.Write(data, 0, data.Length);
             Console.WriteLine(request);
         }
 
@@ -54,10 +65,10 @@ namespace KMZILib
             StringBuilder response = new StringBuilder();
             do
             {
-                int bytes = Stream.Read(data, 0, data.Length);
+                int bytes = stream.Read(data, 0, data.Length);
                 response.Append(Encoding.UTF8.GetString(data, 0, bytes));
             }
-            while (Stream.DataAvailable); // пока данные есть в потоке
+            while (stream.DataAvailable); // пока данные есть в потоке
             string result = response.ToString().Trim(new char[] { '\n' });
             Console.WriteLine("Server: " + result);
             return result;
@@ -74,12 +85,12 @@ namespace KMZILib
         }
 
         /// <summary>
-        /// ЗАкрывает соединения и высвобождает их ресурсы.
+        /// Закрывает соединения и высвобождает их ресурсы.
         /// </summary>
         public void Dispose()
         {
-            Stream?.Dispose();
-            InnerClient?.Dispose();
+            stream?.Dispose();
+            innerClient?.Dispose();
         }
     }
 }
