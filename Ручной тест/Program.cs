@@ -10,6 +10,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using KMZILib.Ciphers;
 using CodingTheory = KMZILib.CodingTheory;
 
 namespace Ручной_тест
@@ -19,7 +20,9 @@ namespace Ручной_тест
 
         static void Main(string[] args)
         {
-            
+            string encoded = SKS.Encode("ВРАГБУДЕТРАЗБИТ", "ПАМИР");
+            string decoded = SKS.Decode(encoded, "ПАМИР");
+            Console.WriteLine();
         }
     }
 }
