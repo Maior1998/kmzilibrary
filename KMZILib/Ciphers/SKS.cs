@@ -7,7 +7,7 @@ using System.Text;
 namespace KMZILib.Ciphers
 {
     /// <summary>
-    ///     Single Key Swap
+    ///     SKS - Single Key Swap
     /// </summary>
     public static class SKS
     {
@@ -40,7 +40,7 @@ namespace KMZILib.Ciphers
             for (int i = 0; i < key.Length; i++)
                 for (int j = 0; j < RowCount; j++)
                     result.Append( source[j*key.Length+columns[i].Value]);
-            return result.ToString();
+            return result.ToString().TrimEnd();
         }
     }
 }

@@ -29,4 +29,6 @@ namespace KMZILib.Ciphers
             return result.ToString().TrimEnd();
         }
     }
+
+    
 }

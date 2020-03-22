@@ -20,9 +20,8 @@ namespace Ручной_тест
 
         static void Main(string[] args)
         {
-            string encoded = SKS.Encode("ВРАГБУДЕТРАЗБИТ", "ПАМИР");
-            string decoded = SKS.Decode(encoded, "ПАМИР");
-            Console.WriteLine();
+            string encoded = DKS.Encode("МЕСТОВСТРЕЧИИЗМЕНИТЬНЕВОЗМОЖНО", "ПРИВЕТ", "ВЕСНА");
+            Console.WriteLine(DKS.Decode(encoded, "ПРИВЕТ", "ВЕСНА"));
         }
     }
 }
