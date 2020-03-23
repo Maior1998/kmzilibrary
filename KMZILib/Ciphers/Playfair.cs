@@ -111,11 +111,15 @@ namespace KMZILib.Ciphers
                 }
             }
 
+            for (int i = buffer.Length - 3; i >= 0; i--)
+                if (buffer[i] == buffer[i + 2] && buffer[i + 1] == 'X' && i % 2 == 0)
+                    buffer.Remove(i + 1, 1);
+
             if (buffer[buffer.Length - 1] == 'X') buffer.Remove(buffer.Length - 1, 1);
 
-            string result = new Regex(@"(.)X\1").Replace(buffer.ToString(), "$1$1");
 
-            return result.TrimEnd();
+
+            return buffer.ToString().TrimEnd();
         }
     }
 }
