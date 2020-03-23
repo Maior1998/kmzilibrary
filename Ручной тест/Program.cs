@@ -20,7 +20,8 @@ namespace Ручной_тест
 
         static void Main(string[] args)
         {
-            Console.WriteLine(Playfair.Encode("IDIOCY OFTEN LOOKS LIKE INTELLIGENCE", "WHEATSON"));
+            string encoded = Playfair.Encode("IDIOCY OFTEN LOOKS LIKE INTELLIGENCE", "WHEATSON");
+            Console.WriteLine(Playfair.Decode(encoded, "WHEATSON"));
         }
     }
 }

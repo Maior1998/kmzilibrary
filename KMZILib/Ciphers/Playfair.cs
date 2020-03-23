@@ -66,5 +66,56 @@ namespace KMZILib.Ciphers
             }
             return result.ToString();
         }
+
+        public static string Decode(string source, string key, Languages.ALanguage language = null)
+        {
+            //определяем алфавит
+            if (language is null)
+                language = Languages.LangByChar(source[0]);
+            //создаем матрицу
+            int matrixHeight = 1;
+            while ((int)Math.Pow(matrixHeight, 2) < language.Alphabet.Length) matrixHeight++;
+            int matrixWidth = matrixHeight;
+            while ((matrixWidth - 1) * (matrixHeight + 1) >= language.Alphabet.Length)
+            {
+                matrixWidth--;
+                matrixHeight++;
+            }
+            char[] matrix = Enumerable.Repeat(' ', matrixWidth * matrixHeight).ToArray();
+            key.Distinct().Union(language.AlphabetArray).ToArray().CopyTo(matrix, 0);
+
+            StringBuilder buffer = new StringBuilder(source);
+
+            for (int i = 0; i < buffer.Length - 1; i += 2)
+            {
+                int firstPos = Array.IndexOf(matrix, buffer[i]);
+                int firstRow = firstPos / matrixWidth;
+                int firstColumn = firstPos % matrixWidth;
+                int secondPos = Array.IndexOf(matrix, buffer[i + 1]);
+                int secondRow = secondPos / matrixWidth;
+                int secondColumn = secondPos % matrixWidth;
+                if (firstRow == secondRow)
+                {
+                    buffer[i] = matrix[firstRow * matrixWidth + (firstColumn == 0 ? matrixWidth - 1 : firstColumn - 1)];
+                    buffer[i + 1] = matrix[secondRow * matrixWidth + (secondColumn == 0 ? matrixWidth - 1 : secondColumn - 1)];
+                }
+                else if (firstColumn == secondColumn)
+                {
+                    buffer[i] = matrix[(firstRow == 0 ? matrixHeight - 1 : firstRow - 1) * matrixWidth + firstColumn];
+                    buffer[i + 1] = matrix[(secondRow == 0 ? matrixHeight - 1 : secondRow - 1) * matrixWidth + secondColumn];
+                }
+                else
+                {
+                    buffer[i] = matrix[firstRow * matrixWidth + secondColumn];
+                    buffer[i + 1] = matrix[secondRow * matrixWidth + firstColumn];
+                }
+            }
+
+            if (buffer[buffer.Length - 1] == 'X') buffer.Remove(buffer.Length - 1, 1);
+
+            string result = new Regex(@"(.)X\1").Replace(buffer.ToString(), "$1$1");
+
+            return result.TrimEnd();
+        }
     }
 }
