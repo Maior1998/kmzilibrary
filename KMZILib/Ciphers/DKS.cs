@@ -2,14 +2,22 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace KMZILib.Ciphers
 {
-    ////DKS - double key swap
+    //DKS - double key swap
+    /// <summary>
+    ///     Шифр двойной перестановки по строковому ключу.
+    /// </summary>
     public static class DKS
     {
-
+        /// <summary>
+        ///     Осуществляет кодирование шифром двойной перестановки по строковому ключу.
+        /// </summary>
+        /// <param name="source">Открытый текст.</param>
+        /// <param name="key1">Строка- первый ключ шифрования.</param>
+        /// <param name="key2">Строка- второй ключ шифрования.</param>
+        /// <returns>Строка - зашифрованное сообщение.</returns>
         public static string Encode(string source, string key1, string key2)
         {
             source += string.Concat(Enumerable.Repeat(' ', Math.Max(0, key1.Length * key2.Length - source.Length)));
@@ -28,15 +36,19 @@ namespace KMZILib.Ciphers
             {
                 result.Append(string.Concat(Enumerable.Repeat(' ', key1.Length)));
                 for (int j = 0; j < columnscount; j++)
-                {
                     result[columnscount * i + j] = source[key1.Length * trans1[i].Key + trans2[j].Key];
-                }
             }
 
             return result.ToString();
         }
 
-
+        /// <summary>
+        ///     Осуществляет декодирование шифра двойной перестановки по строковому ключу.
+        /// </summary>
+        /// <param name="source">Шифртект, который необходимо расшифровать.</param>
+        /// <param name="key1"> Первый ключ, при помощи которого необходимо провести дешифровку.</param>
+        /// <param name="key2"> Второй ключ, при помощи которого необходимо провести дешифровку.</param>
+        /// <returns>Строка - расшифрованное сообщение.</returns>
         public static string Decode(string source, string key1, string key2)
         {
             int RowCount = source.Length / key1.Length;
@@ -57,11 +69,9 @@ namespace KMZILib.Ciphers
                     .OrderBy(pair => pair.Key)
                     .ToArray();
             for (int i = 0; i < RowCount; i++)
-                for (int j = 0; j < ColumnsCount; j++)
-                    result.Append(source[rows[i].Value * key1.Length + columns[j].Value]);
+            for (int j = 0; j < ColumnsCount; j++)
+                result.Append(source[rows[i].Value * key1.Length + columns[j].Value]);
             return result.ToString().TrimEnd();
         }
-
-
     }
 }

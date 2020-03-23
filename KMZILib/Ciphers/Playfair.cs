@@ -1,18 +1,27 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using Microsoft.Win32;
 
 namespace KMZILib.Ciphers
 {
+    /// <summary>
+    ///     Шифр Плейфора.
+    /// </summary>
     public static class Playfair
     {
+        /// <summary>
+        ///     Осуществляет кодирование шифром Плейфора. При шифровании удаляет все инородные от языка символы.
+        /// </summary>
+        /// <param name="source">Открытый текст.</param>
+        /// <param name="key">Строка-ключ шифрования.</param>
+        /// <param name="language">
+        ///     Язык, из которого состоит исходный текст. Если не будет указан, будет определен из первого
+        ///     символа исходного текста.
+        /// </param>
+        /// <returns>Строка - зашифрованное сообщение.</returns>
         public static string Encode(string source, string key, Languages.ALanguage language = null)
         {
-
             //определяем алфавит
             if (language is null)
                 language = Languages.LangByChar(source[0]);
@@ -20,13 +29,14 @@ namespace KMZILib.Ciphers
             source = new Regex("[^" + language.Alphabet + "]").Replace(source.ToUpper(), string.Empty);
             //создаем матрицу
             int matrixHeight = 1;
-            while ((int)Math.Pow(matrixHeight, 2) < language.Alphabet.Length) matrixHeight++;
+            while ((int) Math.Pow(matrixHeight, 2) < language.Alphabet.Length) matrixHeight++;
             int matrixWidth = matrixHeight;
             while ((matrixWidth - 1) * (matrixHeight + 1) >= language.Alphabet.Length)
             {
                 matrixWidth--;
                 matrixHeight++;
             }
+
             char[] matrix = Enumerable.Repeat(' ', matrixWidth * matrixHeight).ToArray();
             key.Distinct().Union(language.AlphabetArray).ToArray().CopyTo(matrix, 0);
             //вставляем X в биграммы с одинаковыми сиволами
@@ -38,6 +48,7 @@ namespace KMZILib.Ciphers
                 result.Insert(i + 1, 'X');
                 bufferLength++;
             }
+
             //если в последней биграмме только один символ - добавляем в конец X.
             if (result.Length % 2 != 0) result.Append('X');
             for (int i = 0; i < result.Length - 1; i += 2)
@@ -51,12 +62,14 @@ namespace KMZILib.Ciphers
                 if (firstRow == secondRow)
                 {
                     result[i] = matrix[firstRow * matrixWidth + (firstColumn == matrixWidth - 1 ? 0 : firstColumn + 1)];
-                    result[i + 1] = matrix[secondRow * matrixWidth + (secondColumn == matrixWidth - 1 ? 0 : secondColumn + 1)];
+                    result[i + 1] =
+                        matrix[secondRow * matrixWidth + (secondColumn == matrixWidth - 1 ? 0 : secondColumn + 1)];
                 }
                 else if (firstColumn == secondColumn)
                 {
                     result[i] = matrix[(firstRow == matrixHeight - 1 ? 0 : firstRow + 1) * matrixWidth + firstColumn];
-                    result[i + 1] = matrix[(secondRow == matrixHeight - 1 ? 0 : secondRow + 1) * matrixWidth + secondColumn];
+                    result[i + 1] =
+                        matrix[(secondRow == matrixHeight - 1 ? 0 : secondRow + 1) * matrixWidth + secondColumn];
                 }
                 else
                 {
@@ -64,9 +77,20 @@ namespace KMZILib.Ciphers
                     result[i + 1] = matrix[secondRow * matrixWidth + firstColumn];
                 }
             }
+
             return result.ToString();
         }
 
+        /// <summary>
+        ///     Осуществляет декодирование шифра Плейфора.
+        /// </summary>
+        /// <param name="source">Шифртект, который необходимо расшифровать.</param>
+        /// <param name="key">Ключ, при помощи которого необходимо провести дешифровку.</param>
+        /// <param name="language">
+        ///     Язык, которым нужно оперировать при операциях. Если не будет указан, будет определен из первого
+        ///     символа исходного текста.
+        /// </param>
+        /// <returns>Строка - расшифрованное сообщение.</returns>
         public static string Decode(string source, string key, Languages.ALanguage language = null)
         {
             //определяем алфавит
@@ -74,13 +98,14 @@ namespace KMZILib.Ciphers
                 language = Languages.LangByChar(source[0]);
             //создаем матрицу
             int matrixHeight = 1;
-            while ((int)Math.Pow(matrixHeight, 2) < language.Alphabet.Length) matrixHeight++;
+            while ((int) Math.Pow(matrixHeight, 2) < language.Alphabet.Length) matrixHeight++;
             int matrixWidth = matrixHeight;
             while ((matrixWidth - 1) * (matrixHeight + 1) >= language.Alphabet.Length)
             {
                 matrixWidth--;
                 matrixHeight++;
             }
+
             char[] matrix = Enumerable.Repeat(' ', matrixWidth * matrixHeight).ToArray();
             key.Distinct().Union(language.AlphabetArray).ToArray().CopyTo(matrix, 0);
 
@@ -97,12 +122,14 @@ namespace KMZILib.Ciphers
                 if (firstRow == secondRow)
                 {
                     buffer[i] = matrix[firstRow * matrixWidth + (firstColumn == 0 ? matrixWidth - 1 : firstColumn - 1)];
-                    buffer[i + 1] = matrix[secondRow * matrixWidth + (secondColumn == 0 ? matrixWidth - 1 : secondColumn - 1)];
+                    buffer[i + 1] =
+                        matrix[secondRow * matrixWidth + (secondColumn == 0 ? matrixWidth - 1 : secondColumn - 1)];
                 }
                 else if (firstColumn == secondColumn)
                 {
                     buffer[i] = matrix[(firstRow == 0 ? matrixHeight - 1 : firstRow - 1) * matrixWidth + firstColumn];
-                    buffer[i + 1] = matrix[(secondRow == 0 ? matrixHeight - 1 : secondRow - 1) * matrixWidth + secondColumn];
+                    buffer[i + 1] =
+                        matrix[(secondRow == 0 ? matrixHeight - 1 : secondRow - 1) * matrixWidth + secondColumn];
                 }
                 else
                 {
@@ -116,7 +143,6 @@ namespace KMZILib.Ciphers
                     buffer.Remove(i + 1, 1);
 
             if (buffer[buffer.Length - 1] == 'X') buffer.Remove(buffer.Length - 1, 1);
-
 
 
             return buffer.ToString().TrimEnd();

@@ -4,8 +4,17 @@ using System.Text;
 namespace KMZILib.Ciphers
 {
     //SIC - Simple Permutation Cipher
+    /// <summary>
+    ///     Шифр простой перестановки.
+    /// </summary>
     public static class SIC
     {
+        /// <summary>
+        ///     Осуществляет кодирование шифром простой перестановки.
+        /// </summary>
+        /// <param name="source">Открытый текст.</param>
+        /// <param name="key">Массив-ключ шифрования.</param>
+        /// <returns>Строка - зашифрованное сообщение.</returns>
         public static string Encode(string source, int[] key)
         {
             source += string.Concat(Enumerable.Repeat(" ", (key.Length - source.Length % key.Length) % key.Length));
@@ -20,6 +29,12 @@ namespace KMZILib.Ciphers
             return result.ToString();
         }
 
+        /// <summary>
+        ///     Осуществляет декодирование шифра простой перестановки.
+        /// </summary>
+        /// <param name="source">Шифртект, который необходимо расшифровать.</param>
+        /// <param name="key">Ключ, при помощи которого необходимо провести дешифровку.</param>
+        /// <returns>Строка - расшифрованное сообщение.</returns>
         public static string Decode(string source, int[] key)
         {
             StringBuilder result = new StringBuilder(string.Concat(Enumerable.Repeat(' ', source.Length)));
@@ -29,6 +44,4 @@ namespace KMZILib.Ciphers
             return result.ToString().TrimEnd();
         }
     }
-
-    
 }
