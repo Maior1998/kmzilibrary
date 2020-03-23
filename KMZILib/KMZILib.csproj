@@ -72,6 +72,8 @@
     <Compile Include="BinaryFunctions\BinaryFunctionStatic.cs" />
     <Compile Include="Ciphers\AES.cs" />
     <Compile Include="Ciphers\DKS.cs" />
+    <Compile Include="Ciphers\MagicSquare.cs" />
+    <Compile Include="Ciphers\Playfair.cs" />
     <Compile Include="Ciphers\SIC.cs" />
     <Compile Include="Ciphers\SKS.cs" />
     <Compile Include="MathStatistics\RandomValue.cs" />

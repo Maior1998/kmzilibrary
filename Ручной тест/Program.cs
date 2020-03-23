@@ -20,8 +20,7 @@ namespace Ручной_тест
 
         static void Main(string[] args)
         {
-            string encoded = DKS.Encode("МЕСТОВСТРЕЧИИЗМЕНИТЬНЕВОЗМОЖНО", "ПРИВЕТ", "ВЕСНА");
-            Console.WriteLine(DKS.Decode(encoded, "ПРИВЕТ", "ВЕСНА"));
+            Console.WriteLine(Playfair.Encode("IDIOCY OFTEN LOOKS LIKE INTELLIGENCE", "WHEATSON"));
         }
     }
 }
