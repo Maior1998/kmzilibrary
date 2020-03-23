@@ -40,7 +40,7 @@ namespace KMZILib.Ciphers
         public static string Decode(string source, string key1, string key2)
         {
             int RowCount = source.Length / key1.Length;
-            KeyValuePair<int, int>[] rows =
+            KeyValuePair<int, int>[] columns =
                 key1
                     .Select((elem, ind) => new KeyValuePair<int, char>(ind, elem))
                     .OrderBy(pair => pair.Value)
@@ -49,16 +49,16 @@ namespace KMZILib.Ciphers
                     .ToArray();
             int ColumnsCount = source.Length / key2.Length;
             StringBuilder result = new StringBuilder();
-            KeyValuePair<int, int>[] columns =
+            KeyValuePair<int, int>[] rows =
                 key2
                     .Select((elem, ind) => new KeyValuePair<int, char>(ind, elem))
                     .OrderBy(pair => pair.Value)
                     .Select((pair, ind) => new KeyValuePair<int, int>(pair.Key, ind))
                     .OrderBy(pair => pair.Key)
                     .ToArray();
-            for (int i = 0; i < ColumnsCount; i++)
-                for (int j = 0; j < RowCount; j++)
-                    result.Append(source[rows[j].Value * key2.Length + columns[i].Value]);
+            for (int i = 0; i < RowCount; i++)
+                for (int j = 0; j < ColumnsCount; j++)
+                    result.Append(source[rows[i].Value * key1.Length + columns[j].Value]);
             return result.ToString().TrimEnd();
         }
 
