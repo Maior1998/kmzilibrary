@@ -39,19 +39,22 @@ namespace KMZILib.Ciphers
             }
 
             char[] matrix = Enumerable.Repeat(' ', matrixWidth * matrixHeight).ToArray();
-            key.Distinct().Union(language.AlphabetArray).ToArray().CopyTo(matrix, 0);
+            char[] alphabet = key.Distinct().Union(language.AlphabetArray).ToArray();
+            alphabet.CopyTo(matrix, 0);
+            for (int i = alphabet.Length; i < matrix.Length; i++)
+                matrix[i] = (i - alphabet.Length).ToString().Last();
             //вставляем X в биграммы с одинаковыми сиволами
             StringBuilder result = new StringBuilder(source);
             int bufferLength = result.Length;
             for (int i = 0; i < bufferLength - 1; i += 2)
             {
                 if (result[i] != result[i + 1]) continue;
-                result.Insert(i + 1, 'X');
+                result.Insert(i + 1, language.Frequency.Last());
                 bufferLength++;
             }
 
             //если в последней биграмме только один символ - добавляем в конец X.
-            if (result.Length % 2 != 0) result.Append('X');
+            if (result.Length % 2 != 0) result.Append(language.Frequency.Last());
             for (int i = 0; i < result.Length - 1; i += 2)
             {
                 int firstPos = Array.IndexOf(matrix, result[i]);
@@ -109,8 +112,10 @@ namespace KMZILib.Ciphers
             }
 
             char[] matrix = Enumerable.Repeat(' ', matrixWidth * matrixHeight).ToArray();
-            key.Distinct().Union(language.AlphabetArray).ToArray().CopyTo(matrix, 0);
-
+            char[] alphabet = key.Distinct().Union(language.AlphabetArray).ToArray();
+            alphabet.CopyTo(matrix, 0);
+            for (int i = alphabet.Length; i < matrix.Length; i++)
+                matrix[i] = (i - alphabet.Length).ToString().Last();
             StringBuilder buffer = new StringBuilder(source);
 
             for (int i = 0; i < buffer.Length - 1; i += 2)
@@ -141,10 +146,10 @@ namespace KMZILib.Ciphers
             }
 
             for (int i = buffer.Length - 3; i >= 0; i--)
-                if (buffer[i] == buffer[i + 2] && buffer[i + 1] == 'X' && i % 2 == 0)
+                if (buffer[i] == buffer[i + 2] && buffer[i + 1] == language.Frequency.Last() && i % 2 == 0)
                     buffer.Remove(i + 1, 1);
 
-            if (buffer[buffer.Length - 1] == 'X') buffer.Remove(buffer.Length - 1, 1);
+            if (buffer[buffer.Length - 1] == language.Frequency.Last()) buffer.Remove(buffer.Length - 1, 1);
 
 
             return buffer.ToString().TrimEnd();
