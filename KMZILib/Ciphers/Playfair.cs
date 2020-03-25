@@ -22,6 +22,7 @@ namespace KMZILib.Ciphers
         /// <returns>Строка - зашифрованное сообщение.</returns>
         public static string Encode(string source, string key, Languages.ALanguage language = null)
         {
+            key = key.ToUpper();
             //определяем алфавит
             if (language is null)
                 language = Languages.LangByChar(source[0]);
@@ -93,6 +94,7 @@ namespace KMZILib.Ciphers
         /// <returns>Строка - расшифрованное сообщение.</returns>
         public static string Decode(string source, string key, Languages.ALanguage language = null)
         {
+            key = key.ToUpper();
             //определяем алфавит
             if (language is null)
                 language = Languages.LangByChar(source[0]);

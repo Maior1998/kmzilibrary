@@ -18,6 +18,7 @@ namespace KMZILib.Ciphers
         /// <returns>Строка - зашифрованное сообщение.</returns>
         public static string Encode(string source, int[] key)
         {
+            source = source.ToUpper();
             int n = 1;
             while (n * n < key.Length) n++;
             if (n * n != key.Length) throw new InvalidOperationException("Ключ должен быть квадратом!");
@@ -57,6 +58,7 @@ namespace KMZILib.Ciphers
         /// <returns>Строка - расшифрованное сообщение.</returns>
         public static string Decode(string source, int[] key)
         {
+            source = source.ToUpper();
             int n = 1;
             while (n * n < key.Length) n++;
             if (n * n != key.Length) throw new InvalidOperationException("Ключ должен быть квадратом!");

@@ -17,6 +17,8 @@ namespace KMZILib.Ciphers
         /// <returns>Строка - зашифрованное сообщение.</returns>
         public static string Encode(string source, string key)
         {
+            source = source.ToUpper();
+            key = key.ToUpper();
             source += string.Concat(Enumerable.Repeat(" ", (key.Length - source.Length % key.Length) % key.Length));
             int RowCount = source.Length / key.Length;
             KeyValuePair<int, char>[] columns =
@@ -38,6 +40,8 @@ namespace KMZILib.Ciphers
         /// <returns>Строка - расшифрованное сообщение.</returns>
         public static string Decode(string source, string key)
         {
+            source = source.ToUpper();
+            key = key.ToUpper();
             int RowCount = source.Length / key.Length;
             StringBuilder result = new StringBuilder();
             KeyValuePair<int, int>[] columns =
