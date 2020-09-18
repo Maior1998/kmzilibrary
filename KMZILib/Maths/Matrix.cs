@@ -120,7 +120,7 @@ namespace KMZILib
         }
 
         /// <summary>
-        ///     Обозначает, является ли матрица квадратной. Зависит от стобца свободных членов <see cref="HasFreeCoefficient" />.
+        ///     Определяет, является ли матрица квадратной. Зависит от стобца свободных членов <see cref="HasFreeCoefficient" />.
         /// </summary>
         public bool IsSquare => LengthY == LengthX;
 

@@ -105,6 +105,7 @@
     <Compile Include="Ciphers\CaesarsCipher.cs" />
     <Compile Include="Ciphers\ALanguage.cs" />
     <Compile Include="Ciphers\SecretSharing.cs" />
+    <Compile Include="Maths\Graph.cs" />
     <Compile Include="Misc\MySQLConnection.cs" />
     <Compile Include="Misc\PSQLConnection.cs" />
     <Compile Include="Misc\TCPClient.cs" />
