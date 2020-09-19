@@ -25,7 +25,7 @@ namespace KMZILib.Maths.Graphs
                     if (i == j)
                     {
                         for (int k = 0; k < VertexesCount; k++)
-                            result[i].Add(0);
+                            result[k].Add(0);
                         result[i][result[i].Count - 1] = (int)AdjacencyMatrix[i, j] * 2;
                     }
                     else
