@@ -34,7 +34,7 @@ namespace KMZILib.Maths.Graphs
                         for (int edgesCount = 0; edgesCount < AdjacencyMatrix[i, j]; edgesCount++)
                         {
                             for (int k = 0; k < VertexesCount; k++)
-                                result[i].Add(0);
+                                result[k].Add(0);
                             result[i][result[i].Count - 1] = -1;
                             result[j][result[j].Count - 1] = 1;
                         }

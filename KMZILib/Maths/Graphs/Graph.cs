@@ -11,7 +11,7 @@ namespace KMZILib.Maths.Graphs
         /// <summary>
         /// Матрица смежности этого графа.
         /// </summary>
-        protected Matrix AdjacencyMatrix { get; }
+        public Matrix AdjacencyMatrix { get; }
 
         /// <summary>
         /// Число вершин этого графа.
