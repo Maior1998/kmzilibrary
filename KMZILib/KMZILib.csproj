@@ -23,6 +23,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Debug\KMZILib.xml</DocumentationFile>
+    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -31,6 +32,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="BouncyCastle.Crypto, Version=1.8.5.0, Culture=neutral, PublicKeyToken=0e99375e54769942">
@@ -105,7 +107,9 @@
     <Compile Include="Ciphers\CaesarsCipher.cs" />
     <Compile Include="Ciphers\ALanguage.cs" />
     <Compile Include="Ciphers\SecretSharing.cs" />
-    <Compile Include="Maths\Graph.cs" />
+    <Compile Include="Maths\Graphs\DirectedGraph.cs" />
+    <Compile Include="Maths\Graphs\Graph.cs" />
+    <Compile Include="Maths\Graphs\UndirectedGraph.cs" />
     <Compile Include="Misc\MySQLConnection.cs" />
     <Compile Include="Misc\PSQLConnection.cs" />
     <Compile Include="Misc\TCPClient.cs" />
@@ -133,5 +137,6 @@
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

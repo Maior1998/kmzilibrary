@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using System.Runtime.InteropServices;
 
-namespace KMZILib
+namespace KMZILib.Maths
 {
     /// <summary>
     ///     Представляет статический класс для работы с Расширенным Алгоритмом Евклида.

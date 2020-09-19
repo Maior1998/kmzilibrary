@@ -3,9 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using System.Runtime.Remoting.Channels;
 
-namespace KMZILib
+namespace KMZILib.Maths
 {
     /// <summary>
     ///     Представляет статический класс для работы со сравнениями первой степени.

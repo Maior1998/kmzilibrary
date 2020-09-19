@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 
-namespace KMZILib
+namespace KMZILib.Maths
 {
     /// <summary>
     ///     Представляет методы для вычисления символа Лежандра/Якоби

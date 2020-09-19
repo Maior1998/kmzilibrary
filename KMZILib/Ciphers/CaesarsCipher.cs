@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
-using static KMZILib.Comparison;
+using static KMZILib.Maths.Comparison;
 
 namespace KMZILib.Ciphers
 {

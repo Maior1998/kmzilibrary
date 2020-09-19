@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using static KMZILib.Comparison;
-using static KMZILib.Polynoms;
-using static KMZILib.Primes.PrimalityTests;
+using KMZILib.Maths;
+using static KMZILib.Maths.Comparison;
+using static KMZILib.Maths.Polynoms;
+using static KMZILib.Maths.Primes.PrimalityTests;
 
 namespace KMZILib.Ciphers
 {
@@ -247,7 +248,7 @@ namespace KMZILib.Ciphers
                     if (Parts.Count < Limit)
                         throw new InvalidOperationException(
                             "Невозможно восстановить секрет: число долей меньше порогового значения");
-                    LinearComparison NewM = KMZILib.CRT.Solve(Parts.Select(part => part.Comparison));
+                    LinearComparison NewM = Maths.CRT.Solve(Parts.Select(part => part.Comparison));
                     return new LinearComparison(NewM.A, Parts.First().P).A;
                 }
 

@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 
-namespace KMZILib
+namespace KMZILib.Maths
 {
     /// <summary>
     ///     Представляет статический класс для работы с Диофантовыми уравнениями 1 степени.

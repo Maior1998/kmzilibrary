@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.ExceptionServices;
 
-namespace KMZILib
+namespace KMZILib.Maths
 {
     /// <summary>
     ///     Представляет вектор с вещественными координатами.

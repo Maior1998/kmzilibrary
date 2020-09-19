@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Sockets;
 
-namespace KMZILib
+namespace KMZILib.Maths
 {
     /// <summary>
     ///     Представляет собой матрицу. Необязательно прямоугольную.
     /// </summary>
-    public class Matrix
+    public class Matrix : ICloneable
     {
         #region Поля
         /// <summary>
@@ -652,6 +651,35 @@ namespace KMZILib
         {
             return string.Join("\n", Values.Select(row => string.Join("\t", row.Select(
                 element => $"{(Math.Round(element) == element ? element.ToString() : $"{element:F3}")}"))));
+        }
+
+        /// <summary>
+        /// Возвращает копию текущей матрицы. Реализация <see cref="ICloneable"/>.
+        /// </summary>
+        /// <returns>Копия текущей матрицы.</returns>
+        public object Clone()
+        {
+            return this.Copy();
+        }
+    }
+
+    public static class MatrixExtensions
+    {
+        public static Matrix Pow(this Matrix source, int degree)
+        {
+            bool[] maAltorithm = Misc.GetBinaryArray(degree).Skip(1).ToArray();
+
+            Matrix A = source.Copy();
+
+            Matrix result = A.Copy();
+
+            foreach (bool bit in maAltorithm)
+            {
+                result *= result;
+                if (bit)
+                    result *= A;
+            }
+            return result;
         }
     }
 }

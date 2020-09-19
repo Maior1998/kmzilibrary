@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using KMZILib.Maths;
 
 namespace KMZILib.Ciphers
 {

@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using static KMZILib.Comparison;
+using static KMZILib.Maths.Comparison;
 
-namespace KMZILib
+namespace KMZILib.Maths
 {
     /// <summary>
     ///     Chinese Remainder Theorem - Китайская теорема об остатках
