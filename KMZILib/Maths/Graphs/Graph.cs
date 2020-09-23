@@ -53,7 +53,7 @@ namespace KMZILib.Maths.Graphs
         /// <param name="secondVertexId">Номер второй вершины.</param>
         /// <param name="length">Длина маршрута.</param>
         /// <returns>Число маршрутов (путей) в данном графе заданной длины, соединяющих две указанные вершины.</returns>
-        public int GetNumberOfRoutesBetweenVertexes(int firstVertexId, int secondVertexId, int length)
+        public int GetNumberOfRoutesBetweenVertexes(int firstVertexId, int secondVertexId, uint length)
         {
             return (int)GetRouteMatrix(length)[firstVertexId, secondVertexId];
         }
@@ -65,7 +65,7 @@ namespace KMZILib.Maths.Graphs
         public Matrix GetCRouteMatrix()
         {
             Matrix result = Matrix.GetZeroMatrix(VertexesCount);
-            for (int i = 1; i < VertexesCount; i++)
+            for (uint i = 1; i < VertexesCount; i++)
                 result += AdjacencyMatrix.Pow(i);
             return result;
         }
@@ -77,7 +77,7 @@ namespace KMZILib.Maths.Graphs
         public Matrix GetCRouteClosedMatrix()
         {
             Matrix result = Matrix.GetZeroMatrix(VertexesCount);
-            for (int i = 1; i <= VertexesCount; i++)
+            for (uint i = 1; i <= VertexesCount; i++)
                 result += AdjacencyMatrix.Pow(i);
             return result;
         }
@@ -86,7 +86,7 @@ namespace KMZILib.Maths.Graphs
         /// Возвращает матрицу для нахождения числа маршрутов между двумя вершинами указанной длины
         /// </summary>
         /// <returns></returns>
-        public Matrix GetRouteMatrix(int length)
+        public Matrix GetRouteMatrix(uint length)
         {
             return AdjacencyMatrix.Pow(length);
         }

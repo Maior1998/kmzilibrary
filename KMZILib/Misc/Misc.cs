@@ -123,7 +123,7 @@ namespace KMZILib
         /// <returns>Строка - двоичное представление числа</returns>
         public static string GetBinaryString(BigInteger Number)
         {
-            return String.Concat(GetBinaryArray(Number).Select(val => val ? '1' : '0'));
+            return string.Concat(GetBinaryArray(Number).Select(val => val ? '1' : '0'));
         }
 
         /// <summary>
@@ -135,7 +135,7 @@ namespace KMZILib
         /// <returns>Строка - двоичное представление числа</returns>
         public static string GetBinaryString(BigInteger Number, int Count)
         {
-            return String.Concat(GetBinaryArray(Number, Count).Select(val => val ? '1' : '0'));
+            return string.Concat(GetBinaryArray(Number, Count).Select(val => val ? '1' : '0'));
         }
     }
 }

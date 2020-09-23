@@ -663,14 +663,23 @@ namespace KMZILib.Maths
         }
     }
 
+    /// <summary>
+    /// Представляет меотды расширения для класса <see cref="Matrix"/>
+    /// </summary>
     public static class MatrixExtensions
     {
-        public static Matrix Pow(this Matrix source, int degree)
+        /// <summary>
+        /// Возвдеение матрицы в указанную степень.
+        /// </summary>
+        /// <param name="source">Основание-матрица.</param>
+        /// <param name="degree">Степень, в которую необходимо возвести матрицу.</param>
+        /// <returns>Матрица, возведенная в указанную степень.</returns>
+        public static Matrix Pow(this Matrix source, uint degree)
         {
+
             bool[] maAltorithm = Misc.GetBinaryArray(degree).Skip(1).ToArray();
 
             Matrix A = source.Copy();
-
             Matrix result = A.Copy();
 
             foreach (bool bit in maAltorithm)
