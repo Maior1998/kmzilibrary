@@ -1,4 +1,4 @@
-﻿using KMZILib;
+﻿using OSULib;
 
 using System;
 using System.Collections.Generic;
@@ -10,8 +10,8 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using KMZILib.Ciphers;
-using CodingTheory = KMZILib.CodingTheory;
+using OSULib.Ciphers;
+using CodingTheory = OSULib.Misc.CodingTheory;
 
 namespace Ручной_тест
 {

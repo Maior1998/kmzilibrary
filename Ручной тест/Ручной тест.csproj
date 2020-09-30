@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\KMZILib\KMZILib.csproj" />
+    <ProjectReference Include="..\OSULib\OSULib.csproj" />
   </ItemGroup>
 
 </Project>
