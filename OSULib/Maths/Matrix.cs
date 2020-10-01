@@ -529,9 +529,15 @@ namespace OSULib.Maths
             return new Matrix(n, n);
         }
 
-        private static Matrix GetSubmatrix(Matrix Source, int i, int j)
+        /// <summary>
+        /// Возвращает новую матрицу, в которой вырезаны i cтрока и j столбец.
+        /// </summary>
+        /// <param name="i">Номер строки, которую нужно вырезать.</param>
+        /// <param name="j">Номер столбца, который нужно вырезать.</param>
+        /// <returns>Новая матрица, в которой вырезаны i cтрока и j столбец.</returns>
+        public Matrix GetSubmatrix(int i, int j)
         {
-            double[][] Result = Source.Values
+            double[][] Result = Values
                 .Select(row => row.Where((elem, ind) => ind != j).ToArray())
                 .Where((row, ind) => ind != i).ToArray();
             return new Matrix(Result);
@@ -540,22 +546,20 @@ namespace OSULib.Maths
         /// <summary>
         /// Возвращает дополнительный минор данной матрицы
         /// </summary>
-        /// <param name="Source"></param>
         /// <param name="i"></param>
         /// <param name="j"></param>
         /// <returns></returns>
-        public static double GetMinor(Matrix Source, int i, int j) => GetSubmatrix(Source, i, j).Definite;
+        public double GetMinor(int i, int j) => GetSubmatrix(i, j).Definite;
 
         /// <summary>
         /// Возвращает алгебраическое дополнение для заданных матрицы и координат.
         /// </summary>
-        /// <param name="Source"></param>
         /// <param name="i"></param>
         /// <param name="j"></param>
         /// <returns></returns>
-        public static double GetAlgebraicAddition(Matrix Source, int i, int j)
+        public double GetAlgebraicAddition(int i, int j)
         {
-            return Math.Pow(-1, i + j) * GetMinor(Source, i, j);
+            return Math.Pow(-1, i + j) * GetMinor( i, j);
         }
 
         /// <summary>

@@ -46,5 +46,12 @@ namespace OSULib.Maths.Graphs
         }
 
         public override string GraphTypeName => "Ориентированный граф";
+
+        public override Graph RemoveEdge(int firstVertexId, int secondVertexId)
+        {
+            Matrix result = AdjacencyMatrix.Copy();
+            result[firstVertexId, secondVertexId] = 0;
+            return GetGraph(result);
+        }
     }
 }

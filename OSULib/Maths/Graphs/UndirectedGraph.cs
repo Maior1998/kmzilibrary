@@ -55,5 +55,12 @@ namespace OSULib.Maths.Graphs
         }
 
         public override string GraphTypeName => "Неориентированный граф";
+        public override Graph RemoveEdge(int firstVertexId, int secondVertexId)
+        {
+            Matrix result = AdjacencyMatrix.Copy();
+            result[firstVertexId, secondVertexId] = 0;
+            result[secondVertexId, firstVertexId] = 0;
+            return GetGraph(result);
+        }
     }
 }
