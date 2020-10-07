@@ -556,16 +556,16 @@ namespace OSULib.Maths
         /// </summary>
         /// <param name="i"></param>
         /// <param name="j"></param>
-        /// <returns></returns>
+        /// <returns>Алгебраическое дополнение для заданных матрицы и координат.</returns>
         public double GetAlgebraicAddition(int i, int j)
         {
-            return Math.Pow(-1, i + j) * GetMinor( i, j);
+            return Math.Pow(-1, i + j) * GetMinor(i, j);
         }
 
         /// <summary>
         ///     Возвращает матрицу в виде массива коэффициентов.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Матрица в виде массива коэффициентов.</returns>
         public double[][] ToArray()
         {
             double[][] Result = new double[Values.Length][];
@@ -587,7 +587,7 @@ namespace OSULib.Maths
         /// </summary>
         /// <param name="First"></param>
         /// <param name="Second"></param>
-        /// <returns></returns>
+        /// <returns>Матрица - результат сложения.</returns>
         public static Matrix operator +(Matrix First, Matrix Second)
         {
             if (First.LengthX != Second.LengthX ||
@@ -604,7 +604,7 @@ namespace OSULib.Maths
         /// </summary>
         /// <param name="First"></param>
         /// <param name="Second"></param>
-        /// <returns></returns>
+        /// <returns>Матрица - результат разности.</returns>
         public static Matrix operator -(Matrix First, Matrix Second)
         {
             if (First.LengthX != Second.LengthX ||
@@ -621,7 +621,7 @@ namespace OSULib.Maths
         /// </summary>
         /// <param name="First"></param>
         /// <param name="Second"></param>
-        /// <returns></returns>
+        /// <returns>Матрица - результат произведения.</returns>
         public static Matrix operator *(Matrix First, Matrix Second)
         {
             if (First.LengthX != Second.LengthY)
@@ -658,6 +658,65 @@ namespace OSULib.Maths
         }
 
         /// <summary>
+        /// Выполняет поэлементное умножение матрицы и возвращает результат.
+        /// </summary>
+        /// <param name="other">Матрица, с которой необходимо выполнить поэлементное умножение.</param>
+        /// <returns>Матрица - результат поэлементного умножения.</returns>
+        public Matrix ElementMult(Matrix other)
+        {
+            if (LengthX != other.LengthX || LengthY != other.LengthY)
+                throw new InvalidOperationException("ПОэлементное умножение матриц разной размерности не поддерживается");
+            Matrix result = new Matrix(LengthY);
+            for (int i = 0; i < LengthY; i++)
+                for (int j = 0; j < LengthX; j++)
+                    result[i, j] = this[i, j] * other[i, j];
+            return result;
+        }
+
+        /// <summary>
+        /// Выполняет произведение Кронокера с указанной матрицей и возвращает результат.
+        /// </summary>
+        /// <param name="other">Матрица, с которой необходимо выполнить произведение Кронокера.</param>
+        /// <returns>Матрица - результат умножения Кронокера.</returns>
+        public Matrix KroneckerProduct(Matrix other)
+        {
+            Matrix Result = new Matrix(LengthY * other.LengthY, LengthX * other.LengthX);
+
+            for (int i = 0; i < Result.LengthY; i++)
+            {
+                for (int j = 0; j < Result.LengthX; j++)
+                    Result[i, j] = this[i / other.LengthY, j / other.LengthX] *
+                                   other[i % other.LengthY, j % other.LengthX];
+                Console.WriteLine();
+            }
+
+            return Result;
+        }
+
+        /// <summary>
+        /// Возвдеение матрицы в указанную степень.
+        /// </summary>
+        /// <param name="source">Основание-матрица.</param>
+        /// <param name="degree">Степень, в которую необходимо возвести матрицу.</param>
+        /// <returns>Матрица, возведенная в указанную степень.</returns>
+        public Matrix Pow(uint degree)
+        {
+
+            bool[] maAltorithm = Misc.Misc.GetBinaryArray(degree).Skip(1).ToArray();
+
+            Matrix A = Copy();
+            Matrix result = A.Copy();
+
+            foreach (bool bit in maAltorithm)
+            {
+                result *= result;
+                if (bit)
+                    result *= A;
+            }
+            return result;
+        }
+
+        /// <summary>
         /// Возвращает копию текущей матрицы. Реализация <see cref="ICloneable"/>.
         /// </summary>
         /// <returns>Копия текущей матрицы.</returns>
@@ -672,27 +731,6 @@ namespace OSULib.Maths
     /// </summary>
     public static class MatrixExtensions
     {
-        /// <summary>
-        /// Возвдеение матрицы в указанную степень.
-        /// </summary>
-        /// <param name="source">Основание-матрица.</param>
-        /// <param name="degree">Степень, в которую необходимо возвести матрицу.</param>
-        /// <returns>Матрица, возведенная в указанную степень.</returns>
-        public static Matrix Pow(this Matrix source, uint degree)
-        {
 
-            bool[] maAltorithm = Misc.Misc.GetBinaryArray(degree).Skip(1).ToArray();
-
-            Matrix A = source.Copy();
-            Matrix result = A.Copy();
-
-            foreach (bool bit in maAltorithm)
-            {
-                result *= result;
-                if (bit)
-                    result *= A;
-            }
-            return result;
-        }
     }
 }

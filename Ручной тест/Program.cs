@@ -11,6 +11,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using OSULib.Ciphers;
+using OSULib.Maths;
+using OSULib.Maths.Graphs;
 using CodingTheory = OSULib.Misc.CodingTheory;
 
 namespace Ручной_тест
@@ -20,8 +22,29 @@ namespace Ручной_тест
 
         static void Main(string[] args)
         {
-            string encoded = Playfair.Encode("IDIOCY OFTEN LOOKS LIKE INTELLIGENCE", "WHEATSON");
-            Console.WriteLine(Playfair.Decode(encoded, "WHEATSON"));
+            Matrix a = new Matrix(
+                new[]
+                {
+                    new [] { 0, 0, 1, 1 },
+                    new [] { 0, 0, 1, 0 },
+                    new [] {0,0,1,1},
+                    new [] {0,1,1,0}
+                });
+            Matrix b = new Matrix(
+                new[]
+                {
+                    new[] { 1, 1, 1 },
+                    new[] { 1, 1, 0 },
+                    new[] { 1, 1, 0}
+                });
+
+            Graph graphA = Graph.GetGraph(a);
+            Graph graphB = Graph.GetGraph(b);
+
+
+            Console.WriteLine(graphA.Join(graphB).AdjacencyMatrix);
+
+            Console.WriteLine();
         }
     }
 }

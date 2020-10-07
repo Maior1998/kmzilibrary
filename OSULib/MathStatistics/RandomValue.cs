@@ -124,12 +124,12 @@ namespace OSULib.MathStatistics
                 ? squaredsum = Values.Select(val => Math.Pow(val, 2)).Sum()
                 : squaredsum;
 
-            private double sum = Double.NaN;
+            private double sum = double.NaN;
             /// <summary>
             ///     Сумма всех значений данной случайной величины. Для вычисления необходима частотная статистика
             ///     <see cref="Statistic" />.
             /// </summary>
-            public double Sum => Double.IsNaN(sum) ? sum = Statistic.Select(row => row.Key * row.Value).Sum() : sum;
+            public double Sum => double.IsNaN(sum) ? sum = Statistic.Select(row => row.Key * row.Value).Sum() : sum;
 
             private double average = Double.NaN;
             /// <summary>
@@ -605,7 +605,7 @@ namespace OSULib.MathStatistics
         /// <returns></returns>
         public static double GetMCV(Matrix CorrelationTable, int i)
         {
-            return Math.Sqrt(1 - CorrelationTable.Definite / Matrix.GetMinor(CorrelationTable, i, i));
+            return Math.Sqrt(1 - CorrelationTable.Definite / CorrelationTable.GetMinor(i,i));
         }
 
         /// <summary>
@@ -615,9 +615,9 @@ namespace OSULib.MathStatistics
         /// <returns></returns>
         public static double GetPCCV(Matrix CorrelationTable, int i, int j)
         {
-            return Matrix.GetAlgebraicAddition(CorrelationTable, i, j) / Math.Sqrt(
-                       Matrix.GetAlgebraicAddition(CorrelationTable, i, i) *
-                       Matrix.GetAlgebraicAddition(CorrelationTable, j, j));
+            return CorrelationTable.GetAlgebraicAddition(i, j) / Math.Sqrt(
+                       CorrelationTable.GetAlgebraicAddition(i, i) *
+                       CorrelationTable.GetAlgebraicAddition(j, j));
         }
 
         /// <summary>

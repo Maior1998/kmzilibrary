@@ -174,15 +174,31 @@ namespace OSULib.Maths.Graphs
         /// <returns>Граф - результат</returns>
         public Graph Union(Graph other)
         {
-            if (VertexesCount != other.VertexesCount)
-                throw new InvalidOperationException("Объединение графов с разным набором вершин не поддерживается");
             if (IsMultiGraph || other.IsMultiGraph)
                 throw new InvalidOperationException("Объединение мультиграфов не поддерживается");
-            Matrix resultMatrix = new Matrix(VertexesCount);
-            for (int i = 0; i < resultMatrix.LengthY; i++)
-                for (int j = 0; j < resultMatrix.LengthY; j++)
-                    resultMatrix[i, j] = Math.Max(AdjacencyMatrix[i, j], other.AdjacencyMatrix[i, j]);
-            return GetGraph(resultMatrix);
+
+            return GetGraph(GetGraphUnionMatrix(this, other));
+        }
+
+        private static Matrix GetGraphUnionMatrix(Graph first, Graph second)
+        {
+            Matrix resultMatrix = null;
+            if (first.VertexesCount > second.VertexesCount)
+            {
+                resultMatrix = first.AdjacencyMatrix.Copy();
+                for (int i = 0; i < second.VertexesCount; i++)
+                    for (int j = 0; j < second.VertexesCount; j++)
+                        resultMatrix[i, j] = Math.Max(first.AdjacencyMatrix[i, j], second.AdjacencyMatrix[i, j]);
+            }
+            else
+            {
+                resultMatrix = second.AdjacencyMatrix.Copy();
+                for (int i = 0; i < first.VertexesCount; i++)
+                    for (int j = 0; j < first.VertexesCount; j++)
+                        resultMatrix[i, j] = Math.Max(first.AdjacencyMatrix[i, j], second.AdjacencyMatrix[i, j]);
+            }
+
+            return resultMatrix;
         }
 
         /// <summary>
@@ -192,13 +208,14 @@ namespace OSULib.Maths.Graphs
         /// <returns>Граф - результат</returns>
         public Graph Intersection(Graph other)
         {
-            if (VertexesCount != other.VertexesCount)
-                throw new InvalidOperationException("Пересечение графов с разным набором вершин не поддерживается");
             if (IsMultiGraph || other.IsMultiGraph)
                 throw new InvalidOperationException("Пересечение мультиграфов не поддерживается");
-            Matrix resultMatrix = new Matrix(VertexesCount);
+            Matrix resultMatrix = null;
+            resultMatrix = VertexesCount < other.VertexesCount
+                ? new Matrix(VertexesCount)
+                : new Matrix(other.VertexesCount);
             for (int i = 0; i < resultMatrix.LengthY; i++)
-                for (int j = 0; j < resultMatrix.LengthY; j++)
+                for (int j = 0; j < resultMatrix.LengthX; j++)
                     resultMatrix[i, j] = Math.Min(AdjacencyMatrix[i, j], other.AdjacencyMatrix[i, j]);
             return GetGraph(resultMatrix);
         }
@@ -210,14 +227,23 @@ namespace OSULib.Maths.Graphs
         /// <returns>Граф - результат</returns>
         public Graph AnnularSum(Graph other)
         {
-            if (VertexesCount != other.VertexesCount)
-                throw new InvalidOperationException("Кольцевая сумма графов с разным набором вершин не поддерживается");
             if (IsMultiGraph || other.IsMultiGraph)
                 throw new InvalidOperationException("Кольцевая сумма мультиграфов не поддерживается");
-            Matrix resultMatrix = new Matrix(VertexesCount);
-            for (int i = 0; i < resultMatrix.LengthY; i++)
-                for (int j = 0; j < resultMatrix.LengthY; j++)
-                    resultMatrix[i, j] = (AdjacencyMatrix[i, j] + other.AdjacencyMatrix[i, j]) % 2;
+            Matrix resultMatrix = null;
+            if (VertexesCount > other.VertexesCount)
+            {
+                resultMatrix = AdjacencyMatrix.Copy();
+                for (int i = 0; i < other.VertexesCount; i++)
+                    for (int j = 0; j < other.VertexesCount; j++)
+                        resultMatrix[i, j] = (AdjacencyMatrix[i, j] + other.AdjacencyMatrix[i, j]) % 2;
+            }
+            else
+            {
+                resultMatrix = other.AdjacencyMatrix.Copy();
+                for (int i = 0; i < VertexesCount; i++)
+                    for (int j = 0; j < VertexesCount; j++)
+                        resultMatrix[i, j] = (AdjacencyMatrix[i, j] + other.AdjacencyMatrix[i, j]) % 2;
+            }
             return GetGraph(resultMatrix);
         }
 
@@ -228,27 +254,17 @@ namespace OSULib.Maths.Graphs
         /// <returns>Граф - результат</returns>
         public Graph Join(Graph other)
         {
-            //TODO: доделать
             //необходимо создать полный набор вершин, а самих их соединить ребрами
             if (IsMultiGraph || other.IsMultiGraph)
                 throw new InvalidOperationException("Соединение мультиграфов не поддерживается");
 
-            Matrix result = new Matrix(VertexesCount + other.VertexesCount);
-
+            Matrix result = GetGraphUnionMatrix(this, other);
             for (int i = 0; i < VertexesCount; i++)
-                for (int j = 0; j < VertexesCount; j++)
-                    result[i, j] = AdjacencyMatrix[i, j];
-
-            for (int i = VertexesCount; i < result.LengthY; i++)
-            {
-                for (int j = 0; j < VertexesCount; j++)
-                    result[i, j] = result[j, i] = 1;
-                for (int j = VertexesCount; j < result.LengthY; j++)
+                for (int j = 0; j < other.VertexesCount; j++)
                 {
-                    result[i, j] = other.AdjacencyMatrix[i, j];
-                    result[j, i] = other.AdjacencyMatrix[j, i];
+                    if (i == j) continue;
+                    result[i, j] = Math.Min(1, result[i, j] + 1);
                 }
-            }
             return GetGraph(result);
         }
 
@@ -259,7 +275,7 @@ namespace OSULib.Maths.Graphs
         /// <returns>Новый граф, в котором удалена заданная вершина.</returns>
         public Graph RemoveVertex(int vertexId)
         {
-            return Graph.GetGraph(AdjacencyMatrix.GetSubmatrix(vertexId, vertexId));
+            return GetGraph(AdjacencyMatrix.GetSubmatrix(vertexId, vertexId));
         }
 
         /// <summary>
@@ -293,6 +309,17 @@ namespace OSULib.Maths.Graphs
         }
 
         /// <summary>
+        /// Получает декартового (прямое) произвдеение двух графов и возвращает результат.
+        /// </summary>
+        /// <param name="other">Граф. с котором необходимо выполнить декартово произведение.</param>
+        /// <returns>Граф - результат декартового произвдения.</returns>
+        public Graph GetCartesianProduct(Graph other)
+        {
+            return GetGraph(AdjacencyMatrix.KroneckerProduct(Matrix.GetUnitMatrix(other.VertexesCount)) +
+                            Matrix.GetUnitMatrix(VertexesCount).KroneckerProduct(other.AdjacencyMatrix));
+        }
+
+        /// <summary>
         /// Осуществляет операцию стягивания двух вершин.
         /// </summary>
         /// <param name="firstVertexId">Номер первой стягивания вершины.</param>
@@ -306,7 +333,7 @@ namespace OSULib.Maths.Graphs
 
             for (int i = 0; i < VertexesCount; i++)
             {
-                if(i == secondVertexId) continue;
+                if (i == secondVertexId) continue;
                 result[firstVertexId, i] = Math.Min(1, result[firstVertexId, i] + result[secondVertexId, i]);
                 result[i, firstVertexId] = Math.Min(1, result[i, firstVertexId] + result[i, secondVertexId]);
             }
@@ -314,6 +341,29 @@ namespace OSULib.Maths.Graphs
             result = result.GetSubmatrix(secondVertexId, secondVertexId);
             return GetGraph(result);
         }
+
+        private Matrix reachabilityMatrix;
+        public Matrix ReachabilityMatrix
+        {
+            get
+            {
+                if (reachabilityMatrix != null) return reachabilityMatrix;
+                reachabilityMatrix = Matrix.GetUnitMatrix(VertexesCount);
+                for (uint i = 1; i < VertexesCount; i++)
+                    reachabilityMatrix += AdjacencyMatrix.Pow(i);
+                for (int i = 0; i < VertexesCount; i++)
+                    for (int j = 0; j < VertexesCount; j++)
+                        reachabilityMatrix[i, j] = reachabilityMatrix[i, j] != 0 ? 1 : 0;
+                return reachabilityMatrix;
+            }
+        }
+
+        private Matrix tightlyCoupledMatrix;
+
+        /// <summary>
+        /// Матрица сильной связности.
+        /// </summary>
+        public Matrix TightlyCoupledMatrix => tightlyCoupledMatrix ??= ReachabilityMatrix.ElementMult(ReachabilityMatrix.TransposedCopy());
 
     }
 
