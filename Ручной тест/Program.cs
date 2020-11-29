@@ -22,29 +22,34 @@ namespace Ручной_тест
 
         static void Main(string[] args)
         {
-            Matrix a = new Matrix(
-                new[]
-                {
-                    new [] { 0, 0, 1, 1 },
-                    new [] { 0, 0, 1, 0 },
-                    new [] {0,0,1,1},
-                    new [] {0,1,1,0}
-                });
-            Matrix b = new Matrix(
-                new[]
-                {
-                    new[] { 1, 1, 1 },
-                    new[] { 1, 1, 0 },
-                    new[] { 1, 1, 0}
-                });
+            Matrix testMatrix = new Matrix(new[]
+            {
+                new []{0,1,2,1},
+                new []{2,0,7,-1},
+                new []{6,5,0,2},
+                new []{1,-1,4,0},
+            });
+            WeightedGraph graph = new WeightedGraph(testMatrix);
+            var test = graph.GetFloydWarshallShortestPath();
+            Console.OutputEncoding=Encoding.UTF8;
+            Console.InputEncoding=Encoding.UTF8;
+        }
 
-            Graph graphA = Graph.GetGraph(a);
-            Graph graphB = Graph.GetGraph(b);
+        private static object[][] GetEmptyTable(Graph source)
+        {
+            object[][] bufferTable = Enumerable.Range(0, source.VertexesCount + 1)
+                .Select(x => new object[source.VertexesCount + 1]).ToArray();
+            for (int i = 1; i < source.VertexesCount + 1; i++)
+            {
+                bufferTable[0][i] = $"v{i}";
+                bufferTable[i][0] = $"v{i}";
+            }
+            return bufferTable;
+        }
 
-
-            Console.WriteLine(graphA.Join(graphB).AdjacencyMatrix);
-
-            Console.WriteLine();
+        private static void PrintTable(object[][] source)
+        {
+            Console.WriteLine(string.Join("\n", source.Select(x=>string.Join("\t", x))));
         }
     }
 }

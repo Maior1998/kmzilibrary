@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace OSULib.Maths.Graphs
@@ -343,6 +344,9 @@ namespace OSULib.Maths.Graphs
         }
 
         private Matrix reachabilityMatrix;
+        /// <summary>
+        /// Матрица достижимости для орграфа и связности для неорграфа.
+        /// </summary>
         public Matrix ReachabilityMatrix
         {
             get
@@ -364,6 +368,38 @@ namespace OSULib.Maths.Graphs
         /// Матрица сильной связности.
         /// </summary>
         public Matrix TightlyCoupledMatrix => tightlyCoupledMatrix ??= ReachabilityMatrix.ElementMult(ReachabilityMatrix.TransposedCopy());
+
+        private Matrix[] connectivityComponents;
+        public Matrix[] ConnectivityComponents
+        {
+            get
+            {
+                if (connectivityComponents != null) return connectivityComponents;
+                Matrix tightlyCoupledMatrix = TightlyCoupledMatrix;
+                List<Matrix> result = new List<Matrix>();
+                while (tightlyCoupledMatrix.LengthY != 0)
+                {
+                    List<int> connectivityIndexes = new List<int>();
+                    for (int columnIndex = 0; columnIndex < tightlyCoupledMatrix.LengthX; columnIndex++)
+                        if (tightlyCoupledMatrix[0, columnIndex] == 1)
+                            connectivityIndexes.Add(columnIndex);
+                    Matrix buffer = new Matrix(connectivityIndexes.Count);
+                    for (int i = 0; i < connectivityIndexes.Count; i++)
+                    for (int j = 0; j < connectivityIndexes.Count; j++)
+                        buffer[i, j] = AdjacencyMatrix[connectivityIndexes[i], connectivityIndexes[j]];
+                    result.Add(buffer);
+
+                    for (int i = 0; i < connectivityIndexes.Count; i++)
+                    {
+                        tightlyCoupledMatrix = tightlyCoupledMatrix.RemoveRow(connectivityIndexes[i] - i);
+                        tightlyCoupledMatrix = tightlyCoupledMatrix.RemoveColumn(connectivityIndexes[i] - i);
+                    }
+
+
+                }
+                return connectivityComponents = result.ToArray();
+            }
+        }
 
     }
 

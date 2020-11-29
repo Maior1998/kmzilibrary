@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using Google.Protobuf;
+
 namespace OSULib.Maths
 {
     /// <summary>
@@ -64,6 +66,8 @@ namespace OSULib.Maths
         /// <param name="m">Число столбцов матрицы.</param>
         public Matrix(int n, int m)
         {
+            if (n < 0 || m < 0)
+                throw new InvalidOperationException($"Число строк({n}) или столбцов({m}) не может быть отрицательным!");
             Values = new double[n][].Select(row => new double[m]).ToArray();
         }
 
@@ -97,7 +101,7 @@ namespace OSULib.Maths
             get
             {
                 if (LengthY == 0)
-                    return -1;
+                    return 0;
                 int Length = Values.First().Length;
                 if (Values.Any(Doubles => Doubles.Length != Length))
                     return -1;
@@ -504,6 +508,62 @@ namespace OSULib.Maths
             }
 
             return new[] { -1, -1 };
+        }
+
+        /// <summary>
+        /// Вовзвращает матрицу, в которой удалена указанная строка.
+        /// </summary>
+        /// <param name="rowIndex">Индекс строки, которую нужно удалить. (отсчет с 0)</param>
+        /// <returns>Матрица, в которой удалена указанная строка.</returns>
+        public Matrix RemoveRow(int rowIndex)
+        {
+            if(LengthY <=1) return new Matrix(0);
+            Matrix result = new Matrix(LengthY - 1, LengthX);
+            int row = 0;
+            while (row != rowIndex)
+            {
+                for (int j = 0; j < result.LengthX; j++)
+                    result[row, j] = this[row, j];
+                row++;
+            }
+
+            row++;
+            while (row != LengthY)
+            {
+                for (int j = 0; j < result.LengthX; j++)
+                    result[row - 1, j] = this[row, j];
+                row++;
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Вовзвращает матрицу, в которой удален указанный столбец.
+        /// </summary>
+        /// <param name="columnIndex">Индекс столбца, который нужно удалить. (отсчет с 0)</param>
+        /// <returns>Матрица, в которой удален указанный столбец.</returns>
+        public Matrix RemoveColumn(int columnIndex)
+        {
+            if(LengthX <=1) return new Matrix(0);
+            Matrix result = new Matrix(LengthY, LengthX - 1);
+            int column = 0;
+            while (column != columnIndex)
+            {
+                for (int i = 0; i < result.LengthY; i++)
+                    result[i, column] = this[i, column];
+                column++;
+            }
+
+            column++;
+            while (column != LengthX)
+            {
+                for (int i = 0; i < result.LengthY; i++)
+                    result[i, column - 1] = this[i, column];
+                column++;
+            }
+
+            return result;
         }
 
         /// <summary>
