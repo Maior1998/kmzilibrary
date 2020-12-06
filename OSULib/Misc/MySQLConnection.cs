@@ -34,6 +34,17 @@ namespace OSULib.Misc
 
 
         /// <summary>
+        ///     Инициализирует новое соединение с БД.
+        /// </summary>
+        public MySQLConnection(string config)
+        {
+
+            connection = new MySql.Data.MySqlClient.MySqlConnection(config);
+            command = new MySqlCommand("", connection);
+            connection.Open();
+        }
+
+        /// <summary>
         /// Инициализирует новое соединение с БД.
         /// </summary>
         /// <param name="server">Строковое представление адреса сервера с MySQL на борту.</param>

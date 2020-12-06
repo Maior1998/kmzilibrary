@@ -22,34 +22,55 @@ namespace Ручной_тест
 
         static void Main(string[] args)
         {
+            //мой вариант
             Matrix testMatrix = new Matrix(new[]
             {
-                new []{0,1,2,1},
-                new []{2,0,7,-1},
-                new []{6,5,0,2},
-                new []{1,-1,4,0},
+                new []{-1, 1, -1, -1, -1},
+                new []{-1, -1, 3, -1, -1},
+                new []{2 ,-1, -1, -1 ,4},
+                new []{-1, -1, 1, -1, -1},
+                new []{-1, -1, -1, 5, -1},
             });
+            //Matrix testMatrix = new Matrix(new[]
+            //{
+            //    new []{-1, 3, -1},
+            //    new []{1, 2, 4},
+            //    new []{1 ,-1,-1},
+            //});
+            Console.WriteLine("Введите матрицу весов графа: ");
+            Console.WriteLine(string.Join("\n", testMatrix.Values.Select(x => string.Join(" ", x))));
+            Console.WriteLine();
             WeightedGraph graph = new WeightedGraph(testMatrix);
-            var test = graph.GetFloydWarshallShortestPath();
-            Console.OutputEncoding=Encoding.UTF8;
-            Console.InputEncoding=Encoding.UTF8;
+            Matrix result = graph.GetFloydWarshallShortestPath();
+            //string testwat = graph.GetBellmanFordShortestPath();
+            Console.OutputEncoding = Encoding.UTF8;
+            Console.InputEncoding = Encoding.UTF8;
+
+            
+            Console.WriteLine("Матрица минимальных расстояний: ");
+            object[][] raw = GetTable(result);
+            Console.WriteLine(string.Join("\n", raw.Select(x => string.Join("\t", x))));
+            Console.WriteLine();
         }
 
-        private static object[][] GetEmptyTable(Graph source)
+        private static object[][] GetTable(Matrix source)
         {
-            object[][] bufferTable = Enumerable.Range(0, source.VertexesCount + 1)
-                .Select(x => new object[source.VertexesCount + 1]).ToArray();
-            for (int i = 1; i < source.VertexesCount + 1; i++)
+            object[][] bufferTable = Enumerable.Range(0, source.LengthY + 1)
+                .Select(x => new object[source.LengthY + 1]).ToArray();
+            for (int i = 1; i < source.LengthY + 1; i++)
             {
                 bufferTable[0][i] = $"v{i}";
                 bufferTable[i][0] = $"v{i}";
             }
+            for(int i=0;i<source.LengthY;i++)
+            for (int j = 0; j < source.LengthX; j++)
+                bufferTable[i + 1][j + 1] = source[i, j];
             return bufferTable;
         }
 
         private static void PrintTable(object[][] source)
         {
-            Console.WriteLine(string.Join("\n", source.Select(x=>string.Join("\t", x))));
+            Console.WriteLine(string.Join("\n", source.Select(x => string.Join("\t", x))));
         }
     }
 }
