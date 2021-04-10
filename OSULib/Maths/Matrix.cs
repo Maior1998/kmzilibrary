@@ -465,6 +465,17 @@ namespace OSULib.Maths
         }
 
         /// <summary>
+        ///     Возвращает минимальный элемент в матрице.
+        /// </summary>
+        /// <returns></returns>
+        public double GetMin()
+        {
+            return HasFreeCoefficient
+                ? Values.Select(row => row.Take(row.Length - 1).Min()).Min()
+                : Values.Select(row => row.Min()).Min();
+        }
+
+        /// <summary>
         ///     Возвращает максимальный по модулю элемент в матрице.
         /// </summary>
         /// <returns></returns>
@@ -473,6 +484,17 @@ namespace OSULib.Maths
             return HasFreeCoefficient
                 ? Values.Select(row => row.Take(row.Length - 1).Select(Math.Abs).Max()).Max()
                 : Values.Select(row => row.Select(Math.Abs).Max()).Max();
+        }
+
+        /// <summary>
+        ///     Возвращает максимальный по модулю элемент в матрице.
+        /// </summary>
+        /// <returns></returns>
+        public double GetMinAbs()
+        {
+            return HasFreeCoefficient
+                ? Values.Select(row => row.Take(row.Length - 1).Select(Math.Abs).Min()).Min()
+                : Values.Select(row => row.Select(Math.Abs).Min()).Min();
         }
 
         /// <summary>
@@ -564,6 +586,25 @@ namespace OSULib.Maths
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// Производит инкрементацию всех значений в матрице на указанное число.
+        /// </summary>
+        /// <param name="value">Число, которое необходимо прибавить ко всем элементам матрицы.</param>
+        public void IncrementBy(double value)
+        {
+            for (int i = 0; i < Values.Length; i++)
+                for (int j = 0; j < Values[i].Length; j++)
+                    Values[i][j] += value;
+        }
+        /// <summary>
+        /// Производит декрементацию всех значений в матрице на указанное число.
+        /// </summary>
+        /// <param name="value">Число, которое необходимо отнять от всех элементов матрицы.</param>
+        public void DescrementBy(double value)
+        {
+            IncrementBy(-value);
         }
 
         /// <summary>

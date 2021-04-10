@@ -11,4 +11,8 @@
     <ProjectReference Include="..\OSULib\OSULib.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Solver.Foundation" Version="3.1.0" />
+    <PackageReference Include="MySql.Data" Version="8.0.23" />
+  </ItemGroup>
 </Project>

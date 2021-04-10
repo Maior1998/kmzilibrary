@@ -14,6 +14,7 @@ using OSULib.Ciphers;
 using OSULib.Maths;
 using OSULib.Maths.Graphs;
 using CodingTheory = OSULib.Misc.CodingTheory;
+using OSULib.Maths.GamesTheory;
 
 namespace Ручной_тест
 {
@@ -22,55 +23,17 @@ namespace Ручной_тест
 
         static void Main(string[] args)
         {
-            //мой вариант
-            Matrix testMatrix = new Matrix(new[]
+            Matrix source = new Matrix(new double[][]
             {
-                new []{-1, 1, -1, -1, -1},
-                new []{-1, -1, 3, -1, -1},
-                new []{2 ,-1, -1, -1 ,4},
-                new []{-1, -1, 1, -1, -1},
-                new []{-1, -1, -1, 5, -1},
+                new double[]{5, -3, 6, -8, 7, 4},
+                new double[]{7, 5, 5, -4, 8, 1},
+                new double[]{1, 3, -1 ,10, 0 ,2},
+                new double[]{9, -9, 7, 1, 3, 6},
             });
-            //Matrix testMatrix = new Matrix(new[]
-            //{
-            //    new []{-1, 3, -1},
-            //    new []{1, 2, 4},
-            //    new []{1 ,-1,-1},
-            //});
-            Console.WriteLine("Введите матрицу весов графа: ");
-            Console.WriteLine(string.Join("\n", testMatrix.Values.Select(x => string.Join(" ", x))));
-            Console.WriteLine();
-            WeightedGraph graph = new WeightedGraph(testMatrix);
-            Matrix result = graph.GetFloydWarshallShortestPath();
-            //string testwat = graph.GetBellmanFordShortestPath();
-            Console.OutputEncoding = Encoding.UTF8;
-            Console.InputEncoding = Encoding.UTF8;
-
-            
-            Console.WriteLine("Матрица минимальных расстояний: ");
-            object[][] raw = GetTable(result);
-            Console.WriteLine(string.Join("\n", raw.Select(x => string.Join("\t", x))));
+            GameWithNature gameWithNature = new GameWithNature(source);
             Console.WriteLine();
         }
 
-        private static object[][] GetTable(Matrix source)
-        {
-            object[][] bufferTable = Enumerable.Range(0, source.LengthY + 1)
-                .Select(x => new object[source.LengthY + 1]).ToArray();
-            for (int i = 1; i < source.LengthY + 1; i++)
-            {
-                bufferTable[0][i] = $"v{i}";
-                bufferTable[i][0] = $"v{i}";
-            }
-            for(int i=0;i<source.LengthY;i++)
-            for (int j = 0; j < source.LengthX; j++)
-                bufferTable[i + 1][j + 1] = source[i, j];
-            return bufferTable;
-        }
 
-        private static void PrintTable(object[][] source)
-        {
-            Console.WriteLine(string.Join("\n", source.Select(x => string.Join("\t", x))));
-        }
     }
 }
