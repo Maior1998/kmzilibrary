@@ -539,7 +539,7 @@ namespace OSULib.Maths
         /// <returns>Матрица, в которой удалена указанная строка.</returns>
         public Matrix RemoveRow(int rowIndex)
         {
-            if(LengthY <=1) return new Matrix(0);
+            if (LengthY <= 1) return new Matrix(0);
             Matrix result = new Matrix(LengthY - 1, LengthX);
             int row = 0;
             while (row != rowIndex)
@@ -567,7 +567,7 @@ namespace OSULib.Maths
         /// <returns>Матрица, в которой удален указанный столбец.</returns>
         public Matrix RemoveColumn(int columnIndex)
         {
-            if(LengthX <=1) return new Matrix(0);
+            if (LengthX <= 1) return new Matrix(0);
             Matrix result = new Matrix(LengthY, LengthX - 1);
             int column = 0;
             while (column != columnIndex)
@@ -602,9 +602,32 @@ namespace OSULib.Maths
         /// Производит декрементацию всех значений в матрице на указанное число.
         /// </summary>
         /// <param name="value">Число, которое необходимо отнять от всех элементов матрицы.</param>
-        public void DescrementBy(double value)
+        public void DecrementBy(double value)
         {
             IncrementBy(-value);
+        }
+
+        /// <summary>
+        /// Производит умножение всех элементов данной матрицы на указанный коэффициент.
+        /// </summary>
+        /// <param name="value">Коэффициент, на который необходимо умножить все элементы матрицы.</param>
+        public void MultiplyBy(double value)
+        {
+            for (int i = 0; i < Values.Length; i++)
+                for (int j = 0; j < Values[i].Length; j++)
+                    Values[i][j] *= value;
+        }
+
+        /// <summary>
+        /// Возвращает копию данной матрицы, в которой все элементы умножены на указанный коэффициент.
+        /// </summary>
+        /// <param name="multiplier">Коэффициент, на который необходимо умножить все элементы матрицы.</param>
+        /// <returns>Матрица-копия данной, в которой все элементы умножены на указанный коэффициент.</returns>
+        public Matrix GetMultipliedCopy(double multiplier)
+        {
+            Matrix result = this.Copy();
+            result.MultiplyBy(multiplier);
+            return result;
         }
 
         /// <summary>

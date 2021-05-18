@@ -23,14 +23,22 @@ namespace Ручной_тест
 
         static void Main(string[] args)
         {
-            Matrix source = new Matrix(new double[][]
+            Matrix Vsource = new Matrix(new double[][]
             {
-                new double[]{5, -3, 6, -8, 7, 4},
-                new double[]{7, 5, 5, -4, 8, 1},
-                new double[]{1, 3, -1 ,10, 0 ,2},
-                new double[]{9, -9, 7, 1, 3, 6},
+                new double[]{1, 0, -1, 1},
+                new double[]{2, 2, -2, 0},
+                new double[]{4, 1, 3, 2},
+                new double[]{5, -1, 1, 1},
+                new double[]{3,2,1,-2},
             });
-            GameWithNature gameWithNature = new GameWithNature(source);
+            Matrix Wsource = new Matrix(new double[][]
+            {
+                new double[]{0, -0.5, -2, -4},
+                new double[]{-1, 0.5, 1, -1},
+                new double[]{-2.5, -1, 3.5, 3.5},
+                new double[]{-3.5, -2, 2.5, 6.5},
+            });
+            GameWithNature gameWithNature = new GameWithNature(Wsource);
             Console.WriteLine();
         }
 

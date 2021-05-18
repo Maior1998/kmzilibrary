@@ -5,14 +5,18 @@ namespace OSULib.Maths.GamesTheory
 {
     public class GameWithNature
     {
-        private Matrix strategiesWeights;
+        /// <summary>
+        /// Представляет собой матрицу весов выйгрышей (A).
+        /// </summary>
+        private readonly Matrix strategiesWeights;
         public GameWithNature(Matrix strategiesWeights)
         {
             this.strategiesWeights = strategiesWeights.Copy();
-            double min = this.strategiesWeights.GetMin();
-            if (min < 0)
-                this.strategiesWeights.IncrementBy(Math.Abs(min));
+            //double min = this.strategiesWeights.GetMin();
+            //if (min < 0)
+            //    this.strategiesWeights.IncrementBy(Math.Abs(min));
         }
+
         private Matrix risksMatrix;
         /// <summary>
         /// Матрица рисков.
@@ -37,6 +41,21 @@ namespace OSULib.Maths.GamesTheory
                 return risksMatrix = bufferRiskMatrix;
             }
 
+        }
+
+        private Matrix lossMatrix;
+        /// <summary>
+        /// Матрица потерь.
+        /// </summary>
+        public Matrix LossMatrix
+        {
+            get
+            {
+                if (lossMatrix != null)
+                    return lossMatrix;
+                lossMatrix = strategiesWeights.GetMultipliedCopy(-1);
+                return lossMatrix;
+            }
         }
 
         /// <summary>
@@ -97,7 +116,8 @@ namespace OSULib.Maths.GamesTheory
         {
             if (probabilities.Length != strategiesWeights.Values.First().Length)
                 throw new InvalidOperationException("Длина массива вероятностей не равна числу стратегий природы!");
-            return strategiesWeights.Values.Select(x => x.Select((value, index) => value * probabilities[index]).Max()).Max();
+            return strategiesWeights.Values
+                .Select(x => x.Select((value, index) => value * probabilities[index]).Sum()).Max();
         }
 
         /// <summary>
@@ -109,7 +129,7 @@ namespace OSULib.Maths.GamesTheory
         {
             if (probabilities.Length != strategiesWeights.Values.First().Length)
                 throw new InvalidOperationException("Длина массива вероятностей не равна числу стратегий природы!");
-            return RisksMatrix.Values.Select(x => x.Select((value, index) => value * probabilities[index]).Min()).Min();
+            return RisksMatrix.Values.Select(x => x.Select((value, index) => value * probabilities[index]).Sum()).Min();
         }
 
         /// <summary>
